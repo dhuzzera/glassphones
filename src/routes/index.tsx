@@ -22,13 +22,18 @@ const INSTAGRAM = "https://www.instagram.com/glass_phonesbs/";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const waLink = (_msg: string) => WHATSAPP_URL;
 
+// Logos de marca via Simple Icons CDN (SVGs CC0). Uso nominativo — a loja
+// vende esses produtos oficialmente, então exibir a logo original é adequado.
+const logo = (slug: string, color?: string) =>
+  `https://cdn.simpleicons.org/${slug}${color ? `/${color}` : ""}`;
+
 const categorias = [
-  { nome: "iPhone", icone: "📱" },
-  { nome: "Samsung", icone: "📲" },
-  { nome: "Xiaomi", icone: "🔥" },
-  { nome: "Motorola", icone: "⚡" },
-  { nome: "Acessórios", icone: "🎧" },
-  { nome: "Seminovos", icone: "♻️" },
+  { nome: "iPhone", slug: "apple", cor: "111111" },
+  { nome: "Samsung", slug: "samsung", cor: "1428A0" },
+  { nome: "Xiaomi", slug: "xiaomi", cor: "FF6900" },
+  { nome: "Motorola", slug: "motorola", cor: "5C92FA" },
+  { nome: "Acessórios", slug: "jbl", cor: "FF3300" },
+  { nome: "Seminovos", slug: "recycle", cor: "1B7F3B" },
 ];
 
 const produtos = [
