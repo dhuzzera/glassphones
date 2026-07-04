@@ -227,14 +227,18 @@ function Categorias() {
               className="group flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary hover:-translate-y-1 transition"
               style={{ boxShadow: "var(--shadow-product)" }}
             >
-              <img
-                src={logo(c.slug, c.cor)}
-                alt={`Logo ${c.nome}`}
-                width={40}
-                height={40}
-                loading="lazy"
-                className="h-10 w-10 object-contain group-hover:scale-110 transition"
-              />
+              {c.icon ? (
+                <c.icon className="h-10 w-10 text-primary group-hover:scale-110 transition" strokeWidth={1.75} />
+              ) : (
+                <img
+                  src={logo(c.slug!, c.cor)}
+                  alt={`Logo ${c.nome}`}
+                  width={40}
+                  height={40}
+                  loading="lazy"
+                  className="h-10 w-10 object-contain group-hover:scale-110 transition"
+                />
+              )}
 
               <span className="text-sm font-semibold">{c.nome}</span>
             </a>
