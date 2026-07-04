@@ -260,6 +260,9 @@ function HeroCarousel() {
       </div>
     </div>
   );
+}
+
+
 
 function Benefits() {
   const items = [
