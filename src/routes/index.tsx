@@ -1,5 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone, ShieldCheck, Truck, CreditCard, Star, MessageCircle, Search, MapPin, Clock, Phone, Instagram } from "lucide-react";
+import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram } from "lucide-react";
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.695.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.892c0 2.096.549 4.14 1.593 5.945L0 24l6.335-1.652a12.062 12.062 0 005.71 1.447h.006c6.582 0 11.941-5.335 11.944-11.892 0-3.176-1.24-6.165-3.495-8.413zm-8.475 18.297h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.98.999-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.886-9.886 9.886z"/>
+    </svg>
+  );
+}
 import heroImg from "@/assets/hero-phones.jpg";
 
 export const Route = createFileRoute("/")({
@@ -22,13 +31,18 @@ const INSTAGRAM = "https://www.instagram.com/glass_phonesbs/";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const waLink = (_msg: string) => WHATSAPP_URL;
 
+// Logos de marca via Simple Icons CDN (SVGs CC0). Uso nominativo — a loja
+// vende esses produtos oficialmente, então exibir a logo original é adequado.
+const logo = (slug: string, color?: string) =>
+  `https://cdn.simpleicons.org/${slug}${color ? `/${color}` : ""}`;
+
 const categorias = [
-  { nome: "iPhone", icone: "📱" },
-  { nome: "Samsung", icone: "📲" },
-  { nome: "Xiaomi", icone: "🔥" },
-  { nome: "Motorola", icone: "⚡" },
-  { nome: "Acessórios", icone: "🎧" },
-  { nome: "Seminovos", icone: "♻️" },
+  { nome: "iPhone", slug: "apple", cor: "111111" },
+  { nome: "Samsung", slug: "samsung", cor: "1428A0" },
+  { nome: "Xiaomi", slug: "xiaomi", cor: "FF6900" },
+  { nome: "Motorola", slug: "motorola", cor: "5C92FA" },
+  { nome: "Acessórios", slug: "jbl", cor: "FF3300" },
+  { nome: "Seminovos", slug: "recycle", cor: "1B7F3B" },
 ];
 
 const produtos = [
@@ -67,7 +81,7 @@ function TopBar() {
         <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Entrega para todo o Brasil</span>
         <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> Até 12x sem juros no cartão</span>
         <a href={waLink("Olá! Quero falar com um vendedor.")} className="flex items-center gap-2 font-medium hover:underline">
-          <MessageCircle className="h-4 w-4" /> (47) 9680-1247
+          <WhatsAppIcon className="h-4 w-4" /> (47) 9680-1247
         </a>
       </div>
     </div>
@@ -107,7 +121,7 @@ function Header() {
           href={waLink("Olá! Vim pelo site e quero conversar.")}
           className="hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
         >
-          <MessageCircle className="h-4 w-4" /> WhatsApp
+          <WhatsAppIcon className="h-4 w-4" /> WhatsApp
         </a>
       </div>
     </header>
@@ -139,7 +153,7 @@ function Hero() {
               href={waLink("Olá! Quero uma indicação de celular.")}
               className="inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3 rounded-full font-bold hover:opacity-90 transition"
             >
-              <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+              <WhatsAppIcon className="h-4 w-4" /> Falar no WhatsApp
             </a>
           </div>
           <div className="flex items-center gap-4 mt-8 text-sm">
@@ -177,7 +191,7 @@ function Benefits() {
     { icon: ShieldCheck, t: "Garantia oficial", d: "Produtos originais lacrados" },
     { icon: Truck, t: "Frete pra todo Brasil", d: "Enviamos no mesmo dia" },
     { icon: CreditCard, t: "12x sem juros", d: "Cartão, Pix ou boleto" },
-    { icon: MessageCircle, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
+    { icon: WhatsAppIcon, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
   ];
   return (
     <section className="border-b border-border">
@@ -212,7 +226,15 @@ function Categorias() {
               className="group flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary hover:-translate-y-1 transition"
               style={{ boxShadow: "var(--shadow-product)" }}
             >
-              <span className="text-3xl group-hover:scale-110 transition">{c.icone}</span>
+              <img
+                src={logo(c.slug, c.cor)}
+                alt={`Logo ${c.nome}`}
+                width={40}
+                height={40}
+                loading="lazy"
+                className="h-10 w-10 object-contain group-hover:scale-110 transition"
+              />
+
               <span className="text-sm font-semibold">{c.nome}</span>
             </a>
           ))}
@@ -249,6 +271,13 @@ type Produto = typeof produtos[number];
 function ProdutoCard(p: Produto) {
   const desconto = p.promo ? Math.round((1 - p.preco / p.antigo) * 100) : 0;
   const pix = p.preco * 0.9;
+  const marcaSlug: Record<string, { slug: string; cor: string }> = {
+    Apple: { slug: "apple", cor: "111111" },
+    Samsung: { slug: "samsung", cor: "1428A0" },
+    Xiaomi: { slug: "xiaomi", cor: "FF6900" },
+    Motorola: { slug: "motorola", cor: "5C92FA" },
+  };
+  const m = marcaSlug[p.marca];
   return (
     <div
       className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col"
@@ -260,7 +289,18 @@ function ProdutoCard(p: Produto) {
             -{desconto}%
           </span>
         )}
-        <Smartphone className="h-20 w-20 text-muted-foreground/40 group-hover:scale-110 transition" strokeWidth={1} />
+        {m ? (
+          <img
+            src={logo(m.slug, m.cor)}
+            alt={`Logo ${p.marca}`}
+            width={120}
+            height={120}
+            loading="lazy"
+            className="h-24 w-24 object-contain opacity-90 group-hover:scale-110 transition"
+          />
+        ) : (
+          <Smartphone className="h-20 w-20 text-muted-foreground/40" strokeWidth={1} />
+        )}
       </div>
       <div className="p-4 flex flex-col flex-1 gap-2">
         <span className="text-xs text-muted-foreground font-medium">{p.marca} · {p.cor}</span>
@@ -275,7 +315,7 @@ function ProdutoCard(p: Produto) {
           href={waLink(`Olá! Tenho interesse no ${p.nome} (${p.cor}) por ${brl(p.preco)}. Está disponível?`)}
           className="mt-auto inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
         >
-          <MessageCircle className="h-4 w-4" /> Comprar
+          <WhatsAppIcon className="h-4 w-4" /> Comprar
         </a>
       </div>
     </div>
@@ -306,7 +346,7 @@ function SobreCTA() {
             href={waLink("Olá! Quero conhecer melhor a loja.")}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:opacity-90"
           >
-            <MessageCircle className="h-4 w-4" /> Fale com um consultor
+            <WhatsAppIcon className="h-4 w-4" /> Fale com um consultor
           </a>
         </div>
 
@@ -377,7 +417,7 @@ function WhatsAppFloat() {
       className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-whatsapp text-whatsapp-foreground grid place-items-center shadow-lg hover:scale-110 transition animate-pulse"
       style={{ boxShadow: "0 10px 30px -5px oklch(0.7 0.17 150 / 0.6)" }}
     >
-      <MessageCircle className="h-7 w-7" />
+      <WhatsAppIcon className="h-7 w-7" />
     </a>
   );
 }
