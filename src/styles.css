@@ -51,24 +51,24 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 260);
 
-  --primary: oklch(0.62 0.22 30);
+  --primary: oklch(0.6 0.24 5);
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.96 0.02 60);
-  --secondary-foreground: oklch(0.2 0.02 260);
+  --secondary: oklch(0.96 0.02 320);
+  --secondary-foreground: oklch(0.2 0.02 300);
 
-  --muted: oklch(0.96 0.01 60);
-  --muted-foreground: oklch(0.5 0.02 260);
+  --muted: oklch(0.96 0.015 320);
+  --muted-foreground: oklch(0.5 0.03 300);
 
-  --accent: oklch(0.72 0.19 55);
+  --accent: oklch(0.7 0.19 45);
   --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.6 0.24 27);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.92 0.01 60);
-  --input: oklch(0.92 0.01 60);
-  --ring: oklch(0.62 0.22 30);
+  --border: oklch(0.92 0.015 320);
+  --input: oklch(0.92 0.015 320);
+  --ring: oklch(0.6 0.24 5);
 
   --whatsapp: oklch(0.7 0.17 150);
   --whatsapp-foreground: oklch(1 0 0);
