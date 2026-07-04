@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone, ShieldCheck, Truck, CreditCard, Star, MessageCircle, Search, MapPin, Clock, Phone } from "lucide-react";
+import { Smartphone, ShieldCheck, Truck, CreditCard, Star, MessageCircle, Search, MapPin, Clock, Phone, Instagram } from "lucide-react";
 import heroImg from "@/assets/hero-phones.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "OS Reis dos Celulares — Smartphones, Acessórios e Assistência" },
-      { name: "description", content: "Loja de celulares com os melhores preços em iPhone, Samsung, Xiaomi e Motorola. Vitrine online e atendimento rápido via WhatsApp." },
-      { property: "og:title", content: "OS Reis dos Celulares" },
+      { title: "Glass Phones BS — Smartphones, Acessórios e Assistência" },
+      { name: "description", content: "Glass Phones BS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
+      { property: "og:title", content: "Glass Phones BS" },
       { property: "og:description", content: "Vitrine de smartphones novos e seminovos com atendimento pelo WhatsApp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/")({
 });
 
 const WHATSAPP = "5511999999999"; // trocar pelo número real
+const INSTAGRAM = "https://www.instagram.com/glass_phonesbs/";
 const waLink = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
 const categorias = [
@@ -77,11 +78,11 @@ function Header() {
       <div className="container mx-auto px-4 py-4 flex items-center gap-6">
         <a href="#" className="flex items-center gap-2 shrink-0">
           <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>
-            OS
+            GP
           </div>
           <div className="leading-tight">
-            <div className="font-bold text-lg">OS Reis</div>
-            <div className="text-xs text-muted-foreground -mt-0.5">dos Celulares</div>
+            <div className="font-bold text-lg">Glass Phones</div>
+            <div className="text-xs text-muted-foreground -mt-0.5">BS · Celulares</div>
           </div>
         </a>
 
