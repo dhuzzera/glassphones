@@ -327,12 +327,15 @@ function Footer() {
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>OS</div>
-            <div className="font-bold">OS Reis dos Celulares</div>
+            <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>GP</div>
+            <div className="font-bold">Glass Phones BS</div>
           </div>
-          <p className="text-sm text-background/60">
+          <p className="text-sm text-background/60 mb-3">
             Smartphones, acessórios e assistência com atendimento humano.
           </p>
+          <a href={INSTAGRAM} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm hover:text-primary">
+            <Instagram className="h-4 w-4" /> @glass_phonesbs
+          </a>
         </div>
         <div>
           <h4 className="font-semibold mb-3">Categorias</h4>
@@ -352,13 +355,13 @@ function Footer() {
           <h4 className="font-semibold mb-3">Contato</h4>
           <ul className="space-y-2 text-sm text-background/70">
             <li>(11) 99999-9999</li>
-            <li>contato@osreis.com.br</li>
+            <li>contato@glassphonesbs.com.br</li>
             <li>Seg-Sáb 9h às 19h</li>
           </ul>
         </div>
       </div>
       <div className="container mx-auto px-4 mt-10 pt-6 border-t border-background/10 text-xs text-background/50 text-center">
-        © {new Date().getFullYear()} OS Reis dos Celulares. Todos os direitos reservados.
+        © {new Date().getFullYear()} Glass Phones BS. Todos os direitos reservados.
       </div>
     </footer>
   );
