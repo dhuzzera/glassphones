@@ -36,13 +36,14 @@ const waLink = (_msg: string) => WHATSAPP_URL;
 const logo = (slug: string, color?: string) =>
   `https://cdn.simpleicons.org/${slug}${color ? `/${color}` : ""}`;
 
-const categorias = [
-  { nome: "iPhone", slug: "apple", cor: "111111" },
-  { nome: "Samsung", slug: "samsung", cor: "1428A0" },
-  { nome: "Xiaomi", slug: "xiaomi", cor: "FF6900" },
-  { nome: "Motorola", slug: "motorola", cor: "5C92FA" },
-  { nome: "Acessórios", slug: "jbl", cor: "FF3300" },
-  { nome: "Seminovos", slug: "recycle", cor: "1B7F3B" },
+type Categoria = { nome: string; slug?: string; cor?: string; icon?: LucideIcon };
+const categorias: Categoria[] = [
+  { nome: "iPhone", slug: "apple", cor: "FFFFFF" },
+  { nome: "Samsung", slug: "samsung", cor: "FFFFFF" },
+  { nome: "Xiaomi", slug: "xiaomi", cor: "FFFFFF" },
+  { nome: "Motorola", slug: "motorola", cor: "FFFFFF" },
+  { nome: "Acessórios", icon: Headphones },
+  { nome: "Seminovos", icon: RefreshCw },
 ];
 
 const produtos = [
