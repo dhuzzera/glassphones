@@ -16,9 +16,11 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const WHATSAPP = "5511999999999"; // trocar pelo número real
+const WHATSAPP_URL = "https://api.whatsapp.com/message/L6DTBZKAUP67J1?autoload=1&app_absent=0";
 const INSTAGRAM = "https://www.instagram.com/glass_phonesbs/";
-const waLink = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+// Link curto do WhatsApp já traz mensagem padrão configurada pela loja.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const waLink = (_msg: string) => WHATSAPP_URL;
 
 const categorias = [
   { nome: "iPhone", icone: "📱" },
