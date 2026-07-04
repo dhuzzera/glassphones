@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram, Headphones, RefreshCw, type LucideIcon } from "lucide-react";
+import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram, Headphones, RefreshCw, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -9,7 +12,9 @@ function WhatsAppIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-import heroImg from "@/assets/hero-phones.jpg";
+import hero1 from "@/assets/hero1.jpg.asset.json";
+import hero2 from "@/assets/hero2.jpg.asset.json";
+import hero3 from "@/assets/hero3.jpg.asset.json";
 import logoDark from "@/assets/glassphone-logo-dark.png.asset.json";
 import logoFlat from "@/assets/glassphone-logo.png.asset.json";
 
