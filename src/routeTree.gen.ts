@@ -9,13 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicosRouteImport } from './routes/servicos'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as OfertasRouteImport } from './routes/ofertas'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServicosSlugRouteImport } from './routes/servicos.$slug'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicosRoute = ServicosRouteImport.update({
   id: '/servicos',
   path: '/servicos',
@@ -46,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicosSlugRoute = ServicosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ServicosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,7 +65,9 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/ofertas': typeof OfertasRoute
   '/orcamento': typeof OrcamentoRoute
-  '/servicos': typeof ServicosRoute
+  '/servicos': typeof ServicosRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/servicos/$slug': typeof ServicosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +75,9 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/ofertas': typeof OfertasRoute
   '/orcamento': typeof OrcamentoRoute
-  '/servicos': typeof ServicosRoute
+  '/servicos': typeof ServicosRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/servicos/$slug': typeof ServicosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,13 +86,31 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/ofertas': typeof OfertasRoute
   '/orcamento': typeof OrcamentoRoute
-  '/servicos': typeof ServicosRoute
+  '/servicos': typeof ServicosRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/servicos/$slug': typeof ServicosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contato' | '/faq' | '/ofertas' | '/orcamento' | '/servicos'
+  fullPaths:
+    | '/'
+    | '/contato'
+    | '/faq'
+    | '/ofertas'
+    | '/orcamento'
+    | '/servicos'
+    | '/sitemap.xml'
+    | '/servicos/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contato' | '/faq' | '/ofertas' | '/orcamento' | '/servicos'
+  to:
+    | '/'
+    | '/contato'
+    | '/faq'
+    | '/ofertas'
+    | '/orcamento'
+    | '/servicos'
+    | '/sitemap.xml'
+    | '/servicos/$slug'
   id:
     | '__root__'
     | '/'
@@ -85,6 +119,8 @@ export interface FileRouteTypes {
     | '/ofertas'
     | '/orcamento'
     | '/servicos'
+    | '/sitemap.xml'
+    | '/servicos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,11 +129,19 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   OfertasRoute: typeof OfertasRoute
   OrcamentoRoute: typeof OrcamentoRoute
-  ServicosRoute: typeof ServicosRoute
+  ServicosRoute: typeof ServicosRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/servicos': {
       id: '/servicos'
       path: '/servicos'
@@ -140,8 +184,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/servicos/$slug': {
+      id: '/servicos/$slug'
+      path: '/$slug'
+      fullPath: '/servicos/$slug'
+      preLoaderRoute: typeof ServicosSlugRouteImport
+      parentRoute: typeof ServicosRoute
+    }
   }
 }
+
+interface ServicosRouteChildren {
+  ServicosSlugRoute: typeof ServicosSlugRoute
+}
+
+const ServicosRouteChildren: ServicosRouteChildren = {
+  ServicosSlugRoute: ServicosSlugRoute,
+}
+
+const ServicosRouteWithChildren = ServicosRoute._addFileChildren(
+  ServicosRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -149,7 +212,8 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   OfertasRoute: OfertasRoute,
   OrcamentoRoute: OrcamentoRoute,
-  ServicosRoute: ServicosRoute,
+  ServicosRoute: ServicosRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

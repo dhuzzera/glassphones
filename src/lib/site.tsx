@@ -55,12 +55,12 @@ export const produtos = [
 export type Produto = typeof produtos[number];
 
 export const servicos = [
-  { icon: Smartphone, nome: "Troca de Tela", desc: "Display original ou compatível A+ para iPhone, Samsung, Xiaomi e Motorola.", preco: 149 },
-  { icon: BatteryCharging, nome: "Troca de Bateria", desc: "Bateria nova com garantia. Recupere autonomia do seu aparelho.", preco: 99 },
-  { icon: Cpu, nome: "Reparo de Placa", desc: "Diagnóstico e reparo em placa lógica: não liga, sem sinal, oxidação.", preco: 199 },
-  { icon: Plug, nome: "Conector de Carga", desc: "Troca do conector para carregamento e transferência de dados.", preco: 89 },
-  { icon: Wrench, nome: "Limpeza Interna", desc: "Limpeza técnica completa, remoção de poeira e revisão geral.", preco: 59 },
-  { icon: ShieldCheck, nome: "Película 3D", desc: "Aplicação de película de vidro premium com garantia de bolhas.", preco: 39 },
+  { slug: "troca-de-tela", icon: Smartphone, nome: "Troca de Tela", desc: "Display original ou compatível A+ para iPhone, Samsung, Xiaomi e Motorola.", preco: 149, prazo: "40 min a 2 horas", detalhes: "Substituímos o display trincado ou com falha de toque usando peças originais ou compatíveis premium. Testes de multitoque, cores e brilho após a troca, com 90 dias de garantia." },
+  { slug: "troca-de-bateria", icon: BatteryCharging, nome: "Troca de Bateria", desc: "Bateria nova com garantia. Recupere autonomia do seu aparelho.", preco: 99, prazo: "30 a 60 minutos", detalhes: "Trocamos a bateria por uma nova, calibrada, com selo de garantia. Ideal para aparelhos que descarregam rápido, desligam sozinhos ou incham." },
+  { slug: "reparo-de-placa", icon: Cpu, nome: "Reparo de Placa", desc: "Diagnóstico e reparo em placa lógica: não liga, sem sinal, oxidação.", preco: 199, prazo: "1 a 5 dias úteis", detalhes: "Diagnóstico eletrônico em bancada com microscópio para aparelhos que não ligam, sem sinal, sem carga ou com oxidação. Orçamento sem compromisso." },
+  { slug: "conector-de-carga", icon: Plug, nome: "Conector de Carga", desc: "Troca do conector para carregamento e transferência de dados.", preco: 89, prazo: "1 hora", detalhes: "Substituição do flex ou conector de carga (Lightning, USB-C, Micro USB) para resolver mau contato, carregamento intermitente e falha na transferência de dados." },
+  { slug: "limpeza-interna", icon: Wrench, nome: "Limpeza Interna", desc: "Limpeza técnica completa, remoção de poeira e revisão geral.", preco: 59, prazo: "40 minutos", detalhes: "Abertura, limpeza dos componentes internos, alto-falantes e conectores. Recomendado a cada 12 meses ou após contato com poeira e umidade." },
+  { slug: "pelicula-3d", icon: ShieldCheck, nome: "Película 3D", desc: "Aplicação de película de vidro premium com garantia de bolhas.", preco: 39, prazo: "10 minutos", detalhes: "Aplicação profissional de película de vidro 3D com alta transparência e proteção contra impactos. Garantia contra bolhas na aplicação." },
 ];
 
 export const modelosPop = ["iPhone 15", "iPhone 14", "iPhone 13", "iPhone 12", "iPhone 11", "Galaxy S24", "Galaxy S23", "Galaxy A54", "Xiaomi 13", "Redmi Note 12", "Motorola Edge 40", "Outro"];
