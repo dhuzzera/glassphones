@@ -1,24 +1,377 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Smartphone, ShieldCheck, Truck, CreditCard, Star, MessageCircle, Search, MapPin, Clock, Phone } from "lucide-react";
+import heroImg from "@/assets/hero-phones.jpg";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "OS Reis dos Celulares — Smartphones, Acessórios e Assistência" },
+      { name: "description", content: "Loja de celulares com os melhores preços em iPhone, Samsung, Xiaomi e Motorola. Vitrine online e atendimento rápido via WhatsApp." },
+      { property: "og:title", content: "OS Reis dos Celulares" },
+      { property: "og:description", content: "Vitrine de smartphones novos e seminovos com atendimento pelo WhatsApp." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const WHATSAPP = "5511999999999"; // trocar pelo número real
+const waLink = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+const categorias = [
+  { nome: "iPhone", icone: "📱" },
+  { nome: "Samsung", icone: "📲" },
+  { nome: "Xiaomi", icone: "🔥" },
+  { nome: "Motorola", icone: "⚡" },
+  { nome: "Acessórios", icone: "🎧" },
+  { nome: "Seminovos", icone: "♻️" },
+];
+
+const produtos = [
+  { nome: "iPhone 15 Pro Max 256GB", marca: "Apple", preco: 8499, antigo: 9999, promo: true, cor: "Titânio Natural" },
+  { nome: "iPhone 14 128GB", marca: "Apple", preco: 4899, antigo: 5799, promo: true, cor: "Meia-noite" },
+  { nome: "Galaxy S24 Ultra 512GB", marca: "Samsung", preco: 7299, antigo: 8499, promo: true, cor: "Titânio Cinza" },
+  { nome: "Galaxy A55 5G 256GB", marca: "Samsung", preco: 2399, antigo: 2799, promo: false, cor: "Azul" },
+  { nome: "Xiaomi 14 Ultra 512GB", marca: "Xiaomi", preco: 6499, antigo: 7499, promo: true, cor: "Preto" },
+  { nome: "Redmi Note 13 Pro 256GB", marca: "Xiaomi", preco: 1899, antigo: 2299, promo: false, cor: "Verde" },
+  { nome: "Motorola Edge 50 Ultra", marca: "Motorola", preco: 3799, antigo: 4299, promo: false, cor: "Madeira" },
+  { nome: "iPhone 13 128GB Seminovo", marca: "Apple", preco: 3299, antigo: 3899, promo: true, cor: "Estelar" },
+];
+
+const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function Home() {
+  return (
+    <div className="min-h-screen bg-background">
+      <TopBar />
+      <Header />
+      <Hero />
+      <Benefits />
+      <Categorias />
+      <Vitrine />
+      <SobreCTA />
+      <Footer />
+      <WhatsAppFloat />
+    </div>
+  );
+}
+
+function TopBar() {
+  return (
+    <div className="bg-primary text-primary-foreground text-xs md:text-sm">
+      <div className="container mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+        <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Entrega para todo o Brasil</span>
+        <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> Até 12x sem juros no cartão</span>
+        <a href={waLink("Olá! Quero falar com um vendedor.")} className="flex items-center gap-2 font-medium hover:underline">
+          <MessageCircle className="h-4 w-4" /> (11) 99999-9999
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function Header() {
+  return (
+    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
+      <div className="container mx-auto px-4 py-4 flex items-center gap-6">
+        <a href="#" className="flex items-center gap-2 shrink-0">
+          <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>
+            OS
+          </div>
+          <div className="leading-tight">
+            <div className="font-bold text-lg">OS Reis</div>
+            <div className="text-xs text-muted-foreground -mt-0.5">dos Celulares</div>
+          </div>
+        </a>
+
+        <div className="hidden md:flex flex-1 max-w-xl relative">
+          <input
+            type="search"
+            placeholder="Buscar iPhone, Samsung, Xiaomi..."
+            className="w-full pl-11 pr-4 py-2.5 rounded-full bg-muted border border-transparent focus:border-primary focus:bg-card outline-none transition"
+          />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        </div>
+
+        <nav className="hidden lg:flex items-center gap-5 text-sm font-medium">
+          <a href="#vitrine" className="hover:text-primary">Ofertas</a>
+          <a href="#categorias" className="hover:text-primary">Categorias</a>
+          <a href="#sobre" className="hover:text-primary">Sobre</a>
+        </nav>
+
+        <a
+          href={waLink("Olá! Vim pelo site e quero conversar.")}
+          className="hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
+        >
+          <MessageCircle className="h-4 w-4" /> WhatsApp
+        </a>
+      </div>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+      <div className="container mx-auto px-4 py-12 md:py-20 grid md:grid-cols-2 gap-8 items-center">
+        <div className="text-white">
+          <span className="inline-block bg-white/15 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold mb-4">
+            🔥 MEGA OFERTAS DA SEMANA
+          </span>
+          <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-4">
+            Os melhores <br />celulares, os<br /> melhores preços.
+          </h1>
+          <p className="text-white/90 text-lg mb-6 max-w-md">
+            iPhone, Samsung, Xiaomi e Motorola com garantia, parcelamento em até 12x e atendimento humano pelo WhatsApp.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="#vitrine"
+              className="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-full font-bold hover:scale-105 transition"
+            >
+              Ver ofertas <Smartphone className="h-4 w-4" />
+            </a>
+            <a
+              href={waLink("Olá! Quero uma indicação de celular.")}
+              className="inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3 rounded-full font-bold hover:opacity-90 transition"
+            >
+              <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+            </a>
+          </div>
+          <div className="flex items-center gap-4 mt-8 text-sm">
+            <div className="flex -space-x-2">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-accent to-primary" />
+              ))}
+            </div>
+            <div>
+              <div className="flex items-center gap-1">
+                {[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-300 text-yellow-300" />)}
+              </div>
+              <div className="text-white/80 text-xs">+5.000 clientes satisfeitos</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative">
+          <img
+            src={heroImg}
+            alt="Smartphones em destaque"
+            width={1600}
+            height={1024}
+            className="rounded-3xl w-full h-auto"
+            style={{ boxShadow: "var(--shadow-glow)" }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Benefits() {
+  const items = [
+    { icon: ShieldCheck, t: "Garantia oficial", d: "Produtos originais lacrados" },
+    { icon: Truck, t: "Frete pra todo Brasil", d: "Enviamos no mesmo dia" },
+    { icon: CreditCard, t: "12x sem juros", d: "Cartão, Pix ou boleto" },
+    { icon: MessageCircle, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
+  ];
+  return (
+    <section className="border-b border-border">
+      <div className="container mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {items.map(({ icon: Icon, t, d }) => (
+          <div key={t} className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary grid place-items-center shrink-0">
+              <Icon className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="font-semibold text-sm">{t}</div>
+              <div className="text-xs text-muted-foreground">{d}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Categorias() {
+  return (
+    <section id="categorias" className="py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl md:text-3xl font-bold mb-2">Navegue por categoria</h2>
+        <p className="text-muted-foreground mb-8">Escolha sua marca favorita</p>
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+          {categorias.map(c => (
+            <a
+              key={c.nome}
+              href={waLink(`Quero ver opções de ${c.nome}.`)}
+              className="group flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary hover:-translate-y-1 transition"
+              style={{ boxShadow: "var(--shadow-product)" }}
+            >
+              <span className="text-3xl group-hover:scale-110 transition">{c.icone}</span>
+              <span className="text-sm font-semibold">{c.nome}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Vitrine() {
+  return (
+    <section id="vitrine" className="py-12 md:py-16 bg-secondary/40">
+      <div className="container mx-auto px-4">
+        <div className="flex items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold">Ofertas em destaque</h2>
+            <p className="text-muted-foreground">Aproveite os preços da semana</p>
+          </div>
+          <a href={waLink("Quero ver o catálogo completo.")} className="hidden sm:inline text-sm font-semibold text-primary hover:underline">
+            Ver catálogo completo →
+          </a>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {produtos.map(p => <ProdutoCard key={p.nome} {...p} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+type Produto = typeof produtos[number];
+
+function ProdutoCard(p: Produto) {
+  const desconto = p.promo ? Math.round((1 - p.preco / p.antigo) * 100) : 0;
+  const pix = p.preco * 0.9;
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
+      className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col"
+      style={{ boxShadow: "var(--shadow-product)" }}
     >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+      <div className="relative aspect-square bg-gradient-to-br from-muted to-secondary grid place-items-center">
+        {p.promo && (
+          <span className="absolute top-3 left-3 bg-badge-promo text-white text-xs font-bold px-2.5 py-1 rounded-full">
+            -{desconto}%
+          </span>
+        )}
+        <Smartphone className="h-20 w-20 text-muted-foreground/40 group-hover:scale-110 transition" strokeWidth={1} />
+      </div>
+      <div className="p-4 flex flex-col flex-1 gap-2">
+        <span className="text-xs text-muted-foreground font-medium">{p.marca} · {p.cor}</span>
+        <h3 className="font-semibold text-sm leading-snug line-clamp-2 min-h-[2.5rem]">{p.nome}</h3>
+        <div className="mt-1">
+          {p.promo && <div className="text-xs text-muted-foreground line-through">{brl(p.antigo)}</div>}
+          <div className="text-price font-black text-xl leading-tight">{brl(p.preco)}</div>
+          <div className="text-xs text-whatsapp font-semibold">ou {brl(pix)} no Pix</div>
+          <div className="text-xs text-muted-foreground">12x de {brl(p.preco / 12)} sem juros</div>
+        </div>
+        <a
+          href={waLink(`Olá! Tenho interesse no ${p.nome} (${p.cor}) por ${brl(p.preco)}. Está disponível?`)}
+          className="mt-auto inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
+        >
+          <MessageCircle className="h-4 w-4" /> Comprar
+        </a>
+      </div>
     </div>
+  );
+}
+
+function SobreCTA() {
+  return (
+    <section id="sobre" className="py-16 md:py-20">
+      <div className="container mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <span className="text-primary font-semibold text-sm">SOBRE A LOJA</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+            Mais de 10 anos vendendo confiança.
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Somos referência em celulares novos e seminovos, com garantia real e atendimento consultivo. Nosso time te ajuda a escolher o aparelho ideal pelo WhatsApp, sem enrolação.
+          </p>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {[{n:"+10k",l:"clientes"},{n:"4.9★",l:"avaliação"},{n:"12x",l:"sem juros"}].map(s=>(
+              <div key={s.l} className="p-4 rounded-xl bg-secondary text-center">
+                <div className="text-2xl font-black text-primary">{s.n}</div>
+                <div className="text-xs text-muted-foreground">{s.l}</div>
+              </div>
+            ))}
+          </div>
+          <a
+            href={waLink("Olá! Quero conhecer melhor a loja.")}
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:opacity-90"
+          >
+            <MessageCircle className="h-4 w-4" /> Fale com um consultor
+          </a>
+        </div>
+
+        <div className="rounded-3xl p-8 text-white" style={{ background: "var(--gradient-hero)" }}>
+          <h3 className="text-2xl font-bold mb-4">Visite nossa loja</h3>
+          <ul className="space-y-3 text-white/90">
+            <li className="flex items-start gap-3"><MapPin className="h-5 w-5 shrink-0 mt-0.5" /> Av. Principal, 1234 — Centro, São Paulo/SP</li>
+            <li className="flex items-start gap-3"><Clock className="h-5 w-5 shrink-0 mt-0.5" /> Seg a Sáb — 9h às 19h</li>
+            <li className="flex items-start gap-3"><Phone className="h-5 w-5 shrink-0 mt-0.5" /> (11) 99999-9999</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="bg-foreground text-background/90 pt-12 pb-6">
+      <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>OS</div>
+            <div className="font-bold">OS Reis dos Celulares</div>
+          </div>
+          <p className="text-sm text-background/60">
+            Smartphones, acessórios e assistência com atendimento humano.
+          </p>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-3">Categorias</h4>
+          <ul className="space-y-2 text-sm text-background/70">
+            {categorias.map(c => <li key={c.nome}><a href="#categorias" className="hover:text-primary">{c.nome}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-3">Institucional</h4>
+          <ul className="space-y-2 text-sm text-background/70">
+            <li><a href="#sobre" className="hover:text-primary">Sobre nós</a></li>
+            <li><a href="#vitrine" className="hover:text-primary">Ofertas</a></li>
+            <li><a href={waLink("Quero tirar uma dúvida")} className="hover:text-primary">Atendimento</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-semibold mb-3">Contato</h4>
+          <ul className="space-y-2 text-sm text-background/70">
+            <li>(11) 99999-9999</li>
+            <li>contato@osreis.com.br</li>
+            <li>Seg-Sáb 9h às 19h</li>
+          </ul>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 mt-10 pt-6 border-t border-background/10 text-xs text-background/50 text-center">
+        © {new Date().getFullYear()} OS Reis dos Celulares. Todos os direitos reservados.
+      </div>
+    </footer>
+  );
+}
+
+function WhatsAppFloat() {
+  return (
+    <a
+      href={waLink("Olá! Vim pelo site.")}
+      aria-label="Falar no WhatsApp"
+      className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-whatsapp text-whatsapp-foreground grid place-items-center shadow-lg hover:scale-110 transition animate-pulse"
+      style={{ boxShadow: "0 10px 30px -5px oklch(0.7 0.17 150 / 0.6)" }}
+    >
+      <MessageCircle className="h-7 w-7" />
+    </a>
   );
 }
