@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram, Headphones, RefreshCw, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
+import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram, Headphones, RefreshCw, ChevronLeft, ChevronRight, ChevronDown, Wrench, BatteryCharging, Cpu, Plug, Send, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
