@@ -119,8 +119,12 @@ function Home() {
       <Hero />
       <Benefits />
       <Categorias />
+      <Servicos />
+      <Orcamento />
       <Vitrine />
+      <FAQ />
       <SobreCTA />
+
       <Footer />
       <WhatsAppFloat />
     </div>
