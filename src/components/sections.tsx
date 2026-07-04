@@ -198,8 +198,9 @@ export function ServicosGrid() {
               <p className="text-sm text-muted-foreground mb-4 flex-1">{s.desc}</p>
               <div className="flex items-end justify-between gap-3 mt-auto">
                 <div><div className="text-xs text-muted-foreground">a partir de</div><div className="text-price font-black text-2xl leading-tight">{brl(s.preco)}</div></div>
-                <a href={`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(`Olá, Glass Phone! Quero um orçamento para: ${s.nome} (a partir de ${brl(s.preco)}).`)}`} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 bg-whatsapp text-whatsapp-foreground px-3 py-2 rounded-full text-sm font-bold hover:opacity-90 transition"><WhatsAppIcon className="h-3.5 w-3.5" /> Orçamento</a>
+                <Link to="/servicos/$slug" params={{ slug: s.slug }} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline">Ver detalhes <Send className="h-3.5 w-3.5" /></Link>
               </div>
+              <a href={`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(`Olá, Glass Phone! Quero um orçamento para: ${s.nome} (a partir de ${brl(s.preco)}).`)}`} target="_blank" rel="noopener" className="mt-3 inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground px-3 py-2 rounded-full text-sm font-bold hover:opacity-90 transition"><WhatsAppIcon className="h-3.5 w-3.5" /> Orçamento no WhatsApp</a>
             </div>
           ))}
         </div>
