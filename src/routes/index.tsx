@@ -569,3 +569,191 @@ function WhatsAppFloat() {
     </a>
   );
 }
+
+// ============ Serviços ============
+const servicos = [
+  { icon: Smartphone, nome: "Troca de Tela", desc: "Display original ou compatível A+ para iPhone, Samsung, Xiaomi e Motorola.", preco: 149 },
+  { icon: BatteryCharging, nome: "Troca de Bateria", desc: "Bateria nova com garantia. Recupere autonomia do seu aparelho.", preco: 99 },
+  { icon: Cpu, nome: "Reparo de Placa", desc: "Diagnóstico e reparo em placa lógica: não liga, sem sinal, oxidação.", preco: 199 },
+  { icon: Plug, nome: "Conector de Carga", desc: "Troca do conector para carregamento e transferência de dados.", preco: 89 },
+  { icon: Wrench, nome: "Limpeza Interna", desc: "Limpeza técnica completa, remoção de poeira e revisão geral.", preco: 59 },
+  { icon: ShieldCheck, nome: "Película 3D", desc: "Aplicação de película de vidro premium com garantia de bolhas.", preco: 39 },
+];
+
+function Servicos() {
+  return (
+    <section id="servicos" className="py-16 md:py-20 bg-secondary/40">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-10">
+          <span className="text-primary font-semibold text-sm tracking-widest">SERVIÇOS</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2">Assistência técnica especializada</h2>
+          <p className="text-muted-foreground mt-2 max-w-xl mx-auto">Reparos com garantia real, peças de qualidade e prazo que cabe no seu dia.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {servicos.map(s => (
+            <div key={s.nome} className="group bg-card rounded-2xl p-6 border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col" style={{ boxShadow: "var(--shadow-product)" }}>
+              <div className="h-12 w-12 rounded-xl bg-primary/15 text-primary grid place-items-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition">
+                <s.icon className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">{s.nome}</h3>
+              <p className="text-sm text-muted-foreground mb-4 flex-1">{s.desc}</p>
+              <div className="flex items-end justify-between gap-3 mt-auto">
+                <div>
+                  <div className="text-xs text-muted-foreground">a partir de</div>
+                  <div className="text-price font-black text-2xl leading-tight">{brl(s.preco)}</div>
+                </div>
+                <a href={waLink(`Olá! Quero um orçamento para: ${s.nome}.`)} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline">
+                  Orçamento <WhatsAppIcon className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============ Orçamento rápido ============
+const modelosPop = ["iPhone 15", "iPhone 14", "iPhone 13", "iPhone 12", "iPhone 11", "Galaxy S24", "Galaxy S23", "Galaxy A54", "Xiaomi 13", "Redmi Note 12", "Motorola Edge 40", "Outro"];
+const defeitos = ["Tela quebrada / trincada", "Bateria viciada", "Não liga", "Conector de carga", "Câmera com defeito", "Alto-falante", "Molhou", "Outro"];
+
+function Orcamento() {
+  const [modelo, setModelo] = useState("");
+  const [defeito, setDefeito] = useState("");
+  const [obs, setObs] = useState("");
+
+  const canSend = modelo.trim().length > 0 && defeito.length > 0;
+  const enviar = () => {
+    if (!canSend) return;
+    const msg = [
+      "Olá, Glass Phone! Gostaria de um orçamento:",
+      `• Modelo: ${modelo.trim().slice(0, 80)}`,
+      `• Defeito: ${defeito}`,
+      obs.trim() ? `• Observações: ${obs.trim().slice(0, 300)}` : null,
+    ].filter(Boolean).join("\n");
+    window.open(`https://wa.me/5547996801247?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+  };
+
+  return (
+    <section id="orcamento" className="py-16 md:py-20">
+      <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <span className="text-primary font-semibold text-sm tracking-widest">ORÇAMENTO RÁPIDO</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Receba seu orçamento em minutos</h2>
+          <p className="text-muted-foreground mb-6">Informe o modelo do aparelho e o defeito. Enviamos o valor pelo WhatsApp com prazo real de reparo.</p>
+          <ul className="space-y-3 text-sm">
+            {[
+              "Orçamento gratuito e sem compromisso",
+              "Resposta em até 15 minutos no horário comercial",
+              "90 dias de garantia sobre o reparo",
+            ].map(x => (
+              <li key={x} className="flex items-start gap-2"><ShieldCheck className="h-5 w-5 text-primary shrink-0 mt-0.5" /> {x}</li>
+            ))}
+          </ul>
+        </div>
+
+        <form
+          onSubmit={(e) => { e.preventDefault(); enviar(); }}
+          className="bg-card border border-border rounded-3xl p-6 md:p-8 space-y-4"
+          style={{ boxShadow: "var(--shadow-glow)" }}
+        >
+          <div>
+            <label htmlFor="modelo" className="text-sm font-semibold block mb-1.5">Modelo do aparelho</label>
+            <input
+              id="modelo"
+              list="modelos-list"
+              value={modelo}
+              onChange={(e) => setModelo(e.target.value)}
+              maxLength={80}
+              required
+              placeholder="Ex: iPhone 13 Pro Max"
+              className="w-full px-4 py-3 rounded-xl bg-muted border border-transparent focus:border-primary outline-none transition"
+            />
+            <datalist id="modelos-list">
+              {modelosPop.map(m => <option key={m} value={m} />)}
+            </datalist>
+          </div>
+          <div>
+            <label htmlFor="defeito" className="text-sm font-semibold block mb-1.5">Defeito</label>
+            <select
+              id="defeito"
+              value={defeito}
+              onChange={(e) => setDefeito(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-xl bg-muted border border-transparent focus:border-primary outline-none transition"
+            >
+              <option value="">Selecione o defeito…</option>
+              {defeitos.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="obs" className="text-sm font-semibold block mb-1.5">Observações (opcional)</label>
+            <textarea
+              id="obs"
+              value={obs}
+              onChange={(e) => setObs(e.target.value)}
+              maxLength={300}
+              rows={3}
+              placeholder="Detalhes do problema, urgência, etc."
+              className="w-full px-4 py-3 rounded-xl bg-muted border border-transparent focus:border-primary outline-none transition resize-none"
+            />
+            <div className="text-xs text-muted-foreground text-right mt-1">{obs.length}/300</div>
+          </div>
+          <button
+            type="submit"
+            disabled={!canSend}
+            className="w-full inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3.5 rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Send className="h-4 w-4" /> Enviar pelo WhatsApp
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+// ============ FAQ ============
+const faqs = [
+  { q: "Qual a garantia dos reparos?", a: "Todos os reparos têm 90 dias de garantia sobre o serviço e as peças aplicadas. Basta apresentar a ordem de serviço." },
+  { q: "Quanto tempo demora a troca de tela?", a: "A maioria das trocas de tela é concluída no mesmo dia, entre 40 minutos e 2 horas, dependendo do modelo e da disponibilidade da peça." },
+  { q: "Como funciona o orçamento?", a: "O orçamento é gratuito. Envie modelo e defeito pelo WhatsApp ou traga o aparelho na loja. Respondemos em poucos minutos com valor e prazo." },
+  { q: "Vocês atendem qualquer marca?", a: "Sim. Trabalhamos com iPhone, Samsung, Xiaomi, Motorola e outras marcas populares. Se o modelo for raro, confirmamos a disponibilidade da peça antes." },
+  { q: "Formas de pagamento?", a: "Aceitamos Pix, dinheiro, débito e crédito em até 12x sem juros no cartão." },
+  { q: "Vocês fazem retirada no domicílio?", a: "Sim, atendemos São Bento do Sul e região com serviço de coleta e entrega. Consulte a disponibilidade pelo WhatsApp." },
+];
+
+function FAQ() {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section id="faq" className="py-16 md:py-20 bg-secondary/40">
+      <div className="container mx-auto px-4 max-w-3xl">
+        <div className="text-center mb-10">
+          <span className="text-primary font-semibold text-sm tracking-widest">DÚVIDAS FREQUENTES</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2">Perguntas mais comuns</h2>
+        </div>
+        <div className="space-y-3">
+          {faqs.map((f, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={f.q} className="bg-card border border-border rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  className="w-full flex items-center justify-between gap-4 text-left p-5 hover:bg-muted/40 transition"
+                >
+                  <span className="font-semibold">{f.q}</span>
+                  <ChevronDown className={`h-5 w-5 shrink-0 text-primary transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed">{f.a}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
