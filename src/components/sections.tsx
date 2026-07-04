@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronDown, ChevronRight, Clock, CreditCard, MapPin, Phone, Search, Send, ShieldCheck, Smartphone, Star, Truck } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronRight, Clock, CreditCard, MapPin, Phone, Send, ShieldCheck, Smartphone, Star, Truck } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState } from "react";
