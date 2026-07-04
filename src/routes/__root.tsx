@@ -77,8 +77,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Glass Phones BS — Smartphones e Acessórios" },
-      { name: "description", content: "Glass Phones BS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Atendimento pelo WhatsApp." },
+      { title: "Glass Phone SBS — Smartphones e Acessórios" },
+      { name: "description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Atendimento pelo WhatsApp." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
