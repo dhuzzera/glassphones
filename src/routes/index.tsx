@@ -81,7 +81,7 @@ function TopBar() {
         <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Entrega para todo o Brasil</span>
         <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> Até 12x sem juros no cartão</span>
         <a href={waLink("Olá! Quero falar com um vendedor.")} className="flex items-center gap-2 font-medium hover:underline">
-          <MessageCircle className="h-4 w-4" /> (47) 9680-1247
+          <WhatsAppIcon className="h-4 w-4" /> (47) 9680-1247
         </a>
       </div>
     </div>
@@ -121,7 +121,7 @@ function Header() {
           href={waLink("Olá! Vim pelo site e quero conversar.")}
           className="hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
         >
-          <MessageCircle className="h-4 w-4" /> WhatsApp
+          <WhatsAppIcon className="h-4 w-4" /> WhatsApp
         </a>
       </div>
     </header>
@@ -153,7 +153,7 @@ function Hero() {
               href={waLink("Olá! Quero uma indicação de celular.")}
               className="inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3 rounded-full font-bold hover:opacity-90 transition"
             >
-              <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+              <WhatsAppIcon className="h-4 w-4" /> Falar no WhatsApp
             </a>
           </div>
           <div className="flex items-center gap-4 mt-8 text-sm">
@@ -191,7 +191,7 @@ function Benefits() {
     { icon: ShieldCheck, t: "Garantia oficial", d: "Produtos originais lacrados" },
     { icon: Truck, t: "Frete pra todo Brasil", d: "Enviamos no mesmo dia" },
     { icon: CreditCard, t: "12x sem juros", d: "Cartão, Pix ou boleto" },
-    { icon: MessageCircle, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
+    { icon: WhatsAppIcon, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
   ];
   return (
     <section className="border-b border-border">
@@ -346,7 +346,7 @@ function SobreCTA() {
             href={waLink("Olá! Quero conhecer melhor a loja.")}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:opacity-90"
           >
-            <MessageCircle className="h-4 w-4" /> Fale com um consultor
+            <WhatsAppIcon className="h-4 w-4" /> Fale com um consultor
           </a>
         </div>
 
@@ -417,7 +417,7 @@ function WhatsAppFloat() {
       className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-whatsapp text-whatsapp-foreground grid place-items-center shadow-lg hover:scale-110 transition animate-pulse"
       style={{ boxShadow: "0 10px 30px -5px oklch(0.7 0.17 150 / 0.6)" }}
     >
-      <MessageCircle className="h-7 w-7" />
+      <WhatsAppIcon className="h-7 w-7" />
     </a>
   );
 }
