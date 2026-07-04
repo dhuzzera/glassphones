@@ -175,16 +175,8 @@ function Hero() {
           </div>
         </div>
 
-        <div className="relative">
-          <img
-            src={heroImg}
-            alt="Smartphones em destaque"
-            width={1600}
-            height={1024}
-            className="rounded-3xl w-full h-auto"
-            style={{ boxShadow: "var(--shadow-glow)" }}
-          />
-        </div>
+        <HeroCarousel />
+
       </div>
     </section>
   );
