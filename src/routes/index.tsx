@@ -262,6 +262,13 @@ type Produto = typeof produtos[number];
 function ProdutoCard(p: Produto) {
   const desconto = p.promo ? Math.round((1 - p.preco / p.antigo) * 100) : 0;
   const pix = p.preco * 0.9;
+  const marcaSlug: Record<string, { slug: string; cor: string }> = {
+    Apple: { slug: "apple", cor: "111111" },
+    Samsung: { slug: "samsung", cor: "1428A0" },
+    Xiaomi: { slug: "xiaomi", cor: "FF6900" },
+    Motorola: { slug: "motorola", cor: "5C92FA" },
+  };
+  const m = marcaSlug[p.marca];
   return (
     <div
       className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col"
@@ -273,7 +280,18 @@ function ProdutoCard(p: Produto) {
             -{desconto}%
           </span>
         )}
-        <Smartphone className="h-20 w-20 text-muted-foreground/40 group-hover:scale-110 transition" strokeWidth={1} />
+        {m ? (
+          <img
+            src={logo(m.slug, m.cor)}
+            alt={`Logo ${p.marca}`}
+            width={120}
+            height={120}
+            loading="lazy"
+            className="h-24 w-24 object-contain opacity-90 group-hover:scale-110 transition"
+          />
+        ) : (
+          <Smartphone className="h-20 w-20 text-muted-foreground/40" strokeWidth={1} />
+        )}
       </div>
       <div className="p-4 flex flex-col flex-1 gap-2">
         <span className="text-xs text-muted-foreground font-medium">{p.marca} · {p.cor}</span>
@@ -288,7 +306,7 @@ function ProdutoCard(p: Produto) {
           href={waLink(`Olá! Tenho interesse no ${p.nome} (${p.cor}) por ${brl(p.preco)}. Está disponível?`)}
           className="mt-auto inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
         >
-          <MessageCircle className="h-4 w-4" /> Comprar
+          <WhatsAppIcon className="h-4 w-4" /> Comprar
         </a>
       </div>
     </div>
