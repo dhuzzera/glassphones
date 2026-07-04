@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram } from "lucide-react";
+import { Smartphone, ShieldCheck, Truck, CreditCard, Star, Search, MapPin, Clock, Phone, Instagram, Headphones, RefreshCw, type LucideIcon } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
