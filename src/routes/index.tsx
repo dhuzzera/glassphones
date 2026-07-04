@@ -5,9 +5,9 @@ import heroImg from "@/assets/hero-phones.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Glass Phones BS — Smartphones, Acessórios e Assistência" },
-      { name: "description", content: "Glass Phones BS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
-      { property: "og:title", content: "Glass Phones BS" },
+      { title: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
+      { name: "description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
+      { property: "og:title", content: "Glass Phone SBS" },
       { property: "og:description", content: "Vitrine de smartphones novos e seminovos com atendimento pelo WhatsApp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -81,8 +81,8 @@ function Header() {
             GP
           </div>
           <div className="leading-tight">
-            <div className="font-bold text-lg">Glass Phones</div>
-            <div className="text-xs text-muted-foreground -mt-0.5">BS · Celulares</div>
+            <div className="font-bold text-lg">Glass Phone</div>
+            <div className="text-xs text-muted-foreground -mt-0.5">SBS · Celulares</div>
           </div>
         </a>
 
@@ -328,7 +328,7 @@ function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>GP</div>
-            <div className="font-bold">Glass Phones BS</div>
+            <div className="font-bold">Glass Phone SBS</div>
           </div>
           <p className="text-sm text-background/60 mb-3">
             Smartphones, acessórios e assistência com atendimento humano.
@@ -361,7 +361,7 @@ function Footer() {
         </div>
       </div>
       <div className="container mx-auto px-4 mt-10 pt-6 border-t border-background/10 text-xs text-background/50 text-center">
-        © {new Date().getFullYear()} Glass Phones BS. Todos os direitos reservados.
+        © {new Date().getFullYear()} Glass Phone SBS. Todos os direitos reservados.
       </div>
     </footer>
   );
