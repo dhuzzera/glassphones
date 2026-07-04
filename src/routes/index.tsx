@@ -82,7 +82,7 @@ function Header() {
           </div>
           <div className="leading-tight">
             <div className="font-bold text-lg">Glass Phone</div>
-            <div className="text-xs text-muted-foreground -mt-0.5">BS · Celulares</div>
+            <div className="text-xs text-muted-foreground -mt-0.5">SBS · Celulares</div>
           </div>
         </a>
 
