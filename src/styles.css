@@ -51,34 +51,35 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 260);
 
-  --primary: oklch(0.62 0.22 30);
+  --primary: oklch(0.6 0.24 5);
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.96 0.02 60);
-  --secondary-foreground: oklch(0.2 0.02 260);
+  --secondary: oklch(0.96 0.02 320);
+  --secondary-foreground: oklch(0.2 0.02 300);
 
-  --muted: oklch(0.96 0.01 60);
-  --muted-foreground: oklch(0.5 0.02 260);
+  --muted: oklch(0.96 0.015 320);
+  --muted-foreground: oklch(0.5 0.03 300);
 
-  --accent: oklch(0.72 0.19 55);
+  --accent: oklch(0.7 0.19 45);
   --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.6 0.24 27);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.92 0.01 60);
-  --input: oklch(0.92 0.01 60);
-  --ring: oklch(0.62 0.22 30);
+  --border: oklch(0.92 0.015 320);
+  --input: oklch(0.92 0.015 320);
+  --ring: oklch(0.6 0.24 5);
 
   --whatsapp: oklch(0.7 0.17 150);
   --whatsapp-foreground: oklch(1 0 0);
-  --price: oklch(0.55 0.2 30);
-  --badge-promo: oklch(0.65 0.24 20);
+  --price: oklch(0.55 0.24 5);
+  --badge-promo: oklch(0.6 0.26 350);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.62 0.22 30) 0%, oklch(0.55 0.24 20) 60%, oklch(0.45 0.22 15) 100%);
-  --gradient-brand: linear-gradient(90deg, oklch(0.62 0.22 30), oklch(0.72 0.19 55));
-  --shadow-product: 0 10px 30px -12px oklch(0.2 0.05 30 / 0.18);
-  --shadow-glow: 0 20px 60px -20px oklch(0.62 0.22 30 / 0.55);
+  /* Instagram-inspired gradient: amber → pink → magenta → violet */
+  --gradient-hero: linear-gradient(135deg, #feda75 0%, #fa7e1e 20%, #d62976 55%, #962fbf 80%, #4f5bd5 100%);
+  --gradient-brand: linear-gradient(90deg, #fa7e1e, #d62976, #962fbf);
+  --shadow-product: 0 10px 30px -12px oklch(0.2 0.05 320 / 0.2);
+  --shadow-glow: 0 20px 60px -20px oklch(0.55 0.25 350 / 0.55);
 }
 
 .dark {

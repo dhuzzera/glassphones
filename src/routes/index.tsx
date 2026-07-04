@@ -67,7 +67,7 @@ function TopBar() {
         <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Entrega para todo o Brasil</span>
         <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> Até 12x sem juros no cartão</span>
         <a href={waLink("Olá! Quero falar com um vendedor.")} className="flex items-center gap-2 font-medium hover:underline">
-          <MessageCircle className="h-4 w-4" /> (11) 99999-9999
+          <MessageCircle className="h-4 w-4" /> (47) 9680-1247
         </a>
       </div>
     </div>
@@ -315,7 +315,7 @@ function SobreCTA() {
           <ul className="space-y-3 text-white/90">
             <li className="flex items-start gap-3"><MapPin className="h-5 w-5 shrink-0 mt-0.5" /> Av. Principal, 1234 — Centro, São Paulo/SP</li>
             <li className="flex items-start gap-3"><Clock className="h-5 w-5 shrink-0 mt-0.5" /> Seg a Sáb — 9h às 19h</li>
-            <li className="flex items-start gap-3"><Phone className="h-5 w-5 shrink-0 mt-0.5" /> (11) 99999-9999</li>
+            <li className="flex items-start gap-3"><Phone className="h-5 w-5 shrink-0 mt-0.5" /> (47) 9680-1247</li>
           </ul>
         </div>
       </div>
@@ -356,7 +356,7 @@ function Footer() {
         <div>
           <h4 className="font-semibold mb-3">Contato</h4>
           <ul className="space-y-2 text-sm text-background/70">
-            <li>(11) 99999-9999</li>
+            <li>(47) 9680-1247</li>
             <li>contato@glassphonesbs.com.br</li>
             <li>Seg-Sáb 9h às 19h</li>
           </ul>
