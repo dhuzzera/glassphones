@@ -182,6 +182,85 @@ function Hero() {
   );
 }
 
+const heroSlides = [
+  { img: hero1.url, tag: "Assistência Técnica", title: "Tela quebrada?", sub: "A gente resolve com garantia." },
+  { img: hero2.url, tag: "Vitrine Premium", title: "iPhone & Galaxy", sub: "Modelos novos e seminovos." },
+  { img: hero3.url, tag: "Reparo Especializado", title: "Placa, bateria, conector", sub: "Diagnóstico em minutos." },
+];
+
+function HeroCarousel() {
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, align: "start" },
+    [Autoplay({ delay: 4500, stopOnInteraction: false })],
+  );
+  const [selected, setSelected] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  return (
+    <div className="relative">
+      <div className="overflow-hidden rounded-3xl border border-primary/30" style={{ boxShadow: "var(--shadow-glow)" }} ref={emblaRef}>
+        <div className="flex">
+          {heroSlides.map((s, i) => (
+            <div key={i} className="relative flex-[0_0_100%] aspect-[16/10]">
+              <img
+                src={s.img}
+                alt={s.title}
+                width={1600}
+                height={1024}
+                loading={i === 0 ? "eager" : "lazy"}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-background/85 via-background/30 to-transparent" />
+              <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-8 gap-1.5">
+                <span className="inline-block w-fit text-[10px] md:text-xs font-bold tracking-widest uppercase text-primary bg-primary/10 backdrop-blur border border-primary/40 px-2.5 py-1 rounded-full">
+                  {s.tag}
+                </span>
+                <div className="text-white font-black text-2xl md:text-4xl leading-tight uppercase">{s.title}</div>
+                <div className="text-white/85 text-sm md:text-base">{s.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        aria-label="Anterior"
+        onClick={scrollPrev}
+        className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/70 backdrop-blur border border-primary/40 text-white grid place-items-center hover:bg-primary hover:border-primary transition"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <button
+        aria-label="Próximo"
+        onClick={scrollNext}
+        className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/70 backdrop-blur border border-primary/40 text-white grid place-items-center hover:bg-primary hover:border-primary transition"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+        {heroSlides.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Ir para slide ${i + 1}`}
+            onClick={() => emblaApi?.scrollTo(i)}
+            className={`h-1.5 rounded-full transition-all ${selected === i ? "w-8 bg-primary" : "w-2 bg-white/40 hover:bg-white/70"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+
 function Benefits() {
   const items = [
     { icon: ShieldCheck, t: "Garantia oficial", d: "Produtos originais lacrados" },
