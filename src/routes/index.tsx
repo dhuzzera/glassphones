@@ -10,6 +10,8 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 import heroImg from "@/assets/hero-phones.jpg";
+import logoDark from "@/assets/glassphone-logo-dark.png.asset.json";
+import logoFlat from "@/assets/glassphone-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -93,15 +95,11 @@ function Header() {
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
       <div className="container mx-auto px-4 py-4 flex items-center gap-6">
-        <a href="#" className="flex items-center gap-2 shrink-0">
-          <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>
-            GP
-          </div>
-          <div className="leading-tight">
-            <div className="font-bold text-lg">Glass Phone</div>
-            <div className="text-xs text-muted-foreground -mt-0.5">SBS · Celulares</div>
-          </div>
+        <a href="#" className="flex items-center shrink-0">
+          <img src={logoDark.url} alt="Glass Phone SBS" className="h-12 md:h-14 w-auto" />
         </a>
+
+
 
         <div className="hidden md:flex flex-1 max-w-xl relative">
           <input
@@ -373,10 +371,8 @@ function Footer() {
     <footer className="bg-foreground text-background/90 pt-12 pb-6">
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>GP</div>
-            <div className="font-bold">Glass Phone SBS</div>
-          </div>
+          <img src={logoFlat.url} alt="Glass Phone SBS" className="h-14 w-auto mb-3" />
+
           <p className="text-sm text-background/60 mb-3">
             Smartphones, acessórios e assistência com atendimento humano.
           </p>
