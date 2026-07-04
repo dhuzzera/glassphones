@@ -129,12 +129,14 @@ function ServicoDetalhe() {
               href={`https://wa.me/${WHATSAPP_NUM}?text=${waMsg}`}
               target="_blank"
               rel="noopener"
+              onClick={() => trackWhatsApp("servico_detalhe_orcamento", { slug: s.slug, nome: s.nome, preco: s.preco })}
               className="w-full inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3.5 rounded-xl font-bold hover:opacity-90 transition"
             >
               <WhatsAppIcon className="h-4 w-4" /> Solicitar orçamento
             </a>
             <a
               href={waLink("")}
+              onClick={() => trackWhatsApp("servico_detalhe_duvida", { slug: s.slug })}
               className="mt-3 w-full inline-flex items-center justify-center gap-2 border border-border px-6 py-3 rounded-xl font-semibold text-sm hover:bg-muted transition"
             >
               Tirar dúvida rápida
