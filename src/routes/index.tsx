@@ -502,7 +502,7 @@ function SobreCTA() {
         <div className="rounded-3xl p-8 text-white" style={{ background: "var(--gradient-hero)" }}>
           <h3 className="text-2xl font-bold mb-4">Visite nossa loja</h3>
           <ul className="space-y-3 text-white/90">
-            <li className="flex items-start gap-3"><MapPin className="h-5 w-5 shrink-0 mt-0.5" /> Av. Principal, 1234 — Centro, São Paulo/SP</li>
+            <li className="flex items-start gap-3"><MapPin className="h-5 w-5 shrink-0 mt-0.5" /> Av. São Bento, 1330 — Sala 8, São Bento do Sul/SC · CEP 89281-100</li>
             <li className="flex items-start gap-3"><Clock className="h-5 w-5 shrink-0 mt-0.5" /> Seg a Sáb — 9h às 19h</li>
             <li className="flex items-start gap-3"><Phone className="h-5 w-5 shrink-0 mt-0.5" /> (47) 9680-1247</li>
           </ul>
