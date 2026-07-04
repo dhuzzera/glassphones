@@ -371,10 +371,8 @@ function Footer() {
     <footer className="bg-foreground text-background/90 pt-12 pb-6">
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="h-10 w-10 rounded-xl grid place-items-center text-white font-bold" style={{ background: "var(--gradient-brand)" }}>GP</div>
-            <div className="font-bold">Glass Phone SBS</div>
-          </div>
+          <img src={logoFlat.url} alt="Glass Phone SBS" className="h-14 w-auto mb-3" />
+
           <p className="text-sm text-background/60 mb-3">
             Smartphones, acessórios e assistência com atendimento humano.
           </p>
