@@ -327,5 +327,3 @@ export function ContatoCard() {
   );
 }
 
-// suppress unused warnings for shared imports used elsewhere
-export const _keep = { Search };
