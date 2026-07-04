@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ChevronLeft, Clock, ShieldCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, ShieldCheck } from "lucide-react";
 import { SiteShell } from "@/components/site-shell";
 import { brl, servicos, SITE_URL, waLink, WhatsAppIcon, WHATSAPP_NUM } from "@/lib/site";
+import { trackWhatsApp } from "@/lib/analytics";
 
 export const Route = createFileRoute("/servicos/$slug")({
   loader: ({ params }) => {
