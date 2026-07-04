@@ -543,8 +543,9 @@ function Footer() {
         <div>
           <h4 className="font-semibold mb-3">Contato</h4>
           <ul className="space-y-2 text-sm text-background/70">
-            <li>(47) 9680-1247</li>
-            <li>contato@glassphonesbs.com.br</li>
+            <li>Av. São Bento, 1330 — Sala 8</li>
+            <li>São Bento do Sul/SC · 89281-100</li>
+            <li>(47) 9 9680-1247</li>
             <li>Seg-Sáb 9h às 19h</li>
           </ul>
         </div>
