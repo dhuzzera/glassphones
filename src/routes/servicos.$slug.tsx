@@ -87,6 +87,15 @@ function ServicoDetalhe() {
   return (
     <SiteShell>
       <div className="container mx-auto px-4 py-8">
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+            <li><Link to="/" className="hover:text-primary hover:underline">Home</Link></li>
+            <li aria-hidden="true"><ChevronRight className="h-3.5 w-3.5" /></li>
+            <li><Link to="/servicos" className="hover:text-primary hover:underline">Serviços</Link></li>
+            <li aria-hidden="true"><ChevronRight className="h-3.5 w-3.5" /></li>
+            <li className="text-foreground font-medium" aria-current="page">{s.nome}</li>
+          </ol>
+        </nav>
         <Link to="/servicos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-6">
           <ChevronLeft className="h-4 w-4" /> Todos os serviços
         </Link>
