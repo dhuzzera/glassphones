@@ -277,10 +277,10 @@ function ProdutoCard(p: Produto) {
   const desconto = p.promo ? Math.round((1 - p.preco / p.antigo) * 100) : 0;
   const pix = p.preco * 0.9;
   const marcaSlug: Record<string, { slug: string; cor: string }> = {
-    Apple: { slug: "apple", cor: "111111" },
-    Samsung: { slug: "samsung", cor: "1428A0" },
-    Xiaomi: { slug: "xiaomi", cor: "FF6900" },
-    Motorola: { slug: "motorola", cor: "5C92FA" },
+    Apple: { slug: "apple", cor: "FFFFFF" },
+    Samsung: { slug: "samsung", cor: "FFFFFF" },
+    Xiaomi: { slug: "xiaomi", cor: "FFFFFF" },
+    Motorola: { slug: "motorola", cor: "FFFFFF" },
   };
   const m = marcaSlug[p.marca];
   return (
