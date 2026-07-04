@@ -160,19 +160,37 @@ function Hero() {
               <WhatsAppIcon className="h-4 w-4" /> Falar no WhatsApp
             </a>
           </div>
-          <div className="flex items-center gap-4 mt-8 text-sm">
-            <div className="flex -space-x-2">
-              {[1,2,3,4].map(i => (
-                <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-accent to-primary" />
+          <div className="flex items-center gap-4 mt-8">
+            <div className="flex -space-x-3">
+              {[
+                { i: "JS", from: "#0D6EFD", to: "#1B3CFF" },
+                { i: "MR", from: "#1B3CFF", to: "#0A2E8A" },
+                { i: "AL", from: "#4C8DFF", to: "#0D6EFD" },
+                { i: "PC", from: "#0A2E8A", to: "#1B3CFF" },
+              ].map((a) => (
+                <div
+                  key={a.i}
+                  className="h-9 w-9 rounded-full border-2 border-background grid place-items-center text-[10px] font-bold text-white shadow-lg"
+                  style={{ background: `linear-gradient(135deg, ${a.from}, ${a.to})` }}
+                >
+                  {a.i}
+                </div>
               ))}
-            </div>
-            <div>
-              <div className="flex items-center gap-1">
-                {[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-300 text-yellow-300" />)}
+              <div className="h-9 w-9 rounded-full border-2 border-background bg-primary/20 backdrop-blur grid place-items-center text-[10px] font-bold text-primary">
+                +5k
               </div>
-              <div className="text-white/80 text-xs">+5.000 clientes satisfeitos</div>
+            </div>
+            <div className="leading-tight">
+              <div className="flex items-center gap-1.5">
+                {[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
+                <span className="text-white font-bold text-sm ml-1">4.9</span>
+              </div>
+              <div className="text-white/70 text-xs mt-0.5">
+                <span className="font-semibold text-white/90">+5.000 clientes</span> satisfeitos
+              </div>
             </div>
           </div>
+
         </div>
 
         <HeroCarousel />
