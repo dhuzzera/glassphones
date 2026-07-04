@@ -77,8 +77,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Glass Phone SBS — Smartphones e Acessórios" },
-      { name: "description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Atendimento pelo WhatsApp." },
+      { title: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
+      { name: "description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
+      { property: "og:title", content: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
+      { name: "twitter:title", content: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
+      { property: "og:description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
+      { name: "twitter:description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f6876b28-dc2b-4fba-822f-e32a3bfaeb23" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f6876b28-dc2b-4fba-822f-e32a3bfaeb23" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
