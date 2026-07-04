@@ -21,12 +21,57 @@ import logoFlat from "@/assets/glassphone-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
-      { name: "description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
-      { property: "og:title", content: "Glass Phone SBS" },
-      { property: "og:description", content: "Vitrine de smartphones novos e seminovos com atendimento pelo WhatsApp." },
+      { title: "Glass Phone SBS — Assistência Técnica de Celular em São Bento do Sul" },
+      { name: "description", content: "Assistência técnica especializada em celulares em São Bento do Sul: troca de tela, bateria, placa e conector. Orçamento rápido pelo WhatsApp." },
+      { property: "og:title", content: "Glass Phone SBS — Assistência Técnica" },
+      { property: "og:description", content: "Troca de tela, bateria e placa com garantia. Atendimento em São Bento do Sul e região." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://glassphones.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://glassphones.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://glassphones.lovable.app/#business",
+          name: "Glass Phone SBS",
+          image: "https://glassphones.lovable.app/__l5e/assets-v1/739dfcef-1519-4af3-875e-3147d284a9a2/glassphone-logo-dark.png",
+          url: "https://glassphones.lovable.app/",
+          telephone: "+55-47-99680-1247",
+          priceRange: "$$",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Avenida São Bento, 1330 - Sala 8",
+            addressLocality: "São Bento do Sul",
+            addressRegion: "SC",
+            postalCode: "89281-100",
+            addressCountry: "BR",
+          },
+          geo: { "@type": "GeoCoordinates", latitude: -26.2497, longitude: -49.3789 },
+          openingHoursSpecification: [{
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+            opens: "09:00", closes: "19:00",
+          }],
+          sameAs: ["https://www.instagram.com/glass_phonesbs/"],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: "Qual a garantia dos reparos?", acceptedAnswer: { "@type": "Answer", text: "Todos os reparos têm 90 dias de garantia sobre o serviço e as peças aplicadas." }},
+            { "@type": "Question", name: "Quanto tempo demora a troca de tela?", acceptedAnswer: { "@type": "Answer", text: "A maioria das trocas de tela é concluída no mesmo dia, entre 40 minutos e 2 horas." }},
+            { "@type": "Question", name: "Como funciona o orçamento?", acceptedAnswer: { "@type": "Answer", text: "O orçamento é gratuito e feito pelo WhatsApp ou na loja. Você informa modelo e defeito, e enviamos o valor em minutos." }},
+            { "@type": "Question", name: "Vocês atendem qualquer marca?", acceptedAnswer: { "@type": "Answer", text: "Sim. Atendemos iPhone, Samsung, Xiaomi, Motorola e outras marcas populares." }},
+          ],
+        }),
+      },
     ],
   }),
   component: Home,
