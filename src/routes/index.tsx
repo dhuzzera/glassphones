@@ -10,6 +10,8 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 import heroImg from "@/assets/hero-phones.jpg";
+import logoDark from "@/assets/glassphone-logo-dark.png.asset.json";
+import logoFlat from "@/assets/glassphone-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
