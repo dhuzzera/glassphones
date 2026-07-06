@@ -2,8 +2,8 @@ import { Headphones, RefreshCw, Smartphone, ShieldCheck, BatteryCharging, Cpu, P
 import hero1 from "@/assets/hero1.jpg.asset.json";
 import hero2 from "@/assets/hero2.jpg.asset.json";
 import hero3 from "@/assets/hero3.jpg.asset.json";
-import logoDark from "@/assets/glassphone-logo-dark.png.asset.json";
-import logoFlat from "@/assets/glassphone-logo.png.asset.json";
+import logoDark from "@/assets/glassphone-logo-cliente.png.asset.json";
+import logoFlat from "@/assets/glassphone-logo-cliente.png.asset.json";
 
 export const SITE_URL = "https://glassphones.lovable.app";
 export const WHATSAPP_URL = "https://api.whatsapp.com/message/L6DTBZKAUP67J1?autoload=1&app_absent=0";
