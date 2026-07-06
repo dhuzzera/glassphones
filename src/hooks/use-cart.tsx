@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import type { OrderItem } from "@/integrations/supabase/types";
+import type { OrderItem } from "@/lib/marketplace-types";
 
 const STORAGE_KEY = "gpsbs:cart:v1";
 const EVENT = "gpsbs:cart:changed";

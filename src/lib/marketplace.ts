@@ -1,4 +1,4 @@
-import type { OrderItem } from "@/integrations/supabase/types";
+import type { OrderItem } from "@/lib/marketplace-types";
 
 export const WHATSAPP_NUMBER = "5547996801247";
 

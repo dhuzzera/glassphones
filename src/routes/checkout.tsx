@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type { DeliveryMethod } from "@/integrations/supabase/types";
+import type { DeliveryMethod } from "@/lib/marketplace-types";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Nome muito curto").max(120),

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { Category, CategoryType } from "@/integrations/supabase/types";
+import type { Category, CategoryType } from "@/lib/marketplace-types";
 import { slugify } from "@/lib/marketplace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

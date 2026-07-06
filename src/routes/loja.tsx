@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { ShoppingCart, Search, Wrench, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Category } from "@/integrations/supabase/types";
+import type { Product, Category } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";

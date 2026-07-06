@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { Order, OrderStatus } from "@/integrations/supabase/types";
+import type { Order, OrderStatus } from "@/lib/marketplace-types";
 import { formatBRL } from "@/lib/marketplace";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
