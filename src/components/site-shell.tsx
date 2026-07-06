@@ -112,9 +112,11 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <div className="container mx-auto px-4 mt-10 pt-6 border-t border-background/10 text-xs text-background/50 text-center">
-        © {new Date().getFullYear()} Glass Phone SBS. Todos os direitos reservados.
+      <div className="container mx-auto px-4 mt-10 pt-6 border-t border-background/10 text-xs text-background/50 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
+        <span>© {new Date().getFullYear()} Glass Phone SBS. Todos os direitos reservados.</span>
+        <Link to="/auth" className="hover:text-primary transition-colors">Admin</Link>
       </div>
+
     </footer>
   );
 }
