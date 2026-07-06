@@ -76,7 +76,7 @@ function ProductDetail() {
           </div>
           {product.image_urls.length > 1 && (
             <div className="mt-2 flex gap-2 overflow-x-auto">
-              {product.image_urls.map((u, i) => (
+              {product.image_urls.map((u: string, i: number) => (
                 <button
                   key={i}
                   onClick={() => setSelectedImg(i)}

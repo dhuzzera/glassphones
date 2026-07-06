@@ -124,7 +124,7 @@ function OrdersAdmin() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Itens</p>
                   <div className="space-y-1 text-sm">
-                    {detail.items.map((i, idx) => (
+                    {detail.items.map((i: typeof detail.items[number], idx: number) => (
                       <div key={idx} className="flex justify-between">
                         <span>{i.quantity}x {i.name}</span>
                         <span>{formatBRL(i.price_cents * i.quantity)}</span>
