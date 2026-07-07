@@ -9,6 +9,7 @@ import type { Product } from "@/lib/marketplace-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { WhatsAppIcon } from "@/lib/site";
+import { trackWhatsApp } from "@/lib/analytics";
 
 export const Route = createFileRoute("/em/$cidade")({
   beforeLoad: ({ params }) => {
@@ -17,17 +18,23 @@ export const Route = createFileRoute("/em/$cidade")({
   head: ({ params }) => {
     const cidade = findCidade(params.cidade);
     if (!cidade) return { meta: [{ title: "Cidade não encontrada" }] };
-    const title = `Celulares e Assistência em ${cidade.nome}/${cidade.uf} — Glass Phone SBS`;
-    const description = `iPhone, Samsung, Xiaomi e assistência técnica com atendimento para ${cidade.nome}. ${cidade.destaque} Fale no WhatsApp.`;
+    // Título CTR-focused: começa com o benefício + cidade, marca no final.
+    const title = `iPhone, Samsung e Assistência em ${cidade.nome}/${cidade.uf} · Entrega Rápida | Glass Phone SBS`;
+    const description = `Loja de celulares em ${cidade.nome}: iPhone, Samsung, Xiaomi, Motorola, acessórios e assistência técnica. ${cidade.destaque} Atendimento humano no WhatsApp em ~5 min.`;
     const url = `https://glassphones.lovable.app/em/${cidade.slug}`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "keywords", content: `celulares ${cidade.nome}, iphone ${cidade.nome}, assistência técnica ${cidade.nome}, loja de celular ${cidade.nome} ${cidade.uf}` },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -53,6 +60,42 @@ export const Route = createFileRoute("/em/$cidade")({
             },
             telephone: "+55 47 99680-1247",
             url,
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: `Vocês entregam celulares em ${cidade.nome}?`,
+                acceptedAnswer: { "@type": "Answer", text: `Sim. ${cidade.destaque} Combinamos a entrega ou envio pelo WhatsApp (47) 99680-1247.` },
+              },
+              {
+                "@type": "Question",
+                name: `Qual a distância da loja física até ${cidade.nome}?`,
+                acceptedAnswer: { "@type": "Answer", text: `A loja fica em São Bento do Sul, a aproximadamente ${cidade.distanciaKm} km de ${cidade.nome}.` },
+              },
+              {
+                "@type": "Question",
+                name: `Fazem assistência técnica para clientes de ${cidade.nome}?`,
+                acceptedAnswer: { "@type": "Answer", text: `Sim — troca de tela, bateria, conectores e mais. Consulte orçamento no WhatsApp.` },
+              },
+            ],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Início", item: "https://glassphones.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "Atendimento", item: "https://glassphones.lovable.app/em/sao-bento-do-sul" },
+              { "@type": "ListItem", position: 3, name: `${cidade.nome}/${cidade.uf}`, item: url },
+            ],
           }),
         },
       ],
@@ -120,7 +163,10 @@ function CidadePage() {
             {cidade.regiao} com iPhone, Samsung, Xiaomi, Motorola, acessórios e reparos.
           </p>
           <div className="flex flex-wrap gap-3">
-            <a href={waUrl}>
+            <a
+              href={waUrl}
+              onClick={() => trackWhatsApp("cidade_hero", { cidade: cidade.slug, uf: cidade.uf })}
+            >
               <Button size="lg" className="bg-whatsapp text-whatsapp-foreground hover:opacity-90">
                 <WhatsAppIcon className="h-5 w-5 mr-2" /> Falar no WhatsApp
               </Button>
@@ -206,7 +252,11 @@ function CidadePage() {
             </h2>
             <p className="text-sm text-muted-foreground">
               {cidade.bairros.join(" · ")}. Não achou seu bairro? Fale no{" "}
-              <a href={waUrl} className="text-primary hover:underline font-medium">
+              <a
+                href={waUrl}
+                onClick={() => trackWhatsApp("cidade_bairros", { cidade: cidade.slug, uf: cidade.uf })}
+                className="text-primary hover:underline font-medium"
+              >
                 WhatsApp
               </a>{" "}
               — combinamos a melhor forma de entrega.
@@ -214,6 +264,27 @@ function CidadePage() {
           </div>
         </section>
       )}
+
+      {/* FAQ visível — reforça as respostas do FAQPage JSON-LD */}
+      <section className="container mx-auto px-4 pb-12">
+        <h2 className="text-2xl font-bold mb-4">Perguntas frequentes de clientes de {cidade.nome}</h2>
+        <div className="space-y-3">
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-1">Vocês entregam em {cidade.nome}?</h3>
+            <p className="text-sm text-muted-foreground">{cidade.destaque} Combinamos a entrega pelo WhatsApp.</p>
+          </div>
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-1">Qual a distância até {cidade.nome}?</h3>
+            <p className="text-sm text-muted-foreground">Cerca de {cidade.distanciaKm} km entre nossa loja em São Bento do Sul e {cidade.nome}.</p>
+          </div>
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-1">Fazem assistência técnica?</h3>
+            <p className="text-sm text-muted-foreground">
+              Sim — troca de tela, bateria e mais. <Link to="/servicos" className="text-primary hover:underline">Ver serviços</Link>.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Outras cidades (linking interno para SEO) */}
       <section className="container mx-auto px-4 pb-16">

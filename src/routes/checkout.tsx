@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/use-cart";
 import { formatBRL, buildOrderWhatsappUrl } from "@/lib/marketplace";
+import { track } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,8 @@ const schema = z.object({
   email: z.string().trim().email("E-mail inválido").max(160).optional().or(z.literal("")),
   notes: z.string().max(500).optional(),
 });
+
+type PaymentMethod = "pix" | "cartao" | "dinheiro" | "combinar";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -38,6 +41,13 @@ function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [delivery, setDelivery] = useState<DeliveryMethod>("pickup");
+  // Endereço (opcional para retirada, exigido quando entrega for a combinar).
+  const [cep, setCep] = useState("");
+  const [rua, setRua] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [payment, setPayment] = useState<PaymentMethod>("pix");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -52,8 +62,23 @@ function CheckoutPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    // Endereço obrigatório quando frete for combinado.
+    if (delivery === "whatsapp_shipping" && (!rua.trim() || !numero.trim() || !cidade.trim())) {
+      toast.error("Preencha o endereço para envio (rua, número e cidade).");
+      return;
+    }
     setSubmitting(true);
     try {
+      // Consolidamos endereço + pagamento em `notes` (sem alterar o schema do banco).
+      const enderecoBlock =
+        delivery === "whatsapp_shipping" || rua.trim()
+          ? `Endereço: ${rua}, ${numero} — ${bairro} — ${cidade}${cep ? ` (CEP ${cep})` : ""}`
+          : "";
+      const pagamentoBlock = `Pagamento preferido: ${payment}`;
+      const notasFinais = [enderecoBlock, pagamentoBlock, parsed.data.notes]
+        .filter(Boolean)
+        .join(" | ");
+
       const { data, error } = await supabase
         .from("orders")
         .insert({
@@ -63,11 +88,19 @@ function CheckoutPage() {
           items,
           total_cents: totalCents,
           delivery_method: delivery,
-          notes: parsed.data.notes || null,
+          notes: notasFinais || null,
         })
         .select("id")
         .single();
       if (error) throw error;
+
+      track("checkout_submit", {
+        order_id: data.id,
+        total_cents: totalCents,
+        items_count: items.length,
+        delivery_method: delivery,
+        payment_method: payment,
+      });
 
       const url = buildOrderWhatsappUrl({
         orderId: data.id,
@@ -75,7 +108,7 @@ function CheckoutPage() {
         items,
         totalCents,
         deliveryMethod: delivery,
-        notes: parsed.data.notes,
+        notes: notasFinais,
       });
       clear();
       toast.success("Pedido registrado! Abrindo WhatsApp...");
@@ -145,12 +178,68 @@ function CheckoutPage() {
             </Card>
 
             <Card>
+              <CardHeader>
+                <CardTitle>Endereço {delivery === "pickup" && <span className="text-sm font-normal text-muted-foreground">(opcional para retirada)</span>}</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-6 gap-3">
+                <div className="sm:col-span-2">
+                  <Label htmlFor="cep">CEP</Label>
+                  <Input id="cep" value={cep} onChange={(e) => setCep(e.target.value)} placeholder="89281-100" maxLength={9} />
+                </div>
+                <div className="sm:col-span-4">
+                  <Label htmlFor="rua">Rua / Logradouro</Label>
+                  <Input id="rua" value={rua} onChange={(e) => setRua(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="numero">Número</Label>
+                  <Input id="numero" value={numero} onChange={(e) => setNumero(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="bairro">Bairro</Label>
+                  <Input id="bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="cidade">Cidade</Label>
+                  <Input id="cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle>Pagamento</CardTitle></CardHeader>
+              <CardContent>
+                <RadioGroup value={payment} onValueChange={(v) => setPayment(v as PaymentMethod)} className="grid grid-cols-2 gap-2">
+                  {[
+                    { v: "pix", label: "PIX", desc: "Envio da chave no WhatsApp" },
+                    { v: "cartao", label: "Cartão", desc: "Débito/crédito na retirada" },
+                    { v: "dinheiro", label: "Dinheiro", desc: "Na entrega ou retirada" },
+                    { v: "combinar", label: "A combinar", desc: "Falamos no WhatsApp" },
+                  ].map((op) => (
+                    <label
+                      key={op.v}
+                      className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition ${
+                        payment === op.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                      }`}
+                    >
+                      <RadioGroupItem value={op.v} className="mt-1" />
+                      <div>
+                        <div className="text-sm font-medium">{op.label}</div>
+                        <div className="text-xs text-muted-foreground">{op.desc}</div>
+                      </div>
+                    </label>
+                  ))}
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            <Card>
               <CardHeader><CardTitle>Observações</CardTitle></CardHeader>
               <CardContent>
                 <Textarea placeholder="Alguma observação sobre o pedido?" value={notes} onChange={(e) => setNotes(e.target.value)} />
               </CardContent>
             </Card>
           </div>
+
 
           <div>
             <Card className="sticky top-4">
