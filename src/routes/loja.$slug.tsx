@@ -405,10 +405,10 @@ function ProductDetail() {
                   </a>
                 ) : (
                   <>
-                    <Button size="lg" className="w-full" disabled={!inStock} onClick={() => handleAdd(true)}>
-                      Comprar agora
+                    <Button size="lg" className="w-full" disabled={!inStock || (hasVariants && !activeVariant)} onClick={() => handleAdd(true)}>
+                      {hasVariants && !activeVariant ? "Selecione a variação" : "Comprar agora"}
                     </Button>
-                    <Button size="lg" variant="outline" className="w-full" disabled={!inStock} onClick={() => handleAdd(false)}>
+                    <Button size="lg" variant="outline" className="w-full" disabled={!inStock || (hasVariants && !activeVariant)} onClick={() => handleAdd(false)}>
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Adicionar ao carrinho
                     </Button>
