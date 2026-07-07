@@ -178,12 +178,68 @@ function CheckoutPage() {
             </Card>
 
             <Card>
+              <CardHeader>
+                <CardTitle>Endereço {delivery === "pickup" && <span className="text-sm font-normal text-muted-foreground">(opcional para retirada)</span>}</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-6 gap-3">
+                <div className="sm:col-span-2">
+                  <Label htmlFor="cep">CEP</Label>
+                  <Input id="cep" value={cep} onChange={(e) => setCep(e.target.value)} placeholder="89281-100" maxLength={9} />
+                </div>
+                <div className="sm:col-span-4">
+                  <Label htmlFor="rua">Rua / Logradouro</Label>
+                  <Input id="rua" value={rua} onChange={(e) => setRua(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="numero">Número</Label>
+                  <Input id="numero" value={numero} onChange={(e) => setNumero(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="bairro">Bairro</Label>
+                  <Input id="bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="cidade">Cidade</Label>
+                  <Input id="cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle>Pagamento</CardTitle></CardHeader>
+              <CardContent>
+                <RadioGroup value={payment} onValueChange={(v) => setPayment(v as PaymentMethod)} className="grid grid-cols-2 gap-2">
+                  {[
+                    { v: "pix", label: "PIX", desc: "Envio da chave no WhatsApp" },
+                    { v: "cartao", label: "Cartão", desc: "Débito/crédito na retirada" },
+                    { v: "dinheiro", label: "Dinheiro", desc: "Na entrega ou retirada" },
+                    { v: "combinar", label: "A combinar", desc: "Falamos no WhatsApp" },
+                  ].map((op) => (
+                    <label
+                      key={op.v}
+                      className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition ${
+                        payment === op.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                      }`}
+                    >
+                      <RadioGroupItem value={op.v} className="mt-1" />
+                      <div>
+                        <div className="text-sm font-medium">{op.label}</div>
+                        <div className="text-xs text-muted-foreground">{op.desc}</div>
+                      </div>
+                    </label>
+                  ))}
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            <Card>
               <CardHeader><CardTitle>Observações</CardTitle></CardHeader>
               <CardContent>
                 <Textarea placeholder="Alguma observação sobre o pedido?" value={notes} onChange={(e) => setNotes(e.target.value)} />
               </CardContent>
             </Card>
           </div>
+
 
           <div>
             <Card className="sticky top-4">
