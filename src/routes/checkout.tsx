@@ -41,6 +41,13 @@ function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [delivery, setDelivery] = useState<DeliveryMethod>("pickup");
+  // Endereço (opcional para retirada, exigido quando entrega for a combinar).
+  const [cep, setCep] = useState("");
+  const [rua, setRua] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [payment, setPayment] = useState<PaymentMethod>("pix");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -55,8 +62,23 @@ function CheckoutPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    // Endereço obrigatório quando frete for combinado.
+    if (delivery === "whatsapp_shipping" && (!rua.trim() || !numero.trim() || !cidade.trim())) {
+      toast.error("Preencha o endereço para envio (rua, número e cidade).");
+      return;
+    }
     setSubmitting(true);
     try {
+      // Consolidamos endereço + pagamento em `notes` (sem alterar o schema do banco).
+      const enderecoBlock =
+        delivery === "whatsapp_shipping" || rua.trim()
+          ? `Endereço: ${rua}, ${numero} — ${bairro} — ${cidade}${cep ? ` (CEP ${cep})` : ""}`
+          : "";
+      const pagamentoBlock = `Pagamento preferido: ${payment}`;
+      const notasFinais = [enderecoBlock, pagamentoBlock, parsed.data.notes]
+        .filter(Boolean)
+        .join(" | ");
+
       const { data, error } = await supabase
         .from("orders")
         .insert({
@@ -66,11 +88,19 @@ function CheckoutPage() {
           items,
           total_cents: totalCents,
           delivery_method: delivery,
-          notes: parsed.data.notes || null,
+          notes: notasFinais || null,
         })
         .select("id")
         .single();
       if (error) throw error;
+
+      track("checkout_submit", {
+        order_id: data.id,
+        total_cents: totalCents,
+        items_count: items.length,
+        delivery_method: delivery,
+        payment_method: payment,
+      });
 
       const url = buildOrderWhatsappUrl({
         orderId: data.id,
@@ -78,7 +108,7 @@ function CheckoutPage() {
         items,
         totalCents,
         deliveryMethod: delivery,
-        notes: parsed.data.notes,
+        notes: notasFinais,
       });
       clear();
       toast.success("Pedido registrado! Abrindo WhatsApp...");
