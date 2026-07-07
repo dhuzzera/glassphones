@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut } from "lucide-react";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare } from "lucide-react";
 import type { ReactNode } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
@@ -12,8 +12,10 @@ function AdminBar() {
   const items = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true as const },
     { to: "/admin/produtos", label: "Editar produtos", icon: Package },
+    { to: "/admin/destaques", label: "Destaques", icon: Star },
     { to: "/admin/categorias", label: "Categorias", icon: Tag },
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
+    { to: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquare },
   ];
   return (
     <div className="bg-foreground text-background text-xs md:text-sm border-b border-background/10">
@@ -50,6 +52,7 @@ const NAV = [
   { to: "/loja", label: "Loja" },
   { to: "/servicos", label: "Serviços" },
   { to: "/ofertas", label: "Ofertas" },
+  { to: "/avaliacoes", label: "Avaliações" },
   { to: "/orcamento", label: "Orçamento" },
   { to: "/faq", label: "FAQ" },
   { to: "/contato", label: "Contato" },
