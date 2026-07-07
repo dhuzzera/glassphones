@@ -163,7 +163,10 @@ function CidadePage() {
             {cidade.regiao} com iPhone, Samsung, Xiaomi, Motorola, acessórios e reparos.
           </p>
           <div className="flex flex-wrap gap-3">
-            <a href={waUrl}>
+            <a
+              href={waUrl}
+              onClick={() => trackWhatsApp("cidade_hero", { cidade: cidade.slug, uf: cidade.uf })}
+            >
               <Button size="lg" className="bg-whatsapp text-whatsapp-foreground hover:opacity-90">
                 <WhatsAppIcon className="h-5 w-5 mr-2" /> Falar no WhatsApp
               </Button>
