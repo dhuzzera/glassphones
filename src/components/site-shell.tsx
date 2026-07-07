@@ -14,13 +14,15 @@ const NAV = [
 ] as const;
 
 function TopBar() {
+  const { get } = useSiteSettings();
+  const wa = get("contact.whatsapp_url");
   return (
     <div className="bg-primary text-primary-foreground text-xs md:text-sm">
       <div className="container mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-        <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Entrega para todo o Brasil</span>
-        <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> Até 12x sem juros no cartão</span>
-        <a href={waLink("Olá! Quero falar com um vendedor.")} className="flex items-center gap-2 font-medium hover:underline">
-          <WhatsAppIcon className="h-4 w-4" /> {PHONE_DISPLAY}
+        <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> {get("topbar.shipping")}</span>
+        <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> {get("topbar.payment")}</span>
+        <a href={wa} className="flex items-center gap-2 font-medium hover:underline">
+          <WhatsAppIcon className="h-4 w-4" /> {get("contact.phone_display")}
         </a>
       </div>
     </div>
