@@ -32,6 +32,7 @@ interface FormState {
   featured: boolean;
   active: boolean;
   stock: string;
+  batteryHealth: string;
 }
 
 const emptyForm: FormState = {
@@ -45,6 +46,7 @@ const emptyForm: FormState = {
   featured: false,
   active: true,
   stock: "",
+  batteryHealth: "100",
 };
 
 function ProductsAdmin() {
