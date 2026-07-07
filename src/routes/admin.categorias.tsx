@@ -85,18 +85,10 @@ function CategoriesPage() {
             ) : (
               <div className="space-y-2">
                 {cats.map((c) => (
-                  <div key={c.id} className="flex items-center justify-between p-3 border rounded-md">
-                    <div>
-                      <p className="font-medium">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">/{c.slug}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={c.type === "product" ? "default" : "secondary"}>{c.type === "product" ? "Produto" : "Serviço"}</Badge>
-                      <Button variant="ghost" size="icon" onClick={() => remove(c.id)}>
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
+                  <CategoryRow key={c.id} category={c} onRemove={remove} onChanged={() => {
+                    qc.invalidateQueries({ queryKey: ["admin-categories"] });
+                    qc.invalidateQueries({ queryKey: ["categories"] });
+                  }} />
                 ))}
               </div>
             )}
