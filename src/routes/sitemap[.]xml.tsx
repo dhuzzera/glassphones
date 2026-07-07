@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { servicos } from "@/lib/site";
+import { CIDADES } from "@/lib/cidades";
 
 const BASE_URL = "https://glassphones.lovable.app";
 
@@ -15,8 +16,12 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
+          { path: "/loja", changefreq: "weekly", priority: "0.95" },
           { path: "/servicos", changefreq: "monthly", priority: "0.9" },
+          { path: "/comparar", changefreq: "weekly", priority: "0.85" },
+          { path: "/trade-in", changefreq: "monthly", priority: "0.85" },
           { path: "/ofertas", changefreq: "weekly", priority: "0.9" },
+          { path: "/avaliacoes", changefreq: "weekly", priority: "0.8" },
           { path: "/orcamento", changefreq: "monthly", priority: "0.8" },
           { path: "/faq", changefreq: "monthly", priority: "0.7" },
           { path: "/contato", changefreq: "yearly", priority: "0.7" },
@@ -24,6 +29,11 @@ export const Route = createFileRoute("/sitemap.xml")({
             path: `/servicos/${s.slug}`,
             changefreq: "monthly",
             priority: "0.8",
+          })),
+          ...CIDADES.map<SitemapEntry>((c) => ({
+            path: `/em/${c.slug}`,
+            changefreq: "monthly",
+            priority: "0.85",
           })),
         ];
 
