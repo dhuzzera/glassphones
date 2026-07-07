@@ -80,6 +80,21 @@ function ProductDetail() {
     },
   });
 
+  const { data: variants = [] } = useQuery({
+    queryKey: ["variants", product?.id],
+    enabled: !!product,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_variants")
+        .select("*")
+        .eq("product_id", product!.id)
+        .eq("active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return (data ?? []) as ProductVariant[];
+    },
+  });
+
   const { data: related = [] } = useQuery({
     queryKey: ["related", product?.category_id, product?.id],
     enabled: !!product,
