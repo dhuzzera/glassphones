@@ -170,7 +170,7 @@ export function ProdutoCard(p: Produto) {
           {p.promo && <div className="text-xs text-muted-foreground line-through">{brl(p.antigo)}</div>}
           <div className="text-price font-black text-xl leading-tight">{brl(p.preco)}</div>
           <div className="text-xs text-whatsapp font-semibold">ou {brl(pix)} no Pix</div>
-          <div className="text-xs text-muted-foreground">12x de {brl(p.preco / 12)} sem juros</div>
+          <div className="text-xs text-muted-foreground">Consulte parcelamento no WhatsApp</div>
         </div>
         <Link to="/loja/$slug" params={{ slug }} className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition">
           Ver produto
