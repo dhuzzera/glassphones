@@ -12,8 +12,10 @@ function AdminBar() {
   const items = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true as const },
     { to: "/admin/produtos", label: "Editar produtos", icon: Package },
+    { to: "/admin/destaques", label: "Destaques", icon: Star },
     { to: "/admin/categorias", label: "Categorias", icon: Tag },
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
+    { to: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquare },
   ];
   return (
     <div className="bg-foreground text-background text-xs md:text-sm border-b border-background/10">
