@@ -254,14 +254,25 @@ function ProductGrid({ products, loading, kind, onQuickView }: { products: Produ
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (slug: string) => void }) {
   const { add } = useCart();
+  const { isAdmin } = useAuth();
   const img = product.image_urls[0];
   const isService = product.kind === "service";
 
   return (
-    <Card className="overflow-hidden flex flex-col group hover:shadow-lg transition">
-      <Link to="/loja/$slug" params={{ slug: product.slug }}>
+    <Card className="overflow-hidden flex flex-col group hover:shadow-lg transition relative">
+      {isAdmin && (
+        <Link
+          to="/admin/produtos"
+          aria-label="Editar produto"
+          onClick={(e) => e.stopPropagation()}
+          className="absolute top-2 right-2 z-10 h-8 w-8 grid place-items-center rounded-full bg-foreground text-background shadow-md hover:bg-primary transition"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Link>
+      )}
+      <button type="button" onClick={() => onQuickView(product.slug)} className="text-left">
         <div className="aspect-square bg-muted overflow-hidden">
           {img ? (
             <img src={img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
@@ -271,11 +282,11 @@ function ProductCard({ product }: { product: Product }) {
             </div>
           )}
         </div>
-      </Link>
+      </button>
       <CardContent className="p-4 flex-1">
-        <Link to="/loja/$slug" params={{ slug: product.slug }} className="hover:underline">
+        <button type="button" onClick={() => onQuickView(product.slug)} className="hover:underline text-left w-full">
           <h3 className="font-semibold line-clamp-2">{product.name}</h3>
-        </Link>
+        </button>
         <p className="mt-2 text-xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
         <p className="text-xs text-muted-foreground">
           ou 12x de {formatBRL(Math.round(product.price_cents / 12))}
@@ -288,22 +299,10 @@ function ProductCard({ product }: { product: Product }) {
             <Button variant="default" className="w-full">Agendar pelo WhatsApp</Button>
           </a>
         ) : (
-          <Link to="/loja/$slug" params={{ slug: product.slug }} className="w-full">
-            <Button className="w-full" variant="outline" onClick={(e) => {
-              // If product has no attributes required, add directly
-              e.preventDefault();
-              add({
-                product_id: product.id,
-                variant_id: null,
-                variant_label: null,
-                name: product.name,
-                price_cents: product.price_cents,
-                kind: product.kind,
-              });
-            }}>
-              Adicionar ao carrinho
-            </Button>
-          </Link>
+          <Button className="w-full" onClick={() => onQuickView(product.slug)}>
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Comprar agora
+          </Button>
         )}
       </CardFooter>
     </Card>
