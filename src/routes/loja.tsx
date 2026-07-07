@@ -233,30 +233,11 @@ function LojaPage() {
           </Tabs>
         </section>
       </main>
-    </div>
+      </div>
+    </SiteShell>
   );
 }
 
-function MarketplaceHeader({ count }: { count: number }) {
-  return (
-    <header className="border-b bg-card sticky top-0 z-40 backdrop-blur">
-      <div className="container mx-auto flex items-center justify-between py-4 px-4">
-        <Link to="/" className="text-xl font-bold">Glass Phone SBS</Link>
-        <div className="flex items-center gap-2">
-          <Link to="/carrinho">
-            <Button variant="outline" size="sm" className="relative">
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Carrinho
-              {count > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 min-w-5 px-1">{count}</Badge>
-              )}
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function ProductGrid({ products, loading, kind }: { products: Product[]; loading: boolean; kind: "product" | "service" }) {
   if (loading) return <p className="text-muted-foreground">Carregando...</p>;
