@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { CreditCard, Instagram, Truck } from "lucide-react";
 import type { ReactNode } from "react";
-import { assets, categorias, INSTAGRAM, PHONE_DISPLAY, waLink, WhatsAppIcon } from "@/lib/site";
+import { assets, categorias, WhatsAppIcon } from "@/lib/site";
+import { useSiteSettings } from "@/hooks/use-site-content";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -13,13 +14,15 @@ const NAV = [
 ] as const;
 
 function TopBar() {
+  const { get } = useSiteSettings();
+  const wa = get("contact.whatsapp_url");
   return (
     <div className="bg-primary text-primary-foreground text-xs md:text-sm">
       <div className="container mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-        <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> Entrega para todo o Brasil</span>
-        <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> Até 12x sem juros no cartão</span>
-        <a href={waLink("Olá! Quero falar com um vendedor.")} className="flex items-center gap-2 font-medium hover:underline">
-          <WhatsAppIcon className="h-4 w-4" /> {PHONE_DISPLAY}
+        <span className="flex items-center gap-2"><Truck className="h-4 w-4" /> {get("topbar.shipping")}</span>
+        <span className="hidden md:flex items-center gap-2"><CreditCard className="h-4 w-4" /> {get("topbar.payment")}</span>
+        <a href={wa} className="flex items-center gap-2 font-medium hover:underline">
+          <WhatsAppIcon className="h-4 w-4" /> {get("contact.phone_display")}
         </a>
       </div>
     </div>
@@ -27,6 +30,7 @@ function TopBar() {
 }
 
 function Header() {
+  const { get } = useSiteSettings();
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
       <div className="container mx-auto px-4 py-4 flex items-center gap-6">
@@ -49,7 +53,7 @@ function Header() {
         </nav>
 
         <a
-          href={waLink("Olá! Vim pelo site e quero conversar.")}
+          href={get("contact.whatsapp_url")}
           className="ml-auto hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
         >
           <WhatsAppIcon className="h-4 w-4" /> WhatsApp
@@ -76,16 +80,19 @@ function Header() {
 }
 
 function Footer() {
+  const { get } = useSiteSettings();
+  const insta = get("contact.instagram");
+  const instaHandle = insta.replace(/\/$/, "").split("/").pop() || "instagram";
   return (
     <footer className="bg-foreground text-background/90 pt-12 pb-6 mt-16">
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
         <div>
           <img src={assets.logoFlat} alt="Glass Phone SBS" className="h-14 w-auto mb-3" />
           <p className="text-sm text-background/60 mb-3">
-            Smartphones, acessórios e assistência com atendimento humano.
+            {get("footer.tagline")}
           </p>
-          <a href={INSTAGRAM} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm hover:text-primary">
-            <Instagram className="h-4 w-4" /> @glass_phonesbs
+          <a href={insta} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm hover:text-primary">
+            <Instagram className="h-4 w-4" /> @{instaHandle}
           </a>
         </div>
         <div>
@@ -105,10 +112,10 @@ function Footer() {
         <div>
           <h4 className="font-semibold mb-3">Contato</h4>
           <ul className="space-y-2 text-sm text-background/70">
-            <li>Av. São Bento, 1330 — Sala 8</li>
-            <li>São Bento do Sul/SC · 89281-100</li>
-            <li>{PHONE_DISPLAY}</li>
-            <li>Seg-Sáb 9h às 19h</li>
+            <li>{get("contact.address_line1")}</li>
+            <li>{get("contact.address_line2")}</li>
+            <li>{get("contact.phone_display")}</li>
+            <li>{get("contact.hours")}</li>
           </ul>
         </div>
       </div>
@@ -122,9 +129,10 @@ function Footer() {
 }
 
 function WhatsAppFloat() {
+  const { get } = useSiteSettings();
   return (
     <a
-      href={waLink("Olá! Vim pelo site.")}
+      href={get("contact.whatsapp_url")}
       aria-label="Falar no WhatsApp"
       className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-whatsapp text-whatsapp-foreground grid place-items-center shadow-lg hover:scale-110 transition animate-pulse"
       style={{ boxShadow: "0 10px 30px -5px oklch(0.7 0.17 150 / 0.6)" }}

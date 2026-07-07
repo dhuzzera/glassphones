@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState } from "react";
 import { brl, categorias, faqs, defeitos, heroSlides, logo, modelosPop, PHONE_DISPLAY, produtos, servicos, waLink, WhatsAppIcon, WHATSAPP_NUM, type Produto } from "@/lib/site";
+import { useFaqItems, useSiteSettings } from "@/hooks/use-site-content";
 import { trackServiceDetail, trackWhatsApp } from "@/lib/analytics";
 
 export function Hero() {
@@ -267,6 +268,10 @@ export function OrcamentoForm() {
 
 export function FAQList() {
   const [open, setOpen] = useState<number | null>(0);
+  const { data: dbFaqs } = useFaqItems();
+  const items = (dbFaqs && dbFaqs.length > 0)
+    ? dbFaqs.filter(f => f.active).map(f => ({ q: f.question, a: f.answer }))
+    : faqs;
   return (
     <section className="py-16 md:py-20 bg-secondary/40">
       <div className="container mx-auto px-4 max-w-3xl">
@@ -275,7 +280,7 @@ export function FAQList() {
           <h2 className="text-3xl md:text-4xl font-bold mt-2">Perguntas mais comuns</h2>
         </div>
         <div className="space-y-3">
-          {faqs.map((f, i) => {
+          {items.map((f, i) => {
             const isOpen = open === i;
             return (
               <div key={f.q} className="bg-card border border-border rounded-2xl overflow-hidden">
@@ -294,6 +299,7 @@ export function FAQList() {
 }
 
 export function ContatoCard() {
+  const { get } = useSiteSettings();
   return (
     <section className="py-16 md:py-20">
       <div className="container mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
@@ -301,16 +307,16 @@ export function ContatoCard() {
           <span className="text-primary font-semibold text-sm">FALE COM A GENTE</span>
           <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Visite nossa loja em São Bento do Sul</h2>
           <p className="text-muted-foreground mb-6">Atendimento consultivo, sem enrolação. Traga seu aparelho ou fale com a gente pelo WhatsApp.</p>
-          <a href={waLink("Olá! Quero conversar com a Glass Phone.")} className="inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3 rounded-full font-bold hover:opacity-90">
+          <a href={get("contact.whatsapp_url")} className="inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-6 py-3 rounded-full font-bold hover:opacity-90">
             <WhatsAppIcon className="h-4 w-4" /> Falar no WhatsApp
           </a>
         </div>
         <div className="rounded-3xl p-8 text-white" style={{ background: "var(--gradient-hero)" }}>
           <h3 className="text-2xl font-bold mb-4">Onde estamos</h3>
           <ul className="space-y-3 text-white/90">
-            <li className="flex items-start gap-3"><MapPin className="h-5 w-5 shrink-0 mt-0.5" /> Av. São Bento, 1330 — Sala 8, São Bento do Sul/SC · CEP 89281-100</li>
-            <li className="flex items-start gap-3"><Clock className="h-5 w-5 shrink-0 mt-0.5" /> Seg a Sáb — 9h às 19h</li>
-            <li className="flex items-start gap-3"><Phone className="h-5 w-5 shrink-0 mt-0.5" /> {PHONE_DISPLAY}</li>
+            <li className="flex items-start gap-3"><MapPin className="h-5 w-5 shrink-0 mt-0.5" /> {get("contact.address_line1")}, {get("contact.address_line2")}</li>
+            <li className="flex items-start gap-3"><Clock className="h-5 w-5 shrink-0 mt-0.5" /> {get("contact.hours")}</li>
+            <li className="flex items-start gap-3"><Phone className="h-5 w-5 shrink-0 mt-0.5" /> {get("contact.phone_display")}</li>
           </ul>
         </div>
       </div>
@@ -328,4 +334,5 @@ export function ContatoCard() {
     </section>
   );
 }
+
 
