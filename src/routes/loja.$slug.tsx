@@ -629,6 +629,8 @@ function ProductDetail() {
               ))}
             </div>
           </section>
+        )}
+
         {/* Prova social */}
         {!isService && <ProductSocialProof productId={product.id} productName={product.name} />}
 
