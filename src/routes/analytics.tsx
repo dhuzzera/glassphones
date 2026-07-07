@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { clearLog, isDebug, readLog, type LoggedEvent } from "@/lib/analytics";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({
@@ -25,7 +26,25 @@ function label(e: LoggedEvent) {
 }
 
 function AnalyticsPage() {
+  const { isAdmin, loading } = useAuth();
+  const navigate = useNavigate();
   const [events, setEvents] = useState<LoggedEvent[]>([]);
+  const [debug, setDebug] = useState(false);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!isAdmin) navigate({ to: "/auth" });
+  }, [isAdmin, loading, navigate]);
+
+  if (loading) {
+    return (
+      <SiteShell>
+        <div className="min-h-screen flex items-center justify-center">Verificando...</div>
+      </SiteShell>
+    );
+  }
+
+  if (!isAdmin) return null;
   const [debug, setDebug] = useState(false);
 
   const refresh = () => setEvents(readLog());

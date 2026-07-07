@@ -8,7 +8,7 @@ import { formatBRL, WHATSAPP_NUMBER } from "@/lib/marketplace";
 import type { Product } from "@/lib/marketplace-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { WhatsAppIcon } from "@/lib/site";
+import { WhatsAppIcon, SITE_URL } from "@/lib/site";
 import { trackWhatsApp } from "@/lib/analytics";
 
 export const Route = createFileRoute("/em/$cidade")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/em/$cidade")({
     // Título CTR-focused: começa com o benefício + cidade, marca no final.
     const title = `iPhone, Samsung e Assistência em ${cidade.nome}/${cidade.uf} · Entrega Rápida | Glass Phone SBS`;
     const description = `Loja de celulares em ${cidade.nome}: iPhone, Samsung, Xiaomi, Motorola, acessórios e assistência técnica. ${cidade.destaque} Atendimento humano no WhatsApp em ~5 min.`;
-    const url = `https://glassphones.lovable.app/em/${cidade.slug}`;
+    const url = `${SITE_URL}/em/${cidade.slug}`;
     return {
       meta: [
         { title },
@@ -92,8 +92,8 @@ export const Route = createFileRoute("/em/$cidade")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Início", item: "https://glassphones.lovable.app/" },
-              { "@type": "ListItem", position: 2, name: "Atendimento", item: "https://glassphones.lovable.app/em/sao-bento-do-sul" },
+              { "@type": "ListItem", position: 1, name: "Início", item: `${SITE_URL}/` },
+              { "@type": "ListItem", position: 2, name: "Atendimento", item: `${SITE_URL}/em/sao-bento-do-sul` },
               { "@type": "ListItem", position: 3, name: `${cidade.nome}/${cidade.uf}`, item: url },
             ],
           }),

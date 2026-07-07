@@ -29,7 +29,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate({ to: isAdmin ? "/" : "/loja" });
+      navigate({ to: isAdmin ? "/admin" : "/loja" });
     }
   }, [user, isAdmin, loading, navigate]);
 

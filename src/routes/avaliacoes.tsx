@@ -85,6 +85,17 @@ function AvaliacoesPage() {
       toast.error("Preencha nome e depoimento.");
       return;
     }
+
+    // Rate limiting: impede envio de múltiplas avaliações em menos de 5 minutos
+    const lastStr = localStorage.getItem("gp_review_last");
+    if (lastStr) {
+      const last = parseInt(lastStr, 10);
+      if (!isNaN(last) && Date.now() - last < 5 * 60 * 1000) {
+        toast.error("Aguarde alguns minutos antes de enviar outra avaliação.");
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       let uploadedPhotoUrl: string | null = null;
@@ -112,6 +123,7 @@ function AvaliacoesPage() {
         photo_url: uploadedPhotoUrl,
       });
       if (error) throw error;
+      localStorage.setItem("gp_review_last", String(Date.now()));
       toast.success("Avaliação enviada! Ficará visível após aprovação.");
       setName("");
       setComment("");

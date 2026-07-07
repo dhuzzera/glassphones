@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle, Menu, X } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle, Menu, X, Settings, Search } from "lucide-react";
+import { type ReactNode, useState, useRef } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
 import { useAuth } from "@/hooks/use-auth";
@@ -18,6 +18,7 @@ function AdminBar() {
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
     { to: "/admin/leads", label: "Leads", icon: Recycle },
     { to: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquare },
+    { to: "/admin/configuracoes", label: "Config.", icon: Settings },
   ];
   return (
     <div className="bg-foreground text-background text-xs md:text-sm border-b border-background/10">
@@ -80,6 +81,31 @@ function TopBar() {
 function Header() {
   const { get } = useSiteSettings();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  const handleSearchOpen = () => {
+    setSearchOpen(true);
+    setTimeout(() => searchInputRef.current?.focus(), 50);
+  };
+
+  const handleSearchClose = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  };
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    navigate({
+      to: "/loja",
+      search: { q, tab: "product", cat: "null", cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 },
+    });
+    handleSearchClose();
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
@@ -99,6 +125,44 @@ function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Busca global */}
+          {searchOpen ? (
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-1">
+              <input
+                ref={searchInputRef}
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Escape" && handleSearchClose()}
+                placeholder="Buscar produtos..."
+                className="border border-border rounded-md px-3 py-1.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary w-40 sm:w-56"
+                aria-label="Buscar produtos"
+              />
+              <button
+                type="submit"
+                className="p-2 rounded-md hover:bg-muted transition"
+                aria-label="Buscar"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleSearchClose}
+                className="p-2 rounded-md hover:bg-muted transition"
+                aria-label="Fechar busca"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </form>
+          ) : (
+            <button
+              onClick={handleSearchOpen}
+              className="p-2 rounded-md hover:bg-muted transition"
+              aria-label="Abrir busca"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+          )}
           <a href={get("contact.whatsapp_url")}
             className="hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2 rounded-full font-semibold text-sm hover:opacity-90 transition">
             <WhatsAppIcon className="h-4 w-4" /> WhatsApp
