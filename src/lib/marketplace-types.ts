@@ -106,3 +106,33 @@ export interface Review {
   photo_url: string | null;
   created_at: string;
 }
+
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string | null;
+  type: "percent" | "fixed";
+  value: number;
+  min_order_cents: number;
+  max_uses: number | null;
+  uses: number;
+  active: boolean;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export interface Order {
+  id: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string | null;
+  items: OrderItem[];
+  total_cents: number;
+  delivery_method: DeliveryMethod;
+  notes: string | null;
+  status: OrderStatus;
+  source: OrderSource | null;
+  coupon_code: string | null;
+  discount_cents: number;
+  created_at: string;
+}
