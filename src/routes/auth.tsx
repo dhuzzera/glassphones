@@ -29,9 +29,10 @@ function AuthPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate({ to: isAdmin ? "/admin" : "/loja" });
+      navigate({ to: isAdmin ? "/" : "/loja" });
     }
   }, [user, isAdmin, loading, navigate]);
+
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
