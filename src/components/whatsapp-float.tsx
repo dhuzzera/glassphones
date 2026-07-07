@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
+import { trackWhatsApp } from "@/lib/analytics";
 
 /** Horário comercial: Seg-Sáb 9h-19h (America/Sao_Paulo, UTC-3). */
 function useBusinessHours() {
