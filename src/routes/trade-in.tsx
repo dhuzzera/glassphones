@@ -141,6 +141,26 @@ function TradeInPage() {
       return;
     }
     const est = estimar(marca, modelo, estado, b);
+    // Origem do lead: capturamos ?cidade / ?produto / ?origem (links vindos de
+    // /em/$cidade ou de páginas de produto) + referrer para atribuição.
+    const url = typeof window !== "undefined" ? new URL(window.location.href) : null;
+    const cidadeOrigem = url?.searchParams.get("cidade") ?? "";
+    const produtoOrigem = url?.searchParams.get("produto") ?? "";
+    const origemParam = url?.searchParams.get("origem") ?? "";
+    const referrer = typeof document !== "undefined" ? document.referrer : "";
+    track("trade_in_lead_submit", {
+      marca,
+      modelo,
+      estado,
+      bateria: b,
+      estimativa_min: est.min,
+      estimativa_max: est.max,
+      cidade: cidadeOrigem,
+      produto: produtoOrigem,
+      origem: origemParam,
+      referrer,
+    });
+    trackWhatsApp("trade_in_form", { marca, modelo, cidade: cidadeOrigem });
     const msg = [
       "*Trade-in — Glass Phone SBS*",
       `Cliente: ${nome}`,
@@ -149,11 +169,15 @@ function TradeInPage() {
       `Aparelho: ${marca.toUpperCase()} ${modelo}`,
       `Estado: ${estado}`,
       `Bateria: ${b}%`,
+      cidadeOrigem ? `Cidade: ${cidadeOrigem}` : "",
+      produtoOrigem ? `Interesse: ${produtoOrigem}` : "",
       "",
       `Estimativa online: ${formatBRL(est.min)} — ${formatBRL(est.max)}`,
       "",
       "Gostaria de confirmar o valor e as opções de troca. Obrigado!",
-    ].join("\n");
+    ]
+      .filter(Boolean)
+      .join("\n");
     window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
   };
 
