@@ -84,6 +84,7 @@ function ProductsAdmin() {
     featured: p.featured,
     active: p.active,
     stock: p.stock?.toString() ?? "",
+    batteryHealth: p.battery_health?.toString() ?? "100",
   });
 
   const remove = async (id: string) => {
