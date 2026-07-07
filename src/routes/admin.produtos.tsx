@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus, X, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Category, ProductKind } from "@/lib/marketplace-types";
+import type { Product, Category, ProductKind, ProductVariant } from "@/lib/marketplace-types";
 import { formatBRL, slugify } from "@/lib/marketplace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -294,7 +294,251 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
             <Button type="submit" className="flex-1" disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
           </div>
         </form>
+
+        {form.id && form.kind === "product" && (
+          <div className="mt-8 pt-6 border-t">
+            <VariantsManager productId={form.id} basePriceCents={Math.round(parseFloat((form.priceReais || "0").replace(",", ".")) * 100) || 0} />
+          </div>
+        )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+// ============ Variations Manager ============
+
+interface VariantFormState {
+  attributes: Record<string, string>;
+  sku: string;
+  priceReais: string;
+  stock: string;
+  image_url: string;
+  sort_order: number;
+  active: boolean;
+}
+
+const emptyVariantForm: VariantFormState = {
+  attributes: {},
+  sku: "",
+  priceReais: "",
+  stock: "",
+  image_url: "",
+  sort_order: 0,
+  active: true,
+};
+
+function VariantsManager({ productId, basePriceCents }: { productId: string; basePriceCents: number }) {
+  const qc = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<VariantFormState>(emptyVariantForm);
+  const [attrDraftName, setAttrDraftName] = useState("");
+  const [attrDraftValue, setAttrDraftValue] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const { data: variants = [], isLoading } = useQuery({
+    queryKey: ["admin-variants", productId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_variants")
+        .select("*")
+        .eq("product_id", productId)
+        .order("sort_order")
+        .order("created_at");
+      if (error) throw error;
+      return (data ?? []) as ProductVariant[];
+    },
+  });
+
+  const resetForm = () => {
+    setForm(emptyVariantForm);
+    setEditingId(null);
+    setShowForm(false);
+    setAttrDraftName("");
+    setAttrDraftValue("");
+  };
+
+  const openEdit = (v: ProductVariant) => {
+    setEditingId(v.id);
+    setForm({
+      attributes: { ...v.attributes },
+      sku: v.sku ?? "",
+      priceReais: v.price_cents != null ? (v.price_cents / 100).toFixed(2) : "",
+      stock: v.stock != null ? String(v.stock) : "",
+      image_url: v.image_url ?? "",
+      sort_order: v.sort_order,
+      active: v.active,
+    });
+    setShowForm(true);
+  };
+
+  const addAttr = () => {
+    const k = attrDraftName.trim();
+    const v = attrDraftValue.trim();
+    if (!k || !v) return;
+    setForm((f) => ({ ...f, attributes: { ...f.attributes, [k]: v } }));
+    setAttrDraftName("");
+    setAttrDraftValue("");
+  };
+
+  const removeAttr = (k: string) => {
+    setForm((f) => {
+      const next = { ...f.attributes };
+      delete next[k];
+      return { ...f, attributes: next };
+    });
+  };
+
+  const save = async () => {
+    if (Object.keys(form.attributes).length === 0) {
+      toast.error("Adicione ao menos um atributo (ex: Cor: Preto).");
+      return;
+    }
+    setSaving(true);
+    const price = form.priceReais.trim()
+      ? Math.round(parseFloat(form.priceReais.replace(",", ".")) * 100)
+      : null;
+    if (price != null && (isNaN(price) || price < 0)) {
+      setSaving(false);
+      return toast.error("Preço inválido");
+    }
+    const payload = {
+      product_id: productId,
+      attributes: form.attributes,
+      sku: form.sku || null,
+      price_cents: price,
+      stock: form.stock ? parseInt(form.stock, 10) : null,
+      image_url: form.image_url || null,
+      sort_order: form.sort_order,
+      active: form.active,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = editingId
+      ? await supabase.from("product_variants").update(payload).eq("id", editingId)
+      : await supabase.from("product_variants").insert(payload);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(editingId ? "Variação atualizada" : "Variação criada");
+    resetForm();
+    qc.invalidateQueries({ queryKey: ["admin-variants", productId] });
+    qc.invalidateQueries({ queryKey: ["variants", productId] });
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Excluir esta variação?")) return;
+    const { error } = await supabase.from("product_variants").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Variação excluída");
+    qc.invalidateQueries({ queryKey: ["admin-variants", productId] });
+    qc.invalidateQueries({ queryKey: ["variants", productId] });
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="font-semibold">Variações</h3>
+          <p className="text-xs text-muted-foreground">Ex.: Cor, Capacidade. Se vazio, usa preço/estoque do produto.</p>
+        </div>
+        {!showForm && (
+          <Button size="sm" variant="outline" onClick={() => setShowForm(true)}>
+            <Plus className="w-3 h-3 mr-1" /> Nova
+          </Button>
+        )}
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Carregando...</p>
+      ) : variants.length === 0 && !showForm ? (
+        <p className="text-sm text-muted-foreground">Nenhuma variação cadastrada.</p>
+      ) : (
+        <div className="space-y-2">
+          {variants.map((v) => (
+            <div key={v.id} className="flex items-center gap-3 p-2 border rounded">
+              <div className="w-10 h-10 rounded bg-muted overflow-hidden shrink-0">
+                {v.image_url && <img src={v.image_url} alt="" className="w-full h-full object-cover" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">
+                  {Object.entries(v.attributes).map(([k, val]) => `${k}: ${val}`).join(" · ")}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {v.price_cents != null ? formatBRL(v.price_cents) : `${formatBRL(basePriceCents)} (base)`}
+                  {" · "}
+                  {v.stock != null ? `${v.stock} un.` : "estoque livre"}
+                  {!v.active && " · inativa"}
+                </p>
+              </div>
+              <Button size="icon" variant="ghost" onClick={() => openEdit(v)}><Pencil className="w-3 h-3" /></Button>
+              <Button size="icon" variant="ghost" onClick={() => remove(v.id)}><Trash2 className="w-3 h-3 text-destructive" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {showForm && (
+        <div className="mt-4 p-4 border rounded-lg bg-muted/30 space-y-3">
+          <p className="text-sm font-medium">{editingId ? "Editar variação" : "Nova variação"}</p>
+
+          <div>
+            <Label className="text-xs">Atributos</Label>
+            <div className="flex flex-wrap gap-2 mt-1 mb-2">
+              {Object.entries(form.attributes).map(([k, v]) => (
+                <Badge key={k} variant="secondary" className="gap-1">
+                  {k}: {v}
+                  <button type="button" onClick={() => removeAttr(k)}>
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+              {Object.keys(form.attributes).length === 0 && (
+                <span className="text-xs text-muted-foreground">Nenhum atributo</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Input placeholder="Nome (ex: Cor)" value={attrDraftName} onChange={(e) => setAttrDraftName(e.target.value)} className="h-8" />
+              <Input placeholder="Valor (ex: Preto)" value={attrDraftValue} onChange={(e) => setAttrDraftValue(e.target.value)} className="h-8" />
+              <Button type="button" size="sm" onClick={addAttr}>Add</Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-xs">SKU (opcional)</Label>
+              <Input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} className="h-8" />
+            </div>
+            <div>
+              <Label className="text-xs">Ordem</Label>
+              <Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value, 10) || 0 })} className="h-8" />
+            </div>
+            <div>
+              <Label className="text-xs">Preço (R$) — vazio herda</Label>
+              <Input inputMode="decimal" value={form.priceReais} onChange={(e) => setForm({ ...form, priceReais: e.target.value })} className="h-8" />
+            </div>
+            <div>
+              <Label className="text-xs">Estoque</Label>
+              <Input type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="h-8" />
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-xs">Imagem (URL — opcional)</Label>
+            <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." className="h-8" />
+          </div>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+            Ativa
+          </label>
+
+          <div className="flex gap-2">
+            <Button type="button" size="sm" variant="outline" onClick={resetForm} className="flex-1">Cancelar</Button>
+            <Button type="button" size="sm" onClick={save} disabled={saving} className="flex-1">
+              {saving ? "Salvando..." : "Salvar variação"}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

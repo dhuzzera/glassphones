@@ -20,7 +20,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Category } from "@/lib/marketplace-types";
+import type { Product, Category, ProductVariant } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl, WHATSAPP_NUMBER } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
 import { useSiteSettings } from "@/hooks/use-site-content";
@@ -50,6 +50,7 @@ function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [zoomOpen, setZoomOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>({});
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
@@ -76,6 +77,21 @@ function ProductDetail() {
         .maybeSingle();
       if (error) throw error;
       return data as Category | null;
+    },
+  });
+
+  const { data: variants = [] } = useQuery({
+    queryKey: ["variants", product?.id],
+    enabled: !!product,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_variants")
+        .select("*")
+        .eq("product_id", product!.id)
+        .eq("active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return (data ?? []) as ProductVariant[];
     },
   });
 
@@ -132,20 +148,56 @@ function ProductDetail() {
   }
 
   const isService = product.kind === "service";
-  const img = product.image_urls[selectedImg];
-  const inStock = product.stock === null || product.stock > 0;
-  const lowStock = product.stock !== null && product.stock > 0 && product.stock <= 3;
+  const hasVariants = variants.length > 0;
+
+  // Attribute name -> ordered unique values (from all variants)
+  const attrGroups: Record<string, string[]> = {};
+  for (const v of variants) {
+    for (const [k, val] of Object.entries(v.attributes ?? {})) {
+      if (!attrGroups[k]) attrGroups[k] = [];
+      if (!attrGroups[k].includes(val)) attrGroups[k].push(val);
+    }
+  }
+  const attrNames = Object.keys(attrGroups);
+
+  const activeVariant: ProductVariant | null = hasVariants
+    ? variants.find((v) =>
+        attrNames.every((k) => (v.attributes?.[k] ?? "") === (selectedAttrs[k] ?? ""))
+      ) ?? null
+    : null;
+  const allAttrsPicked = attrNames.every((k) => selectedAttrs[k]);
+  const variantLabel = allAttrsPicked
+    ? attrNames.map((k) => `${k}: ${selectedAttrs[k]}`).join(" · ")
+    : null;
+
+  const effectivePrice =
+    activeVariant?.price_cents ?? product.price_cents;
+  const effectiveStock = hasVariants
+    ? activeVariant?.stock ?? null
+    : product.stock;
+  const effectiveImgList = activeVariant?.image_url
+    ? [activeVariant.image_url, ...product.image_urls]
+    : product.image_urls;
+  const img = effectiveImgList[selectedImg];
+  const inStock = effectiveStock === null || effectiveStock > 0;
+  const lowStock = effectiveStock !== null && effectiveStock > 0 && effectiveStock <= 3;
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareText = `${product.name} — ${formatBRL(product.price_cents)}`;
+  const shareText = `${product.name} — ${formatBRL(effectivePrice)}`;
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
 
   const handleAdd = (redirect = false) => {
+    if (hasVariants && !activeVariant) {
+      toast.error("Selecione uma variação antes de adicionar ao carrinho.");
+      return;
+    }
     for (let i = 0; i < qty; i++) {
       add({
         product_id: product.id,
+        variant_id: activeVariant?.id ?? null,
+        variant_label: variantLabel,
         name: product.name,
-        price_cents: product.price_cents,
+        price_cents: effectivePrice,
         kind: product.kind,
       });
     }
@@ -220,11 +272,11 @@ function ProductDetail() {
               )}
             </div>
 
-            {product.image_urls.length > 1 && (
+            {effectiveImgList.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
-                {product.image_urls.map((u, i) => (
+                {effectiveImgList.map((u, i) => (
                   <button
-                    key={i}
+                    key={`${u}-${i}`}
                     onClick={() => setSelectedImg(i)}
                     className={`w-20 h-20 rounded-lg overflow-hidden border-2 shrink-0 transition ${
                       i === selectedImg ? "border-primary" : "border-transparent hover:border-border"
@@ -253,21 +305,71 @@ function ProductDetail() {
 
             <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-sm text-muted-foreground">Preço</p>
-              <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
+              <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(effectivePrice)}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                ou 12x de {formatBRL(Math.round(product.price_cents / 12))} sem juros
+                ou 12x de {formatBRL(Math.round(effectivePrice / 12))} sem juros
               </p>
+
+              {hasVariants && (
+                <div className="mt-5 space-y-4">
+                  {attrNames.map((name) => (
+                    <div key={name}>
+                      <p className="text-sm font-medium mb-2">
+                        {name}
+                        {selectedAttrs[name] && (
+                          <span className="text-muted-foreground font-normal">: {selectedAttrs[name]}</span>
+                        )}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {attrGroups[name].map((val) => {
+                          const selected = selectedAttrs[name] === val;
+                          // check if any variant matches current selection + this option is active
+                          const wouldSelect = { ...selectedAttrs, [name]: val };
+                          const match = variants.find((v) =>
+                            attrNames.every((k) => (v.attributes?.[k] ?? "") === (wouldSelect[k] ?? ""))
+                          );
+                          const disabled = !!wouldSelect && !variants.some((v) => v.attributes?.[name] === val);
+                          const outOfStock = match && match.stock !== null && match.stock <= 0;
+                          return (
+                            <button
+                              key={val}
+                              type="button"
+                              onClick={() => setSelectedAttrs((s) => ({ ...s, [name]: val }))}
+                              disabled={disabled}
+                              className={`px-4 py-2 rounded-full border text-sm font-medium transition ${
+                                selected
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border bg-background hover:border-primary/50"
+                              } ${disabled ? "opacity-40 cursor-not-allowed" : ""} ${
+                                outOfStock && !selected ? "line-through opacity-60" : ""
+                              }`}
+                            >
+                              {val}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  {!allAttrsPicked && (
+                    <p className="text-xs text-muted-foreground">Selecione todas as variações.</p>
+                  )}
+                </div>
+              )}
 
               <div className="mt-4 flex items-center gap-2">
                 {inStock ? (
                   <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600">
                     <Check className="w-3 h-3 mr-1" />
-                    {lowStock ? `Últimas ${product.stock} unidades` : "Em estoque"}
+                    {lowStock ? `Últimas ${effectiveStock} unidades` : "Em estoque"}
                   </Badge>
                 ) : (
                   <Badge variant="destructive">Esgotado</Badge>
                 )}
                 {isService && <Badge variant="outline">Serviço</Badge>}
+                {activeVariant?.sku && (
+                  <Badge variant="outline" className="text-xs">SKU: {activeVariant.sku}</Badge>
+                )}
               </div>
 
               {!isService && inStock && (
@@ -283,7 +385,7 @@ function ProductDetail() {
                     </button>
                     <span className="w-10 text-center font-semibold">{qty}</span>
                     <button
-                      onClick={() => setQty(q => (product.stock !== null ? Math.min(product.stock, q + 1) : q + 1))}
+                      onClick={() => setQty(q => (effectiveStock !== null ? Math.min(effectiveStock, q + 1) : q + 1))}
                       className="h-9 w-9 grid place-items-center hover:bg-muted rounded-r-full transition"
                       aria-label="Aumentar"
                     >
@@ -303,10 +405,10 @@ function ProductDetail() {
                   </a>
                 ) : (
                   <>
-                    <Button size="lg" className="w-full" disabled={!inStock} onClick={() => handleAdd(true)}>
-                      Comprar agora
+                    <Button size="lg" className="w-full" disabled={!inStock || (hasVariants && !activeVariant)} onClick={() => handleAdd(true)}>
+                      {hasVariants && !activeVariant ? "Selecione a variação" : "Comprar agora"}
                     </Button>
-                    <Button size="lg" variant="outline" className="w-full" disabled={!inStock} onClick={() => handleAdd(false)}>
+                    <Button size="lg" variant="outline" className="w-full" disabled={!inStock || (hasVariants && !activeVariant)} onClick={() => handleAdd(false)}>
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Adicionar ao carrinho
                     </Button>

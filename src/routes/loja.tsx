@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
-import { ShoppingCart, Search, Wrench, Smartphone } from "lucide-react";
+import { ShoppingCart, Search, Wrench, Smartphone, ChevronRight, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, Category } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
+import { useSiteSettings } from "@/hooks/use-site-content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { WhatsAppIcon } from "@/lib/site";
 
 export const Route = createFileRoute("/loja")({
   head: () => ({
@@ -29,6 +31,7 @@ function LojaPage() {
   const [tab, setTab] = useState<"product" | "service">("product");
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const { count } = useCart();
+  const { get } = useSiteSettings();
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -53,6 +56,22 @@ function LojaPage() {
     },
   });
 
+  const { data: featuredProducts = [] } = useQuery({
+    queryKey: ["featured-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("active", true)
+        .eq("featured", true)
+        .eq("kind", "product")
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data as Product[];
+    },
+  });
+
   const filtered = useMemo(() => {
     if (!search) return products;
     const s = search.toLowerCase();
@@ -60,64 +79,172 @@ function LojaPage() {
   }, [products, search]);
 
   const catsForTab = categories.filter((c) => c.type === tab);
+  const featuredCats = categories.filter((c) => c.type === "product" && c.featured);
+  const heroImage = get("home.hero_image");
+  const heroTitle = get("home.hero_title") || "Tecnologia com atendimento humano";
+  const heroSubtitle = get("home.hero_subtitle") || "Smartphones, acessórios e assistência técnica em São Bento do Sul.";
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-40">
-        <div className="container mx-auto flex items-center justify-between py-4 px-4">
-          <Link to="/" className="text-xl font-bold">Glass Phone SBS</Link>
-          <div className="flex items-center gap-2">
-            <Link to="/carrinho">
-              <Button variant="outline" size="sm" className="relative">
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Carrinho
-                {count > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 min-w-5 px-1">{count}</Badge>
-                )}
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <MarketplaceHeader count={count} />
 
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Nossa Loja</h1>
-
-        <Tabs value={tab} onValueChange={(v) => { setTab(v as "product" | "service"); setCategoryId(null); }}>
-          <TabsList>
-            <TabsTrigger value="product"><Smartphone className="w-4 h-4 mr-2" />Produtos</TabsTrigger>
-            <TabsTrigger value="service"><Wrench className="w-4 h-4 mr-2" />Serviços</TabsTrigger>
-          </TabsList>
-
-          <div className="my-6 flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar..."
-                className="pl-9"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+      <main>
+        {/* HERO */}
+        <section className="relative overflow-hidden border-b border-border">
+          <div
+            className="absolute inset-0"
+            style={
+              heroImage
+                ? { backgroundImage: `url(${heroImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                : undefined
+            }
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/85 to-background/40" />
+          <div className="relative container mx-auto px-4 py-16 md:py-24 max-w-3xl">
+            <Badge variant="secondary" className="mb-4">
+              <Sparkles className="w-3 h-3 mr-1" /> Loja oficial Glass Phone SBS
+            </Badge>
+            <h1 className="text-3xl md:text-5xl font-bold leading-tight">{heroTitle}</h1>
+            <p className="mt-4 text-lg text-muted-foreground max-w-xl">{heroSubtitle}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="#novidades">
+                <Button size="lg">Ver novidades</Button>
+              </a>
+              <a
+                href={`https://wa.me/${get("contact.whatsapp_number")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button size="lg" variant="outline">
+                  <WhatsAppIcon className="w-4 h-4 mr-2" /> Falar no WhatsApp
+                </Button>
+              </a>
             </div>
-            {catsForTab.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant={categoryId === null ? "default" : "outline"} onClick={() => setCategoryId(null)}>Todas</Button>
-                {catsForTab.map((c) => (
-                  <Button key={c.id} size="sm" variant={categoryId === c.id ? "default" : "outline"} onClick={() => setCategoryId(c.id)}>{c.name}</Button>
-                ))}
-              </div>
-            )}
           </div>
+        </section>
 
-          <TabsContent value="product" className="mt-0">
-            <ProductGrid products={filtered} loading={isLoading} kind="product" />
-          </TabsContent>
-          <TabsContent value="service" className="mt-0">
-            <ProductGrid products={filtered} loading={isLoading} kind="service" />
-          </TabsContent>
-        </Tabs>
+        {/* FEATURED CATEGORIES */}
+        {featuredCats.length > 0 && (
+          <section className="container mx-auto px-4 py-10">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold">Explore por categoria</h2>
+                <p className="text-sm text-muted-foreground">Encontre rápido o que procura.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {featuredCats.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    setTab("product");
+                    setCategoryId(c.id);
+                    document.getElementById("novidades")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="group text-left rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg hover:border-primary/40 transition"
+                >
+                  <div className="aspect-[4/3] bg-muted overflow-hidden">
+                    {c.image_url ? (
+                      <img
+                        src={c.image_url}
+                        alt={c.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full grid place-items-center text-muted-foreground">
+                        <Smartphone className="w-12 h-12" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 flex items-center justify-between">
+                    <span className="font-semibold">{c.name}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* FEATURED PRODUCTS */}
+        {featuredProducts.length > 0 && (
+          <section className="container mx-auto px-4 py-6">
+            <div className="flex items-end justify-between mb-4">
+              <h2 className="text-2xl font-bold">Destaques</h2>
+              <a href="#novidades" className="text-sm text-primary hover:underline">
+                Ver todos
+              </a>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {featuredProducts.slice(0, 8).map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* NOVIDADES / CATALOG WITH FILTERS */}
+        <section id="novidades" className="container mx-auto px-4 py-10 scroll-mt-20">
+          <h2 className="text-2xl font-bold mb-6">Novidades</h2>
+
+          <Tabs value={tab} onValueChange={(v) => { setTab(v as "product" | "service"); setCategoryId(null); }}>
+            <TabsList>
+              <TabsTrigger value="product"><Smartphone className="w-4 h-4 mr-2" />Produtos</TabsTrigger>
+              <TabsTrigger value="service"><Wrench className="w-4 h-4 mr-2" />Serviços</TabsTrigger>
+            </TabsList>
+
+            <div className="my-6 flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar..."
+                  className="pl-9"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              {catsForTab.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant={categoryId === null ? "default" : "outline"} onClick={() => setCategoryId(null)}>Todas</Button>
+                  {catsForTab.map((c) => (
+                    <Button key={c.id} size="sm" variant={categoryId === c.id ? "default" : "outline"} onClick={() => setCategoryId(c.id)}>{c.name}</Button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <TabsContent value="product" className="mt-0">
+              <ProductGrid products={filtered} loading={isLoading} kind="product" />
+            </TabsContent>
+            <TabsContent value="service" className="mt-0">
+              <ProductGrid products={filtered} loading={isLoading} kind="service" />
+            </TabsContent>
+          </Tabs>
+        </section>
       </main>
     </div>
+  );
+}
+
+function MarketplaceHeader({ count }: { count: number }) {
+  return (
+    <header className="border-b bg-card sticky top-0 z-40 backdrop-blur">
+      <div className="container mx-auto flex items-center justify-between py-4 px-4">
+        <Link to="/" className="text-xl font-bold">Glass Phone SBS</Link>
+        <div className="flex items-center gap-2">
+          <Link to="/carrinho">
+            <Button variant="outline" size="sm" className="relative">
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              Carrinho
+              {count > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 min-w-5 px-1">{count}</Badge>
+              )}
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </header>
   );
 }
 
@@ -137,11 +264,11 @@ function ProductCard({ product }: { product: Product }) {
   const isService = product.kind === "service";
 
   return (
-    <Card className="overflow-hidden flex flex-col">
+    <Card className="overflow-hidden flex flex-col group hover:shadow-lg transition">
       <Link to="/loja/$slug" params={{ slug: product.slug }}>
         <div className="aspect-square bg-muted overflow-hidden">
           {img ? (
-            <img src={img} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+            <img src={img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground">
               {isService ? <Wrench className="w-12 h-12" /> : <Smartphone className="w-12 h-12" />}
@@ -154,6 +281,9 @@ function ProductCard({ product }: { product: Product }) {
           <h3 className="font-semibold line-clamp-2">{product.name}</h3>
         </Link>
         <p className="mt-2 text-xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
+        <p className="text-xs text-muted-foreground">
+          ou 12x de {formatBRL(Math.round(product.price_cents / 12))}
+        </p>
         {product.featured && <Badge className="mt-2" variant="secondary">Destaque</Badge>}
       </CardContent>
       <CardFooter className="p-4 pt-0">
@@ -162,17 +292,22 @@ function ProductCard({ product }: { product: Product }) {
             <Button variant="default" className="w-full">Agendar pelo WhatsApp</Button>
           </a>
         ) : (
-          <Button
-            className="w-full"
-            onClick={() => add({
-              product_id: product.id,
-              name: product.name,
-              price_cents: product.price_cents,
-              kind: product.kind,
-            })}
-          >
-            Adicionar ao carrinho
-          </Button>
+          <Link to="/loja/$slug" params={{ slug: product.slug }} className="w-full">
+            <Button className="w-full" variant="outline" onClick={(e) => {
+              // If product has no attributes required, add directly
+              e.preventDefault();
+              add({
+                product_id: product.id,
+                variant_id: null,
+                variant_label: null,
+                name: product.name,
+                price_cents: product.price_cents,
+                kind: product.kind,
+              });
+            }}>
+              Adicionar ao carrinho
+            </Button>
+          </Link>
         )}
       </CardFooter>
     </Card>
