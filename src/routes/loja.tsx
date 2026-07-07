@@ -255,7 +255,6 @@ function ProductGrid({ products, loading, kind, onQuickView }: { products: Produ
 }
 
 function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (slug: string) => void }) {
-  const { add } = useCart();
   const { isAdmin } = useAuth();
   const img = product.image_urls[0];
   const isService = product.kind === "service";
