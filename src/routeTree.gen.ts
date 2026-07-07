@@ -29,6 +29,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ServicosSlugRouteImport } from './routes/servicos.$slug'
 import { Route as LojaSlugRouteImport } from './routes/loja.$slug'
 import { Route as EmCidadeRouteImport } from './routes/em.$cidade'
+import { Route as CelularSlugRouteImport } from './routes/celular.$slug'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
 import { Route as AdminDestaquesRouteImport } from './routes/admin.destaques'
@@ -135,6 +136,11 @@ const EmCidadeRoute = EmCidadeRouteImport.update({
   path: '/em/$cidade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CelularSlugRoute = CelularSlugRouteImport.update({
+  id: '/celular/$slug',
+  path: '/celular/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminProdutosRoute = AdminProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/celular/$slug': typeof CelularSlugRoute
   '/em/$cidade': typeof EmCidadeRoute
   '/loja/$slug': typeof LojaSlugRoute
   '/servicos/$slug': typeof ServicosSlugRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/celular/$slug': typeof CelularSlugRoute
   '/em/$cidade': typeof EmCidadeRoute
   '/loja/$slug': typeof LojaSlugRoute
   '/servicos/$slug': typeof ServicosSlugRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/celular/$slug': typeof CelularSlugRoute
   '/em/$cidade': typeof EmCidadeRoute
   '/loja/$slug': typeof LojaSlugRoute
   '/servicos/$slug': typeof ServicosSlugRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/celular/$slug'
     | '/em/$cidade'
     | '/loja/$slug'
     | '/servicos/$slug'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/celular/$slug'
     | '/em/$cidade'
     | '/loja/$slug'
     | '/servicos/$slug'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/celular/$slug'
     | '/em/$cidade'
     | '/loja/$slug'
     | '/servicos/$slug'
@@ -342,6 +354,7 @@ export interface RootRouteChildren {
   ServicosRoute: typeof ServicosRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradeInRoute: typeof TradeInRoute
+  CelularSlugRoute: typeof CelularSlugRoute
   EmCidadeRoute: typeof EmCidadeRoute
 }
 
@@ -487,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmCidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/celular/$slug': {
+      id: '/celular/$slug'
+      path: '/celular/$slug'
+      fullPath: '/celular/$slug'
+      preLoaderRoute: typeof CelularSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/produtos': {
       id: '/admin/produtos'
       path: '/produtos'
@@ -584,6 +604,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicosRoute: ServicosRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradeInRoute: TradeInRoute,
+  CelularSlugRoute: CelularSlugRoute,
   EmCidadeRoute: EmCidadeRoute,
 }
 export const routeTree = rootRouteImport
