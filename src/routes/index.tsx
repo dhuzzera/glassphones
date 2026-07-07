@@ -1,16 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { SiteShell } from "@/components/site-shell";
-import { Benefits, Hero, OrcamentoForm, FAQList, ContatoCard } from "@/components/sections";
-import { SITE_URL, WhatsAppIcon } from "@/lib/site";
+import { Benefits, Hero, OrcamentoForm, ContatoCard } from "@/components/sections";
+import { SITE_URL, WhatsAppIcon, logo } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/marketplace";
 import type { Product, Category } from "@/lib/marketplace-types";
-import { Smartphone, ChevronRight, Sparkles, ShoppingCart } from "lucide-react";
+import { Smartphone, ChevronRight, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ProductGridSkeleton } from "@/components/product-skeleton";
+
+// Mapa de logo por slug de categoria (simpleicons)
+const BRAND_LOGOS: Record<string, { slug: string; color: string }> = {
+  apple:    { slug: "apple",    color: "FFFFFF" },
+  iphone:   { slug: "apple",    color: "FFFFFF" },
+  samsung:  { slug: "samsung",  color: "FFFFFF" },
+  xiaomi:   { slug: "xiaomi",   color: "FFFFFF" },
+  motorola: { slug: "motorola", color: "FFFFFF" },
+  lg:       { slug: "lg",       color: "FFFFFF" },
+  sony:     { slug: "sony",     color: "FFFFFF" },
+};
+
+function getBrandLogo(categoryName: string, categorySlug: string) {
+  const key = categorySlug.toLowerCase().replace(/[^a-z]/g, "");
+  if (BRAND_LOGOS[key]) return BRAND_LOGOS[key];
+  const nameKey = categoryName.toLowerCase().replace(/[^a-z]/g, "");
+  if (BRAND_LOGOS[nameKey]) return BRAND_LOGOS[nameKey];
+  return null;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -76,46 +95,60 @@ function Home() {
       <Hero />
       <Benefits />
 
-      {/* Categorias do banco */}
+      {/* Categorias com logos reais das marcas como fallback */}
       {featuredCats.length > 0 && (
         <section className="container mx-auto px-4 py-10">
           <h2 className="text-2xl font-bold mb-6">Explore por categoria</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {featuredCats.map(c => (
-              <Link
-                key={c.id}
-                to="/loja"
-                search={{ tab: "product", cat: c.id, q: "", cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 }}
-                className="group text-left rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg hover:border-primary/40 transition"
-              >
-                <div className="aspect-[4/3] bg-muted overflow-hidden">
-                  {c.image_url
-                    ? <img src={c.image_url} alt={c.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
-                    : <div className="w-full h-full grid place-items-center text-muted-foreground"><Smartphone className="w-12 h-12" /></div>
-                  }
-                </div>
-                <div className="p-4 flex items-center justify-between">
-                  <span className="font-semibold">{c.name}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
-                </div>
-              </Link>
-            ))}
+            {featuredCats.map(c => {
+              const brandLogo = getBrandLogo(c.name, c.slug);
+              return (
+                <Link
+                  key={c.id}
+                  to="/loja"
+                  search={{ tab: "product", cat: c.id, q: "", cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 }}
+                  className="group text-left rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg hover:border-primary/40 transition"
+                >
+                  <div className="aspect-[4/3] bg-muted overflow-hidden flex items-center justify-center">
+                    {c.image_url ? (
+                      <img src={c.image_url} alt={c.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
+                    ) : brandLogo ? (
+                      <img
+                        src={logo(brandLogo.slug, brandLogo.color)}
+                        alt={c.name}
+                        className="h-16 w-16 object-contain opacity-80 group-hover:opacity-100 group-hover:scale-110 transition duration-300"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="text-muted-foreground"><Smartphone className="w-12 h-12" /></div>
+                    )}
+                  </div>
+                  <div className="p-4 flex items-center justify-between">
+                    <span className="font-semibold">{c.name}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
 
       {/* Destaques do banco */}
-      <section className="container mx-auto px-4 py-6">
+      <section className="container mx-auto px-4 py-6 pb-12">
         <div className="flex items-end justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary"><Sparkles className="w-3 h-3 mr-1" />Destaques da semana</Badge>
-          </div>
+          <h2 className="text-2xl font-bold">Destaques da semana</h2>
           <Link to="/loja" className="text-sm text-primary hover:underline">Ver todos →</Link>
         </div>
         {loadingProducts
           ? <ProductGridSkeleton count={4} />
           : featuredProducts.length === 0
-            ? <p className="text-muted-foreground text-sm py-4">Nenhum destaque cadastrado ainda.</p>
+            ? (
+              <div className="py-8 text-center text-muted-foreground text-sm">
+                <p>Nenhum destaque cadastrado ainda.</p>
+                <Link to="/loja" className="text-primary hover:underline mt-2 inline-block">Ver todos os produtos →</Link>
+              </div>
+            )
             : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {featuredProducts.slice(0, 8).map(p => (
@@ -133,6 +166,9 @@ function Home() {
                         <p className="font-semibold line-clamp-2 text-sm">{p.name}</p>
                       </Link>
                       <p className="mt-2 text-lg font-bold text-primary">{formatBRL(p.price_cents)}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        ou 12× de {formatBRL(Math.ceil(p.price_cents / 12))} no cartão
+                      </p>
                     </CardContent>
                     <CardFooter className="p-4 pt-0">
                       <Link to="/loja/$slug" params={{ slug: p.slug }} className="w-full">
@@ -149,10 +185,10 @@ function Home() {
       </section>
 
       {/* CTA orçamento */}
-      <section className="py-14 bg-primary/5">
+      <section className="py-14 bg-primary/5 border-y border-border">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Precisa de conserto?</h2>
-          <p className="text-muted-foreground mb-6">Faça seu orçamento em minutos e receba pelo WhatsApp.</p>
+          <p className="text-muted-foreground mb-6">Orçamento gratuito em minutos. Resposta pelo WhatsApp.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link to="/orcamento" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:opacity-90">
               Solicitar orçamento
@@ -165,7 +201,6 @@ function Home() {
       </section>
 
       <OrcamentoForm />
-      <FAQList />
       <ContatoCard />
     </SiteShell>
   );

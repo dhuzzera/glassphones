@@ -2,26 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  ArrowLeft,
-  ShoppingCart,
-  Wrench,
-  Smartphone,
-  Share2,
-  Copy,
-  Check,
-  Truck,
-  ShieldCheck,
-  Store,
-  Star,
-  MapPin,
-  Minus,
-  Plus,
-  X,
-  ZoomIn,
-  Recycle,
+  ArrowLeft, ShoppingCart, Wrench, Smartphone, Share2, Copy,
+  Check, Truck, ShieldCheck, Store, Star, MapPin, Minus, Plus, X, ZoomIn, Recycle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Category, ProductVariant } from "@/lib/marketplace-types";
+import type { Product, Category, ProductVariant, Review } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl, WHATSAPP_NUMBER } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
 import { useSiteSettings } from "@/hooks/use-site-content";
@@ -165,18 +150,32 @@ function ProductDetail() {
     enabled: !!product,
     queryFn: async () => {
       let q = supabase
-        .from("products")
-        .select("*")
-        .eq("active", true)
-        .eq("kind", product!.kind)
-        .neq("id", product!.id)
-        .limit(4);
+        .from("products").select("*")
+        .eq("active", true).eq("kind", product!.kind)
+        .neq("id", product!.id).limit(4);
       if (product!.category_id) q = q.eq("category_id", product!.category_id);
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Product[];
     },
   });
+
+  // Busca avaliações reais para exibir nota dinâmica no topo
+  const { data: storeReviews = [] } = useQuery({
+    queryKey: ["pdp-reviews-summary"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("reviews").select("rating")
+        .eq("approved", true).limit(200);
+      return (data ?? []) as Pick<Review, "rating">[];
+    },
+    staleTime: 120_000,
+  });
+
+  const reviewAvg = storeReviews.length > 0
+    ? (storeReviews.reduce((s, r) => s + r.rating, 0) / storeReviews.length).toFixed(1)
+    : "4.9";
+  const reviewCount = storeReviews.length > 0 ? storeReviews.length : null;
 
   if (isLoading) {
     return (
@@ -364,13 +363,16 @@ function ProductDetail() {
                 <div className="flex items-center gap-0.5 text-yellow-500">
                   {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
                 </div>
-                <span>4.9 · Loja verificada</span>
+                <span>{reviewAvg} · {reviewCount ? `${reviewCount} avaliações` : "Loja verificada"}</span>
               </div>
             </div>
 
             <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-sm text-muted-foreground">Preço</p>
               <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(effectivePrice)}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                ou 12× de {formatBRL(Math.ceil(effectivePrice / 12))} no cartão
+              </p>
 
               {hasVariants && (
                 <div className="mt-5 space-y-4">
@@ -576,7 +578,7 @@ function ProductDetail() {
                     <MapPin className="w-3 h-3" /> {get("contact.address_line2")}
                   </p>
                   <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>⭐ 4.9 (127 avaliações)</span>
+                    <span>⭐ {reviewAvg} ({reviewCount ?? "—"} avaliações)</span>
                     <span>·</span>
                     <span>{get("contact.hours")}</span>
                   </div>
