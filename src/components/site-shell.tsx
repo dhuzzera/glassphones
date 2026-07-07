@@ -1,8 +1,49 @@
 import { Link } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck } from "lucide-react";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+
+function AdminBar() {
+  const { isAdmin } = useAuth();
+  if (!isAdmin) return null;
+  const items = [
+    { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true as const },
+    { to: "/admin/produtos", label: "Editar produtos", icon: Package },
+    { to: "/admin/categorias", label: "Categorias", icon: Tag },
+    { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
+  ];
+  return (
+    <div className="bg-foreground text-background text-xs md:text-sm border-b border-background/10">
+      <div className="container mx-auto px-4 py-2 flex flex-wrap items-center gap-3">
+        <span className="font-semibold uppercase tracking-wider text-[10px] md:text-xs opacity-70">Modo admin</span>
+        <nav className="flex flex-wrap items-center gap-1 md:gap-2">
+          {items.map((it) => (
+            <Link
+              key={it.to}
+              to={it.to}
+              activeOptions={it.exact ? { exact: true } : undefined}
+              activeProps={{ className: "bg-primary text-primary-foreground" }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full hover:bg-background/10 transition"
+            >
+              <it.icon className="h-3.5 w-3.5" />
+              {it.label}
+            </Link>
+          ))}
+        </nav>
+        <button
+          onClick={() => supabase.auth.signOut()}
+          className="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full hover:bg-background/10 transition"
+        >
+          <LogOut className="h-3.5 w-3.5" /> Sair
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
 const NAV = [
   { to: "/", label: "Home" },
