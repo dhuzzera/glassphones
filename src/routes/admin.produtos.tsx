@@ -255,6 +255,19 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
               <Input type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
             </div>
           </div>
+          {form.kind === "product" && (
+            <div>
+              <Label>Saúde da bateria (%) <span className="text-xs text-muted-foreground">(padrão 100)</span></Label>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                value={form.batteryHealth}
+                onChange={(e) => setForm({ ...form, batteryHealth: e.target.value })}
+                placeholder="100"
+              />
+            </div>
+          )}
           <div>
             <Label>Categoria</Label>
             <Select value={form.category_id ?? "none"} onValueChange={(v) => setForm({ ...form, category_id: v === "none" ? null : v })}>
