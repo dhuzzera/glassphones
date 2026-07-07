@@ -4,6 +4,10 @@ import type { OrderItem } from "@/lib/marketplace-types";
 const STORAGE_KEY = "gpsbs:cart:v1";
 const EVENT = "gpsbs:cart:changed";
 
+function itemKey(i: Pick<OrderItem, "product_id" | "variant_id">) {
+  return `${i.product_id}::${i.variant_id ?? ""}`;
+}
+
 function readStorage(): OrderItem[] {
   if (typeof window === "undefined") return [];
   try {
@@ -38,7 +42,8 @@ export function useCart() {
 
   const add = useCallback((item: Omit<OrderItem, "quantity">, qty = 1) => {
     const current = readStorage();
-    const idx = current.findIndex((i) => i.product_id === item.product_id);
+    const key = itemKey(item);
+    const idx = current.findIndex((i) => itemKey(i) === key);
     if (idx >= 0) {
       current[idx].quantity += qty;
     } else {
@@ -47,13 +52,15 @@ export function useCart() {
     writeStorage(current);
   }, []);
 
-  const remove = useCallback((productId: string) => {
-    writeStorage(readStorage().filter((i) => i.product_id !== productId));
+  const remove = useCallback((productId: string, variantId?: string | null) => {
+    const key = itemKey({ product_id: productId, variant_id: variantId ?? null });
+    writeStorage(readStorage().filter((i) => itemKey(i) !== key));
   }, []);
 
-  const updateQty = useCallback((productId: string, qty: number) => {
+  const updateQty = useCallback((productId: string, qty: number, variantId?: string | null) => {
     const current = readStorage();
-    const idx = current.findIndex((i) => i.product_id === productId);
+    const key = itemKey({ product_id: productId, variant_id: variantId ?? null });
+    const idx = current.findIndex((i) => itemKey(i) === key);
     if (idx < 0) return;
     if (qty <= 0) {
       current.splice(idx, 1);

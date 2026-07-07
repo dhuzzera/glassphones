@@ -12,6 +12,8 @@ export interface Category {
   type: CategoryType;
   sort_order: number;
   created_at: string;
+  image_url: string | null;
+  featured: boolean;
 }
 
 export interface Product {
@@ -30,8 +32,25 @@ export interface Product {
   updated_at: string;
 }
 
+// attributes: { [attrName]: value }  ex.: { "Cor": "Preto", "Capacidade": "128GB" }
+export interface ProductVariant {
+  id: string;
+  product_id: string;
+  sku: string | null;
+  attributes: Record<string, string>;
+  price_cents: number | null; // null = herda de products.price_cents
+  stock: number | null;
+  image_url: string | null;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface OrderItem {
   product_id: string;
+  variant_id?: string | null;
+  variant_label?: string | null;
   name: string;
   price_cents: number;
   quantity: number;
