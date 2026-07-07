@@ -166,6 +166,23 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // Envia page_view virtual ao dataLayer a cada mudança de rota (SPA-safe).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const push = () => {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "page_view",
+        page_path: window.location.pathname + window.location.search,
+        page_title: document.title,
+      });
+    };
+    push();
+    const unsub = router.subscribe("onResolved", push);
+    return () => unsub();
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
