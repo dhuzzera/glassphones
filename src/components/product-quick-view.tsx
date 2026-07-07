@@ -133,7 +133,6 @@ export function ProductQuickView({ slug, onClose }: Props) {
                 <div className="mt-3 flex items-baseline gap-3">
                   <span className="text-3xl font-black text-primary">{formatBRL(effectivePrice)}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">ou 12x de {formatBRL(Math.round(effectivePrice / 12))} sem juros</p>
               </div>
 
               {attrNames.length > 0 && (
