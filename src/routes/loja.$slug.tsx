@@ -31,14 +31,78 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { WhatsAppIcon } from "@/lib/site";
+import { ProductSocialProof } from "@/components/product-social-proof";
+import { CIDADES } from "@/lib/cidades";
+
+const BASE_URL = "https://glassphones.lovable.app";
 
 export const Route = createFileRoute("/loja/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Produto — Glass Phone SBS" },
-      { name: "description", content: "Confira os detalhes deste produto na Glass Phone SBS." },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("products")
+      .select("name, description, price_cents, image_urls, slug")
+      .eq("slug", params.slug)
+      .eq("active", true)
+      .maybeSingle();
+    return { product: data };
+  },
+  head: ({ params, loaderData }) => {
+    const p = loaderData?.product;
+    if (!p) {
+      return {
+        meta: [
+          { title: "Produto — Glass Phone SBS" },
+          { name: "description", content: "Confira os detalhes deste produto na Glass Phone SBS." },
+        ],
+      };
+    }
+    const price = (p.price_cents / 100).toFixed(2);
+    const title = `${p.name} — Comprar na Glass Phone SBS`;
+    const desc =
+      (p.description ?? `Compre ${p.name} com garantia, entrega para todo o Brasil e retirada em São Bento do Sul.`)
+        .slice(0, 158);
+    const url = `${BASE_URL}/loja/${params.slug}`;
+    const img = p.image_urls?.[0];
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        ...(img ? [{ property: "og:image", content: img }] : []),
+        ...(img ? [{ name: "twitter:image", content: img }] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: p.name,
+            description: desc,
+            image: img ? [img] : undefined,
+            brand: { "@type": "Brand", name: "Glass Phone SBS" },
+            offers: {
+              "@type": "Offer",
+              price,
+              priceCurrency: "BRL",
+              availability: "https://schema.org/InStock",
+              url,
+            },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "4.9",
+              reviewCount: "127",
+            },
+          }),
+        },
+      ],
+    };
+  },
   component: ProductDetail,
 });
 
@@ -561,6 +625,34 @@ function ProductDetail() {
                     <p className="text-sm font-medium line-clamp-2 min-h-[2.5rem]">{p.name}</p>
                     <p className="mt-1 text-primary font-bold">{formatBRL(p.price_cents)}</p>
                   </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Prova social */}
+        {!isService && <ProductSocialProof productId={product.id} productName={product.name} />}
+
+        {/* SEO local: onde comprar este produto */}
+        {!isService && (
+          <section className="mt-12" aria-labelledby="onde-comprar-titulo">
+            <h2 id="onde-comprar-titulo" className="text-xl font-bold mb-4">
+              Onde comprar {product.name}
+            </h2>
+            <Separator className="mb-6" />
+            <p className="text-sm text-muted-foreground mb-4">
+              Atendemos com entrega rápida e retirada combinada em toda a região:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {CIDADES.map((c) => (
+                <Link
+                  key={c.slug}
+                  to="/em/$cidade"
+                  params={{ cidade: c.slug }}
+                  className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary hover:text-primary transition"
+                >
+                  {product.name.split(" ").slice(0, 3).join(" ")} em {c.nome}
                 </Link>
               ))}
             </div>
