@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Trash2, Star, ImageIcon } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { Review } from "@/lib/marketplace-types";
 
 export const Route = createFileRoute("/admin/avaliacoes")({
@@ -14,6 +16,7 @@ export const Route = createFileRoute("/admin/avaliacoes")({
 
 function AdminReviews() {
   const qc = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const { data: reviews = [], isLoading } = useQuery({
     queryKey: ["admin-reviews"],
     queryFn: async () => {
@@ -39,10 +42,10 @@ function AdminReviews() {
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Excluir avaliação?")) return;
     const { error } = await supabase.from("reviews").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Excluída");
+    setDeleteTarget(null);
     qc.invalidateQueries({ queryKey: ["admin-reviews"] });
     qc.invalidateQueries({ queryKey: ["reviews-public"] });
   };
@@ -52,6 +55,12 @@ function AdminReviews() {
 
   return (
     <div>
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        description="A avaliação será excluída permanentemente."
+        onConfirm={() => deleteTarget && remove(deleteTarget)}
+        onCancel={() => setDeleteTarget(null)}
+      />
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <h1 className="text-2xl font-bold">Moderar avaliações</h1>
         <div className="flex gap-2 text-sm text-muted-foreground">
@@ -114,7 +123,7 @@ function AdminReviews() {
                   <Check className="h-4 w-4 mr-1" />
                   {r.approved ? "Ocultar" : "Aprovar"}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => remove(r.id)}>
+                <Button size="sm" variant="ghost" onClick={() => setDeleteTarget(r.id)}>
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>

@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export const Route = createFileRoute("/admin/produtos")({
   component: ProductsAdmin,
@@ -36,6 +37,7 @@ function ProductsAdmin() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<FormState | null>(null);
   const [search, setSearch] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -66,12 +68,12 @@ function ProductsAdmin() {
   });
 
   const remove = async (id: string) => {
-    if (!confirm("Excluir este item?")) return;
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Excluído");
     qc.invalidateQueries({ queryKey: ["admin-products"] });
     if (editing?.id === id) setEditing(null);
+    setDeleteTarget(null);
   };
 
   const filtered = products.filter(p =>
@@ -80,6 +82,13 @@ function ProductsAdmin() {
 
   return (
     <div className="flex gap-6 h-[calc(100vh-120px)]">
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        description="O produto será excluído permanentemente."
+        onConfirm={() => deleteTarget && remove(deleteTarget)}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       {/* Lista - esquerda */}
       <div className={`flex flex-col ${editing ? "hidden lg:flex lg:w-80 shrink-0" : "w-full"}`}>
         <div className="flex items-center justify-between mb-4">
@@ -110,7 +119,7 @@ function ProductsAdmin() {
                 {!p.active && <Badge variant="destructive" className="text-[10px] px-1 py-0">Inativo</Badge>}
                 {p.featured && <Badge variant="outline" className="text-[10px] px-1 py-0">Destaque</Badge>}
               </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={e => { e.stopPropagation(); remove(p.id); }}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={e => { e.stopPropagation(); setDeleteTarget(p.id); }}>
                 <Trash2 className="w-3.5 h-3.5 text-destructive" />
               </Button>
             </div>

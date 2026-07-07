@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SiteShell } from "@/components/site-shell";
 import { ProductQuickView } from "@/components/product-quick-view";
+import { ProductGridSkeleton } from "@/components/product-skeleton";
 import { WhatsAppIcon } from "@/lib/site";
 
 const searchSchema = z.object({
@@ -41,9 +42,9 @@ export const Route = createFileRoute("/loja")({
       { name: "description", content: "Celulares novos e seminovos, acessórios e serviços de assistência técnica em São Bento do Sul. Filtre por modelo, capacidade, cor e preço." },
       { property: "og:title", content: "Loja — Glass Phone SBS" },
       { property: "og:description", content: "Filtre iPhones e Samsungs por capacidade, cor e faixa de preço." },
-      { property: "og:url", content: "https://glassphones.lovable.app/loja" },
+      { property: "og:url", content: "https://www.glassphone.com.br/loja" },
     ],
-    links: [{ rel: "canonical", href: "https://glassphones.lovable.app/loja" }],
+    links: [{ rel: "canonical", href: "https://www.glassphone.com.br/loja" }],
   }),
   component: LojaPage,
 });
@@ -449,8 +450,8 @@ function LojaPage() {
 
 
 function ProductGrid({ products, loading, kind, onQuickView }: { products: Product[]; loading: boolean; kind: "product" | "service"; onQuickView: (slug: string) => void }) {
-  if (loading) return <p className="text-muted-foreground">Carregando...</p>;
-  if (products.length === 0) return <p className="text-muted-foreground">Nenhum {kind === "product" ? "produto" : "serviço"} encontrado.</p>;
+  if (loading) return <ProductGridSkeleton count={8} />;
+  if (products.length === 0) return <p className="text-muted-foreground py-8 text-center">Nenhum {kind === "product" ? "produto" : "serviço"} encontrado.</p>;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {products.map((p) => <ProductCard key={p.id} product={p} onQuickView={onQuickView} />)}

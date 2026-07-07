@@ -34,7 +34,7 @@ import { WhatsAppIcon } from "@/lib/site";
 import { ProductSocialProof } from "@/components/product-social-proof";
 import { CIDADES } from "@/lib/cidades";
 
-const BASE_URL = "https://glassphones.lovable.app";
+const BASE_URL = "https://www.glassphone.com.br";
 
 export const Route = createFileRoute("/loja/$slug")({
   loader: async ({ params }) => {
