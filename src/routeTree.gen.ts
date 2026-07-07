@@ -17,6 +17,7 @@ import { Route as OfertasRouteImport } from './routes/ofertas'
 import { Route as LojaRouteImport } from './routes/loja'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
@@ -71,6 +72,11 @@ const FaqRoute = FaqRouteImport.update({
 const ContatoRoute = ContatoRouteImport.update({
   id: '/contato',
   path: '/contato',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompararRoute = CompararRouteImport.update({
+  id: '/comparar',
+  path: '/comparar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/avaliacoes': typeof AvaliacoesRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
+  '/comparar': typeof CompararRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
   '/loja': typeof LojaRouteWithChildren
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/avaliacoes': typeof AvaliacoesRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
+  '/comparar': typeof CompararRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
   '/loja': typeof LojaRouteWithChildren
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/avaliacoes': typeof AvaliacoesRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
+  '/comparar': typeof CompararRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
   '/loja': typeof LojaRouteWithChildren
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/avaliacoes'
     | '/carrinho'
     | '/checkout'
+    | '/comparar'
     | '/contato'
     | '/faq'
     | '/loja'
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/avaliacoes'
     | '/carrinho'
     | '/checkout'
+    | '/comparar'
     | '/contato'
     | '/faq'
     | '/loja'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/avaliacoes'
     | '/carrinho'
     | '/checkout'
+    | '/comparar'
     | '/contato'
     | '/faq'
     | '/loja'
@@ -309,6 +321,7 @@ export interface RootRouteChildren {
   AvaliacoesRoute: typeof AvaliacoesRoute
   CarrinhoRoute: typeof CarrinhoRoute
   CheckoutRoute: typeof CheckoutRoute
+  CompararRoute: typeof CompararRoute
   ContatoRoute: typeof ContatoRoute
   FaqRoute: typeof FaqRoute
   LojaRoute: typeof LojaRouteWithChildren
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/contato'
       fullPath: '/contato'
       preLoaderRoute: typeof ContatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comparar': {
+      id: '/comparar'
+      path: '/comparar'
+      fullPath: '/comparar'
+      preLoaderRoute: typeof CompararRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -535,6 +555,7 @@ const rootRouteChildren: RootRouteChildren = {
   AvaliacoesRoute: AvaliacoesRoute,
   CarrinhoRoute: CarrinhoRoute,
   CheckoutRoute: CheckoutRoute,
+  CompararRoute: CompararRoute,
   ContatoRoute: ContatoRoute,
   FaqRoute: FaqRoute,
   LojaRoute: LojaRouteWithChildren,
