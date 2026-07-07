@@ -1,3 +1,6 @@
+# TanStack Router — gerado automaticamente no build
+src/routeTree.gen.ts
+
 # Logs
 logs
 *.log
