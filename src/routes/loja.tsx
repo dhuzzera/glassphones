@@ -33,6 +33,7 @@ function LojaPage() {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"product" | "service">("product");
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [quickSlug, setQuickSlug] = useState<string | null>(null);
   const { count } = useCart();
   const { get } = useSiteSettings();
 
