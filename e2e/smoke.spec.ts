@@ -59,34 +59,26 @@ test.describe("Smoke — WhatsApp deep-links", () => {
   });
 
   test("trade-in monta wa.me com marca/modelo/estimativa", async ({ page }) => {
+    // Intercepta a navegação para wa.me antes que aconteça (não temos rede real).
+    let capturado = "";
+    await page.route("https://wa.me/**", async (route) => {
+      capturado = route.request().url();
+      await route.fulfill({ status: 200, body: "ok" });
+    });
+
     await page.goto("/trade-in?cidade=rio-negrinho&origem=teste");
     await page.getByPlaceholder(/iPhone 13 128GB/i).fill("iPhone 13 128GB");
     await page.getByPlaceholder(/^90$/).fill("90");
-    // Preenche os dois campos de texto restantes (nome, telefone) por posição
     const nome = page.locator('input[maxlength="80"]').last();
     await nome.fill("Teste QA");
     const tel = page.locator('input[maxlength="20"]');
     await tel.fill("47999999999");
 
-    // Botão pode fazer window.location.href = wa.me/... — captura via override.
-    await page.evaluate(() => {
-      (window as unknown as { __lastNav?: string }).__lastNav = "";
-      const desc = Object.getOwnPropertyDescriptor(window.location, "href");
-      Object.defineProperty(window.location, "href", {
-        set(v: string) {
-          (window as unknown as { __lastNav?: string }).__lastNav = v;
-        },
-        get: desc?.get,
-        configurable: true,
-      });
-    });
     await page.getByRole("button", { name: /falar no whatsapp/i }).click();
+    // Aguarda até 5s pela navegação para wa.me
+    await expect.poll(() => capturado, { timeout: 5000 }).toMatch(/wa\.me\/5547996801247/);
 
-    const captured = await page.evaluate(
-      () => (window as unknown as { __lastNav?: string }).__lastNav ?? "",
-    );
-    expect(captured).toMatch(/wa\.me\/5547996801247/);
-    const decoded = decodeURIComponent(captured);
+    const decoded = decodeURIComponent(capturado);
     expect(decoded).toContain("iPhone 13");
     expect(decoded).toContain("Trade-in");
   });
