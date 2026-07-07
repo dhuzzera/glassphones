@@ -53,7 +53,7 @@ function LojaPage() {
   const { get } = useSiteSettings();
 
   const setSearch = (patch: Partial<z.infer<typeof searchSchema>>) => {
-    navigate({ search: (prev) => ({ ...prev, ...patch }), replace: true });
+    navigate({ search: (prev: z.infer<typeof searchSchema>) => ({ ...prev, ...patch }), replace: true });
   };
 
   const { data: categories = [] } = useQuery({
