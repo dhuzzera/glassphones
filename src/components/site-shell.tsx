@@ -52,9 +52,10 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/loja", label: "Loja" },
   { to: "/servicos", label: "Serviços" },
+  { to: "/comparar", label: "Comparar" },
+  { to: "/trade-in", label: "Trade-in" },
   { to: "/ofertas", label: "Ofertas" },
   { to: "/avaliacoes", label: "Avaliações" },
-  { to: "/orcamento", label: "Orçamento" },
   { to: "/faq", label: "FAQ" },
   { to: "/contato", label: "Contato" },
 ] as const;
