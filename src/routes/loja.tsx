@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
-import { ShoppingCart, Search, Wrench, Smartphone, ChevronRight, Sparkles } from "lucide-react";
+import { ShoppingCart, Search, Wrench, Smartphone, ChevronRight, Sparkles, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, Category } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings } from "@/hooks/use-site-content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SiteShell } from "@/components/site-shell";
+import { ProductQuickView } from "@/components/product-quick-view";
 import { WhatsAppIcon } from "@/lib/site";
 
 export const Route = createFileRoute("/loja")({
