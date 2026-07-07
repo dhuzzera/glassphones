@@ -98,3 +98,99 @@ function CategoriesPage() {
     </div>
   );
 }
+
+function CategoryRow({ category, onRemove, onChanged }: {
+  category: Category;
+  onRemove: (id: string) => void;
+  onChanged: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [imageUrl, setImageUrl] = useState(category.image_url ?? "");
+  const [featured, setFeatured] = useState(category.featured);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const uploadFile = async (file: File) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `categories/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("product-images").upload(path, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+      setImageUrl(data.publicUrl);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro no upload");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("categories")
+      .update({ image_url: imageUrl || null, featured })
+      .eq("id", category.id);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Categoria atualizada");
+    setEditing(false);
+    onChanged();
+  };
+
+  return (
+    <div className="p-3 border rounded-md">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-12 h-12 rounded bg-muted overflow-hidden shrink-0">
+            {imageUrl && <img src={imageUrl} alt="" className="w-full h-full object-cover" />}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium truncate">{category.name}</p>
+            <p className="text-xs text-muted-foreground truncate">/{category.slug}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Badge variant={category.type === "product" ? "default" : "secondary"}>
+            {category.type === "product" ? "Produto" : "Serviço"}
+          </Badge>
+          {category.featured && <Badge variant="outline">Destaque</Badge>}
+          <Button variant="outline" size="sm" onClick={() => setEditing((v) => !v)}>
+            {editing ? "Fechar" : "Editar"}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => onRemove(category.id)}>
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
+        </div>
+      </div>
+      {editing && (
+        <div className="mt-3 pt-3 border-t space-y-3">
+          <div>
+            <Label className="text-xs">Imagem de capa (URL)</Label>
+            <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-2 text-sm text-primary cursor-pointer hover:underline">
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => e.target.files?.[0] && uploadFile(e.target.files[0])}
+                />
+                {uploading ? "Enviando..." : "Enviar imagem"}
+              </label>
+            </div>
+          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
+            Exibir como destaque na loja
+          </label>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={save} disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
+            <Button size="sm" variant="outline" onClick={() => setEditing(false)}>Cancelar</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
