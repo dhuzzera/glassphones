@@ -6,7 +6,7 @@ import { SITE_URL, WhatsAppIcon, logo } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/marketplace";
 import type { Product, Category } from "@/lib/marketplace-types";
-import { Smartphone, ChevronRight, ShoppingCart } from "lucide-react";
+import { Smartphone, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -97,9 +97,9 @@ function Home() {
 
       {/* Categorias com logos reais das marcas como fallback */}
       {featuredCats.length > 0 && (
-        <section className="container mx-auto px-4 py-10">
-          <h2 className="text-2xl font-bold mb-6">Explore por categoria</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <section className="container mx-auto px-4 py-8">
+          <h2 className="text-lg font-semibold mb-4 text-muted-foreground uppercase tracking-wider text-xs">Explorar por marca</h2>
+          <div className="flex flex-wrap gap-3">
             {featuredCats.map(c => {
               const brandLogo = getBrandLogo(c.name, c.slug);
               return (
@@ -107,26 +107,21 @@ function Home() {
                   key={c.id}
                   to="/loja"
                   search={{ tab: "product", cat: c.id, q: "", cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 }}
-                  className="group text-left rounded-2xl overflow-hidden border border-border bg-card hover:shadow-lg hover:border-primary/40 transition"
+                  className="group flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-border bg-card hover:border-primary hover:bg-primary/5 transition"
                 >
-                  <div className="aspect-[4/3] bg-muted overflow-hidden flex items-center justify-center">
-                    {c.image_url ? (
-                      <img src={c.image_url} alt={c.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
-                    ) : brandLogo ? (
-                      <img
-                        src={logo(brandLogo.slug, brandLogo.color)}
-                        alt={c.name}
-                        className="h-16 w-16 object-contain opacity-80 group-hover:opacity-100 group-hover:scale-110 transition duration-300"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="text-muted-foreground"><Smartphone className="w-12 h-12" /></div>
-                    )}
-                  </div>
-                  <div className="p-4 flex items-center justify-between">
-                    <span className="font-semibold">{c.name}</span>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition" />
-                  </div>
+                  {c.image_url ? (
+                    <img src={c.image_url} alt={c.name} className="h-5 w-5 object-contain" loading="lazy" />
+                  ) : brandLogo ? (
+                    <img
+                      src={logo(brandLogo.slug, brandLogo.color)}
+                      alt={c.name}
+                      className="h-5 w-5 object-contain opacity-80 group-hover:opacity-100 transition"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className="text-sm font-medium">{c.name}</span>
                 </Link>
               );
             })}
