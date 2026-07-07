@@ -52,6 +52,7 @@ const NAV = [
   { to: "/loja", label: "Loja" },
   { to: "/servicos", label: "Serviços" },
   { to: "/ofertas", label: "Ofertas" },
+  { to: "/avaliacoes", label: "Avaliações" },
   { to: "/orcamento", label: "Orçamento" },
   { to: "/faq", label: "FAQ" },
   { to: "/contato", label: "Contato" },
