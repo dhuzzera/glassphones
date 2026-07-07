@@ -115,10 +115,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#09090b" },
-      { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { title: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
       { name: "description", content: "Glass Phone SBS: loja de celulares com iPhone, Samsung, Xiaomi e Motorola. Melhores preços e atendimento pelo WhatsApp." },
       { property: "og:title", content: "Glass Phone SBS — Smartphones, Acessórios e Assistência" },
@@ -133,8 +129,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/glassphone-logo.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/glassphone-logo.png" },
-      { rel: "manifest", href: "/manifest.json" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" },
@@ -173,12 +167,6 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
-
-  // Registrar service worker para PWA
-  useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/sw.js").catch(() => {/* silencioso */});
-  }, []);
 
   // Envia page_view virtual ao dataLayer a cada mudança de rota (SPA-safe).
   useEffect(() => {

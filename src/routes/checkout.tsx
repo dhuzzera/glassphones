@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Tag, X, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,8 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Badge } from "@/components/ui/badge";
-import type { DeliveryMethod, Coupon } from "@/lib/marketplace-types";
+import type { DeliveryMethod } from "@/lib/marketplace-types";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Nome muito curto").max(120),
@@ -38,13 +37,6 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-function calcDiscount(coupon: Coupon, subtotal: number): number {
-  if (coupon.type === "percent") {
-    return Math.round(subtotal * coupon.value / 100);
-  }
-  return Math.min(coupon.value, subtotal);
-}
-
 function CheckoutPage() {
   const navigate = useNavigate();
   const { items, totalCents, clear, hydrated } = useCart();
@@ -52,6 +44,7 @@ function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [delivery, setDelivery] = useState<DeliveryMethod>("pickup");
+  // Endereço (opcional para retirada, exigido quando entrega for a combinar).
   const [cep, setCep] = useState("");
   const [rua, setRua] = useState("");
   const [numero, setNumero] = useState("");
@@ -60,14 +53,6 @@ function CheckoutPage() {
   const [payment, setPayment] = useState<PaymentMethod>("pix");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  // Cupom
-  const [couponInput, setCouponInput] = useState("");
-  const [coupon, setCoupon] = useState<Coupon | null>(null);
-  const [couponLoading, setCouponLoading] = useState(false);
-
-  // Frete estimado (via WhatsApp — sem API externa por enquanto)
-  const [shippingNote, setShippingNote] = useState("");
 
   useEffect(() => {
     if (hydrated && items.length === 0) navigate({ to: "/carrinho" });
@@ -79,79 +64,38 @@ function CheckoutPage() {
     try {
       const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
       const data = await res.json();
-      if (data.erro) { toast.error("CEP não encontrado"); return; }
+      if (data.erro) return toast.error("CEP não encontrado");
       setRua(data.logradouro ?? "");
       setBairro(data.bairro ?? "");
       setCidade(data.localidade ?? "");
-      // Informar sobre frete baseado na cidade
-      if (data.localidade) {
-        const isSBS = data.localidade.toLowerCase().includes("são bento");
-        setShippingNote(isSBS
-          ? "📍 São Bento do Sul — frete expresso disponível, combinamos no WhatsApp."
-          : `📦 Entrega para ${data.localidade}/${data.uf} via transportadora. Valor combinado no WhatsApp.`
-        );
-      }
-    } catch { /* silencioso */ }
-  };
-
-  const applyCoupon = async () => {
-    const code = couponInput.trim().toUpperCase();
-    if (!code) return;
-    setCouponLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("coupons")
-        .select("*")
-        .eq("code", code)
-        .eq("active", true)
-        .maybeSingle();
-      if (error || !data) {
-        toast.error("Cupom inválido ou expirado.");
-        setCoupon(null);
-        return;
-      }
-      const c = data as Coupon;
-      if (c.expires_at && new Date(c.expires_at) < new Date()) {
-        toast.error("Este cupom expirou.");
-        return;
-      }
-      if (c.max_uses !== null && c.uses >= c.max_uses) {
-        toast.error("Este cupom já atingiu o limite de uso.");
-        return;
-      }
-      if (totalCents < c.min_order_cents) {
-        toast.error(`Pedido mínimo de ${formatBRL(c.min_order_cents)} para este cupom.`);
-        return;
-      }
-      setCoupon(c);
-      toast.success(`Cupom "${c.code}" aplicado!`);
-    } finally {
-      setCouponLoading(false);
+    } catch {
+      // silencioso
     }
   };
-
-  const removeCoupon = () => { setCoupon(null); setCouponInput(""); };
-
-  const discountCents = coupon ? calcDiscount(coupon, totalCents) : 0;
-  const finalTotal = Math.max(0, totalCents - discountCents);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse({ name, phone, email, notes });
-    if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    // Endereço obrigatório quando frete for combinado.
     if (delivery === "whatsapp_shipping" && (!rua.trim() || !numero.trim() || !cidade.trim())) {
       toast.error("Preencha o endereço para envio (rua, número e cidade).");
       return;
     }
     setSubmitting(true);
     try {
-      const enderecoBlock = delivery === "whatsapp_shipping" || rua.trim()
-        ? `Endereço: ${rua}, ${numero} — ${bairro} — ${cidade}${cep ? ` (CEP ${cep})` : ""}`
-        : "";
-      const descontoBlock = coupon ? `Cupom: ${coupon.code} (-${formatBRL(discountCents)})` : "";
+      // Consolidamos endereço + pagamento em `notes` (sem alterar o schema do banco).
+      const enderecoBlock =
+        delivery === "whatsapp_shipping" || rua.trim()
+          ? `Endereço: ${rua}, ${numero} — ${bairro} — ${cidade}${cep ? ` (CEP ${cep})` : ""}`
+          : "";
       const pagamentoBlock = `Pagamento preferido: ${payment}`;
-      const notasFinais = [enderecoBlock, descontoBlock, pagamentoBlock, parsed.data.notes]
-        .filter(Boolean).join(" | ");
+      const notasFinais = [enderecoBlock, pagamentoBlock, parsed.data.notes]
+        .filter(Boolean)
+        .join(" | ");
 
       const { data, error } = await supabase
         .from("orders")
@@ -160,26 +104,17 @@ function CheckoutPage() {
           customer_phone: parsed.data.phone,
           customer_email: parsed.data.email || null,
           items,
-          total_cents: finalTotal,
+          total_cents: totalCents,
           delivery_method: delivery,
           notes: notasFinais || null,
-          coupon_code: coupon?.code ?? null,
-          discount_cents: discountCents,
         })
         .select("id")
         .single();
       if (error) throw error;
 
-      // Incrementar uso do cupom
-      if (coupon) {
-        await supabase.from("coupons").update({ uses: coupon.uses + 1 }).eq("id", coupon.id);
-      }
-
       track("checkout_submit", {
         order_id: data.id,
-        total_cents: finalTotal,
-        discount_cents: discountCents,
-        coupon_code: coupon?.code ?? "",
+        total_cents: totalCents,
         items_count: items.length,
         delivery_method: delivery,
         payment_method: payment,
@@ -189,7 +124,7 @@ function CheckoutPage() {
         orderId: data.id,
         customerName: parsed.data.name,
         items,
-        totalCents: finalTotal,
+        totalCents,
         deliveryMethod: delivery,
         notes: notasFinais,
       });
@@ -198,7 +133,8 @@ function CheckoutPage() {
       window.open(url, "_blank");
       navigate({ to: "/pedido-confirmado", search: { id: data.id, name: parsed.data.name } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao enviar pedido");
+      const msg = err instanceof Error ? err.message : "Erro ao enviar pedido";
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -206,9 +142,9 @@ function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-40">
+      <header className="border-b bg-card">
         <div className="container mx-auto py-4 px-4">
-          <Link to="/carrinho" className="flex items-center gap-2 text-sm hover:text-primary">
+          <Link to="/carrinho" className="flex items-center gap-2 text-sm">
             <ArrowLeft className="w-4 h-4" /> Voltar ao carrinho
           </Link>
         </div>
@@ -219,7 +155,6 @@ function CheckoutPage() {
 
         <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
-            {/* Dados */}
             <Card>
               <CardHeader><CardTitle>Seus dados</CardTitle></CardHeader>
               <CardContent className="space-y-4">
@@ -238,15 +173,14 @@ function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Entrega */}
             <Card>
               <CardHeader><CardTitle>Entrega</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent>
                 <RadioGroup value={delivery} onValueChange={(v) => setDelivery(v as DeliveryMethod)}>
                   <div className="flex items-start gap-2 p-3 border rounded-md">
                     <RadioGroupItem value="pickup" id="d1" className="mt-1" />
                     <Label htmlFor="d1" className="cursor-pointer">
-                      <div className="font-medium">Retirada na loja <Badge variant="secondary" className="ml-2 text-xs">Grátis</Badge></div>
+                      <div className="font-medium">Retirada na loja</div>
                       <div className="text-sm text-muted-foreground">Combinamos horário via WhatsApp.</div>
                     </Label>
                   </div>
@@ -261,7 +195,6 @@ function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Endereço */}
             <Card>
               <CardHeader>
                 <CardTitle>Endereço {delivery === "pickup" && <span className="text-sm font-normal text-muted-foreground">(opcional para retirada)</span>}</CardTitle>
@@ -287,15 +220,9 @@ function CheckoutPage() {
                   <Label htmlFor="cidade">Cidade</Label>
                   <Input id="cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
                 </div>
-                {shippingNote && delivery === "whatsapp_shipping" && (
-                  <div className="sm:col-span-6 text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
-                    {shippingNote}
-                  </div>
-                )}
               </CardContent>
             </Card>
 
-            {/* Pagamento */}
             <Card>
               <CardHeader><CardTitle>Pagamento</CardTitle></CardHeader>
               <CardContent>
@@ -306,7 +233,12 @@ function CheckoutPage() {
                     { v: "dinheiro", label: "Dinheiro", desc: "Na entrega ou retirada" },
                     { v: "combinar", label: "A combinar", desc: "Falamos no WhatsApp" },
                   ].map((op) => (
-                    <label key={op.v} className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition ${payment === op.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}>
+                    <label
+                      key={op.v}
+                      className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition ${
+                        payment === op.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                      }`}
+                    >
                       <RadioGroupItem value={op.v} className="mt-1" />
                       <div>
                         <div className="text-sm font-medium">{op.label}</div>
@@ -318,7 +250,6 @@ function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Observações */}
             <Card>
               <CardHeader><CardTitle>Observações</CardTitle></CardHeader>
               <CardContent>
@@ -327,67 +258,24 @@ function CheckoutPage() {
             </Card>
           </div>
 
-          {/* Resumo */}
+
           <div>
-            <Card className="sticky top-20">
+            <Card className="sticky top-4">
               <CardHeader><CardTitle>Resumo</CardTitle></CardHeader>
               <CardContent className="space-y-3">
                 {items.map((i) => (
-                  <div key={`${i.product_id}::${i.variant_id ?? ""}`} className="flex justify-between text-sm">
-                    <span className="truncate mr-2">{i.quantity}× {i.name}</span>
-                    <span className="shrink-0">{formatBRL(i.price_cents * i.quantity)}</span>
+                  <div key={i.product_id} className="flex justify-between text-sm">
+                    <span>{i.quantity}x {i.name}</span>
+                    <span>{formatBRL(i.price_cents * i.quantity)}</span>
                   </div>
                 ))}
-
-                {/* Cupom */}
-                <div className="pt-2 border-t">
-                  {coupon ? (
-                    <div className="flex items-center justify-between gap-2 text-sm bg-emerald-500/10 rounded-lg px-3 py-2">
-                      <div className="flex items-center gap-1.5 text-emerald-700 font-medium">
-                        <CheckCircle2 className="w-4 h-4" />
-                        {coupon.code}
-                        {coupon.type === "percent" ? ` (−${coupon.value}%)` : ` (−${formatBRL(coupon.value)})`}
-                      </div>
-                      <button type="button" onClick={removeCoupon}>
-                        <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Cupom de desconto"
-                        value={couponInput}
-                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), applyCoupon())}
-                        className="h-9 text-sm"
-                      />
-                      <Button type="button" variant="outline" size="sm" onClick={applyCoupon} disabled={couponLoading} className="shrink-0">
-                        {couponLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Tag className="w-3.5 h-3.5" />}
-                      </Button>
-                    </div>
-                  )}
+                <hr />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total</span>
+                  <span>{formatBRL(totalCents)}</span>
                 </div>
-
-                {/* Totais */}
-                <div className="pt-2 border-t space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
-                    <span>{formatBRL(totalCents)}</span>
-                  </div>
-                  {discountCents > 0 && (
-                    <div className="flex justify-between text-sm text-emerald-600 font-medium">
-                      <span>Desconto</span>
-                      <span>−{formatBRL(discountCents)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between font-bold text-lg pt-1">
-                    <span>Total</span>
-                    <span>{formatBRL(finalTotal)}</span>
-                  </div>
-                </div>
-
                 <Button type="submit" className="w-full" size="lg" disabled={submitting || items.length === 0}>
-                  {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Enviando...</> : "Enviar via WhatsApp"}
+                  {submitting ? "Enviando..." : "Enviar via WhatsApp"}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
                   Ao enviar, seu pedido é registrado e o WhatsApp abre para você confirmar.

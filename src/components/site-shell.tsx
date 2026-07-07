@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle, Menu, X, Settings, Ticket, Search } from "lucide-react";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle, Menu, X, Settings, Search } from "lucide-react";
 import { type ReactNode, useState, useRef } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
@@ -17,7 +17,6 @@ function AdminBar() {
     { to: "/admin/categorias", label: "Categorias", icon: Tag },
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
     { to: "/admin/leads", label: "Leads", icon: Recycle },
-    { to: "/admin/cupons", label: "Cupons", icon: Ticket },
     { to: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquare },
     { to: "/admin/configuracoes", label: "Config.", icon: Settings },
   ];
