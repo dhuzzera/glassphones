@@ -196,12 +196,14 @@ export function ProductQuickView({ slug, onClose }: Props) {
                 </div>
               )}
 
-              <button
-                onClick={() => { onClose(); navigate({ to: "/loja/$slug", params: { slug: product.slug } }); }}
-                className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 self-start"
+              <Link
+                to="/loja/$slug"
+                params={{ slug: product.slug }}
+                onClick={() => onClose()}
+                className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1 self-start"
               >
                 <ExternalLink className="h-3 w-3" /> Abrir página completa
-              </button>
+              </Link>
             </div>
           </div>
         )}
