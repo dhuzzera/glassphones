@@ -108,6 +108,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const GTM_ID = import.meta.env.VITE_GTM_ID as string | undefined;
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -131,6 +133,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" },
     ],
+    scripts: GTM_ID
+      ? [
+          {
+            // GTM bootstrap — inicializa dataLayer e injeta o container.
+            // Eventos custom (`whatsapp_click`, `trade_in_lead_submit`,
+            // `checkout_submit`) já são empurrados pelo helper em src/lib/analytics.ts.
+            children: `window.dataLayer=window.dataLayer||[];window.dataLayer.push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=document.getElementsByTagName('script')[0],j=document.createElement('script'),dl='dataLayer';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id=${GTM_ID}&l='+dl;f.parentNode.insertBefore(j,f);`,
+          },
+        ]
+      : [],
   }),
   shellComponent: RootShell,
   component: RootComponent,
