@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus, X, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Category, ProductKind } from "@/lib/marketplace-types";
+import type { Product, Category, ProductKind, ProductVariant } from "@/lib/marketplace-types";
 import { formatBRL, slugify } from "@/lib/marketplace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
