@@ -85,9 +85,19 @@ function LojaPage() {
   const heroSubtitle = get("home.hero_subtitle") || "Smartphones, acessórios e assistência técnica em São Bento do Sul.";
 
   return (
-    <div className="min-h-screen bg-background">
-      <MarketplaceHeader count={count} />
-
+    <SiteShell>
+      <div className="min-h-screen bg-background">
+        {count > 0 && (
+          <div className="container mx-auto px-4 pt-4 flex justify-end">
+            <Link to="/carrinho">
+              <Button variant="outline" size="sm" className="relative">
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Carrinho
+                <Badge className="absolute -top-2 -right-2 h-5 min-w-5 px-1">{count}</Badge>
+              </Button>
+            </Link>
+          </div>
+        )}
       <main>
         {/* HERO */}
         <section className="relative overflow-hidden border-b border-border">
