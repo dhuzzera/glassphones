@@ -25,6 +25,7 @@ const searchSchema = z.object({
   q: fallback(z.string(), "").default(""),
   cap: fallback(z.array(z.string()), []).default([]),
   cor: fallback(z.array(z.string()), []).default([]),
+  cond: fallback(z.array(z.string()), []).default([]),
   min: fallback(z.number(), 0).default(0),
   max: fallback(z.number(), 0).default(0),
 });
@@ -55,7 +56,6 @@ function LojaPage() {
   const setSearch = (patch: Partial<z.infer<typeof searchSchema>>) => {
     navigate({ search: (prev: z.infer<typeof searchSchema>) => ({ ...prev, ...patch }), replace: true });
   };
-
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -130,6 +130,10 @@ function LojaPage() {
     return products.filter((p) => {
       if (s && !p.name.toLowerCase().includes(s)) return false;
       if (activeMax > 0 && (p.price_cents < activeMin || p.price_cents > activeMax)) return false;
+      if (search.cond.length > 0) {
+        const cond = (p as Product & { condition?: string }).condition ?? null;
+        if (!cond || !search.cond.includes(cond)) return false;
+      }
       if (search.cap.length > 0 || search.cor.length > 0) {
         const pVars = variants.filter((v) => v.product_id === p.id);
         if (pVars.length === 0) return false;
@@ -143,7 +147,7 @@ function LojaPage() {
       }
       return true;
     });
-  }, [products, variants, search.q, search.cap, search.cor, activeMin, activeMax]);
+  }, [products, variants, search.q, search.cap, search.cor, search.cond, activeMin, activeMax]);
 
   const catsForTab = categories.filter((c) => c.type === search.tab);
   const featuredCats = categories.filter((c) => c.type === "product" && c.featured);
@@ -152,16 +156,16 @@ function LojaPage() {
   const heroSubtitle = get("home.hero_subtitle") || "Smartphones, acessórios e assistência técnica em São Bento do Sul.";
 
   const activeFilterCount =
-    search.cap.length + search.cor.length + (search.min > 0 || search.max > 0 ? 1 : 0);
+    search.cap.length + search.cor.length + search.cond.length + (search.min > 0 || search.max > 0 ? 1 : 0);
 
-  const toggleArrayFilter = (key: "cap" | "cor", value: string) => {
+  const toggleArrayFilter = (key: "cap" | "cor" | "cond", value: string) => {
     const arr = search[key];
     const next = arr.includes(value) ? arr.filter((x: string) => x !== value) : [...arr, value];
     setSearch({ [key]: next } as Partial<z.infer<typeof searchSchema>>);
   };
 
   const clearFilters = () =>
-    setSearch({ q: "", cap: [], cor: [], min: 0, max: 0 });
+    setSearch({ q: "", cap: [], cor: [], cond: [], min: 0, max: 0 });
 
   return (
     <SiteShell>
@@ -325,6 +329,23 @@ function LojaPage() {
                     </div>
                   </div>
                 )}
+                <div>
+                  <p className="text-sm font-semibold mb-2">Condição</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(["novo", "semi-novo", "usado"] as const).map((c) => {
+                      const labels = { novo: "Novo", "semi-novo": "Semi-novo", usado: "Usado" };
+                      const on = search.cond.includes(c);
+                      return (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => toggleArrayFilter("cond", c)}
+                          className={`px-3 py-1.5 rounded-full border text-sm transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50"}`}
+                        >{labels[c]}</button>
+                      );
+                    })}
+                  </div>
+                </div>
                 {priceMax > priceMin && (
                   <div>
                     <p className="text-sm font-semibold mb-2">
@@ -351,9 +372,6 @@ function LojaPage() {
                     </div>
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  Filtro de <strong>condição do aparelho</strong> chega assim que a coluna estiver no banco.
-                </p>
               </div>
             )}
 

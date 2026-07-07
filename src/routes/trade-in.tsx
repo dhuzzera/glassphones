@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { WhatsAppIcon } from "@/lib/site";
 import { WHATSAPP_NUMBER, formatBRL } from "@/lib/marketplace";
 import { track, trackWhatsApp } from "@/lib/analytics";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/trade-in")({
   head: () => ({
@@ -126,6 +128,7 @@ function TradeInPage() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [erro, setErro] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const estimativa = useMemo(() => {
     if (!modelo.trim()) return null;
@@ -133,7 +136,7 @@ function TradeInPage() {
     return estimar(marca, modelo, estado, b);
   }, [marca, modelo, estado, bateria]);
 
-  const enviarWhats = () => {
+  const enviarWhats = async () => {
     setErro(null);
     const b = parseInt(bateria, 10);
     const parsed = schema.safeParse({ marca, modelo, estado, bateria: b, nome, telefone });
@@ -142,13 +145,36 @@ function TradeInPage() {
       return;
     }
     const est = estimar(marca, modelo, estado, b);
-    // Origem do lead: capturamos ?cidade / ?produto / ?origem (links vindos de
-    // /em/$cidade ou de páginas de produto) + referrer para atribuição.
     const url = typeof window !== "undefined" ? new URL(window.location.href) : null;
     const cidadeOrigem = url?.searchParams.get("cidade") ?? "";
     const produtoOrigem = url?.searchParams.get("produto") ?? "";
     const origemParam = url?.searchParams.get("origem") ?? "";
     const referrer = typeof document !== "undefined" ? document.referrer : "";
+
+    // Salvar lead no banco antes de abrir o WhatsApp
+    setSaving(true);
+    try {
+      await supabase.from("trade_in_leads").insert({
+        customer_name: nome,
+        customer_phone: telefone,
+        marca,
+        modelo,
+        estado,
+        bateria: b,
+        estimativa_min: est.min,
+        estimativa_max: est.max,
+        cidade_origem: cidadeOrigem || null,
+        produto_origem: produtoOrigem || null,
+        origem: origemParam || null,
+        referrer: referrer || null,
+      });
+      // Ignora erro silenciosamente — não bloqueia o WhatsApp
+    } catch {
+      // noop
+    } finally {
+      setSaving(false);
+    }
+
     track("trade_in_lead_submit", {
       marca,
       modelo,
@@ -162,6 +188,7 @@ function TradeInPage() {
       referrer,
     });
     trackWhatsApp("trade_in_form", { marca, modelo, cidade: cidadeOrigem });
+
     const msg = [
       "*Trade-in — Glass Phone SBS*",
       `Cliente: ${nome}`,
@@ -316,10 +343,11 @@ function TradeInPage() {
                   onClick={enviarWhats}
                   className="w-full bg-whatsapp text-whatsapp-foreground hover:opacity-90"
                   size="lg"
+                  disabled={saving}
                 >
                   <WhatsAppIcon className="h-4 w-4 mr-2" />
-                  Falar no WhatsApp
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  {saving ? "Salvando…" : "Falar no WhatsApp"}
+                  {!saving && <ArrowRight className="h-4 w-4 ml-2" />}
                 </Button>
               </CardContent>
             </Card>

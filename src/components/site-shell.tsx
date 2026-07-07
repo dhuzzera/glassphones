@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare } from "lucide-react";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle } from "lucide-react";
 import type { ReactNode } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
@@ -16,6 +16,7 @@ function AdminBar() {
     { to: "/admin/destaques", label: "Destaques", icon: Star },
     { to: "/admin/categorias", label: "Categorias", icon: Tag },
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
+    { to: "/admin/leads", label: "Leads", icon: Recycle },
     { to: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquare },
   ];
   return (

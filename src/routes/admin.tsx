@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LogOut, LayoutDashboard, Package, Tag, ClipboardList } from "lucide-react";
+import { LogOut, LayoutDashboard, Package, Tag, ClipboardList, Recycle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ function AdminLayout() {
     { to: "/admin/produtos", label: "Produtos", icon: Package },
     { to: "/admin/categorias", label: "Categorias", icon: Tag },
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
+    { to: "/admin/leads", label: "Leads Trade-in", icon: Recycle },
   ];
 
   return (

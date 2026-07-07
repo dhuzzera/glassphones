@@ -33,6 +33,7 @@ interface FormState {
   active: boolean;
   stock: string;
   batteryHealth: string;
+  condition: string;
 }
 
 const emptyForm: FormState = {
@@ -47,6 +48,7 @@ const emptyForm: FormState = {
   active: true,
   stock: "",
   batteryHealth: "100",
+  condition: "",
 };
 
 function ProductsAdmin() {
@@ -85,6 +87,7 @@ function ProductsAdmin() {
     active: p.active,
     stock: p.stock?.toString() ?? "",
     batteryHealth: p.battery_health?.toString() ?? "100",
+    condition: p.condition ?? "",
   });
 
   const remove = async (id: string) => {
@@ -217,6 +220,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
         active: form.active,
         stock: form.stock ? parseInt(form.stock, 10) : null,
         battery_health: batteryHealth,
+        condition: form.kind === "product" && form.condition ? form.condition : null,
         updated_at: new Date().toISOString(),
       };
       console.log("[admin.produtos] salvando", { id: form.id, battery_health: payload.battery_health });
@@ -281,6 +285,20 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
                 onChange={(e) => setForm({ ...form, batteryHealth: e.target.value })}
                 placeholder="100"
               />
+            </div>
+          )}
+          {form.kind === "product" && (
+            <div>
+              <Label>Condição</Label>
+              <Select value={form.condition || "none"} onValueChange={(v) => setForm({ ...form, condition: v === "none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Selecionar condição…" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Não informado</SelectItem>
+                  <SelectItem value="novo">Novo</SelectItem>
+                  <SelectItem value="semi-novo">Semi-novo</SelectItem>
+                  <SelectItem value="usado">Usado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           )}
           <div>

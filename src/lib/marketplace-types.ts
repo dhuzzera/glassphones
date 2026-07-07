@@ -4,6 +4,9 @@ export type CategoryType = "product" | "service";
 export type OrderStatus = "pending" | "confirmed" | "paid" | "delivered" | "cancelled";
 export type DeliveryMethod = "pickup" | "whatsapp_shipping";
 export type AppRole = "admin" | "customer";
+export type ProductCondition = "novo" | "semi-novo" | "usado";
+export type OrderSource = "site" | "whatsapp" | "trade-in" | "loja-fisica";
+export type LeadStatus = "new" | "contacted" | "negotiating" | "won" | "lost";
 
 export interface Category {
   id: string;
@@ -29,6 +32,7 @@ export interface Product {
   active: boolean;
   stock: number | null;
   battery_health: number | null;
+  condition: ProductCondition | null;
   created_at: string;
   updated_at: string;
 }
@@ -68,5 +72,37 @@ export interface Order {
   delivery_method: DeliveryMethod;
   notes: string | null;
   status: OrderStatus;
+  source: OrderSource | null;
+  created_at: string;
+}
+
+export interface TradeInLead {
+  id: string;
+  created_at: string;
+  customer_name: string;
+  customer_phone: string;
+  marca: string;
+  modelo: string;
+  estado: "perfeito" | "bom" | "regular" | "danificado";
+  bateria: number;
+  estimativa_min: number;
+  estimativa_max: number;
+  cidade_origem: string | null;
+  produto_origem: string | null;
+  origem: string | null;
+  referrer: string | null;
+  status: LeadStatus;
+  notes: string | null;
+}
+
+export interface Review {
+  id: string;
+  author_name: string;
+  city: string | null;
+  rating: number;
+  comment: string;
+  approved: boolean;
+  product_id: string | null;
+  photo_url: string | null;
   created_at: string;
 }
