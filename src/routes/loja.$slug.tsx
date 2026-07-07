@@ -18,6 +18,7 @@ import {
   Plus,
   X,
   ZoomIn,
+  Recycle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, Category, ProductVariant } from "@/lib/marketplace-types";
@@ -450,6 +451,35 @@ function ProductDetail() {
                 </div>
               </div>
             )}
+
+            {/* Trade-in CTA — atribui produto + cidade (se veio de /em/$cidade) */}
+            {!isService && (() => {
+              const cidadeParam =
+                typeof window !== "undefined"
+                  ? new URLSearchParams(window.location.search).get("cidade") ?? ""
+                  : "";
+              const qs = new URLSearchParams({
+                produto: product.slug,
+                origem: "produto",
+                ...(cidadeParam ? { cidade: cidadeParam } : {}),
+              }).toString();
+              return (
+                <a href={`/trade-in?${qs}`} className="block">
+                  <div className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/5 to-transparent p-4 hover:border-primary transition">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary grid place-items-center shrink-0">
+                        <Recycle className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm">Troque seu usado neste {product.name.split(" ").slice(0, 2).join(" ")}</p>
+                        <p className="text-xs text-muted-foreground">Estimativa em segundos · desconto direto</p>
+                      </div>
+                      <ArrowLeft className="w-4 h-4 rotate-180 text-muted-foreground" />
+                    </div>
+                  </div>
+                </a>
+              );
+            })()}
 
             {/* Benefits */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">

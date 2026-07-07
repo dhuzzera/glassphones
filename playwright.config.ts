@@ -22,6 +22,16 @@ export default defineConfig({
     viewport: { width: 1280, height: 900 },
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Usa Chromium do sistema quando PLAYWRIGHT_CHROMIUM_EXECUTABLE estiver
+        // setado (útil em sandboxes de CI onde o bundled não tem libs .so).
+        ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
+          ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } }
+          : {}),
+      },
+    },
   ],
 });
