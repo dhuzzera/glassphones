@@ -97,7 +97,7 @@ export function Benefits() {
   const items = [
     { icon: ShieldCheck, t: "Garantia oficial", d: "Produtos originais lacrados" },
     { icon: Truck, t: "Frete pra todo Brasil", d: "Enviamos no mesmo dia" },
-    { icon: CreditCard, t: "12x sem juros", d: "Cartão, Pix ou boleto" },
+    { icon: CreditCard, t: "Pagamento flexível", d: "Consulte as opções no WhatsApp" },
     { icon: WhatsAppIcon, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
   ];
   return (
