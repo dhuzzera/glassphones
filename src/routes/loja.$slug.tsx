@@ -148,20 +148,56 @@ function ProductDetail() {
   }
 
   const isService = product.kind === "service";
-  const img = product.image_urls[selectedImg];
-  const inStock = product.stock === null || product.stock > 0;
-  const lowStock = product.stock !== null && product.stock > 0 && product.stock <= 3;
+  const hasVariants = variants.length > 0;
+
+  // Attribute name -> ordered unique values (from all variants)
+  const attrGroups: Record<string, string[]> = {};
+  for (const v of variants) {
+    for (const [k, val] of Object.entries(v.attributes ?? {})) {
+      if (!attrGroups[k]) attrGroups[k] = [];
+      if (!attrGroups[k].includes(val)) attrGroups[k].push(val);
+    }
+  }
+  const attrNames = Object.keys(attrGroups);
+
+  const activeVariant: ProductVariant | null = hasVariants
+    ? variants.find((v) =>
+        attrNames.every((k) => (v.attributes?.[k] ?? "") === (selectedAttrs[k] ?? ""))
+      ) ?? null
+    : null;
+  const allAttrsPicked = attrNames.every((k) => selectedAttrs[k]);
+  const variantLabel = allAttrsPicked
+    ? attrNames.map((k) => `${k}: ${selectedAttrs[k]}`).join(" · ")
+    : null;
+
+  const effectivePrice =
+    activeVariant?.price_cents ?? product.price_cents;
+  const effectiveStock = hasVariants
+    ? activeVariant?.stock ?? null
+    : product.stock;
+  const effectiveImgList = activeVariant?.image_url
+    ? [activeVariant.image_url, ...product.image_urls]
+    : product.image_urls;
+  const img = effectiveImgList[selectedImg];
+  const inStock = effectiveStock === null || effectiveStock > 0;
+  const lowStock = effectiveStock !== null && effectiveStock > 0 && effectiveStock <= 3;
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareText = `${product.name} — ${formatBRL(product.price_cents)}`;
+  const shareText = `${product.name} — ${formatBRL(effectivePrice)}`;
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
 
   const handleAdd = (redirect = false) => {
+    if (hasVariants && !activeVariant) {
+      toast.error("Selecione uma variação antes de adicionar ao carrinho.");
+      return;
+    }
     for (let i = 0; i < qty; i++) {
       add({
         product_id: product.id,
+        variant_id: activeVariant?.id ?? null,
+        variant_label: variantLabel,
         name: product.name,
-        price_cents: product.price_cents,
+        price_cents: effectivePrice,
         kind: product.kind,
       });
     }
