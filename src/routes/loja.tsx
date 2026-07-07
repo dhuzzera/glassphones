@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
-import { ShoppingCart, Search, Wrench, Smartphone, ChevronRight, Sparkles } from "lucide-react";
+import { ShoppingCart, Search, Wrench, Smartphone, ChevronRight, Sparkles, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, Category } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings } from "@/hooks/use-site-content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SiteShell } from "@/components/site-shell";
+import { ProductQuickView } from "@/components/product-quick-view";
 import { WhatsAppIcon } from "@/lib/site";
 
 export const Route = createFileRoute("/loja")({
@@ -31,6 +33,7 @@ function LojaPage() {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"product" | "service">("product");
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [quickSlug, setQuickSlug] = useState<string | null>(null);
   const { count } = useCart();
   const { get } = useSiteSettings();
 
@@ -189,7 +192,7 @@ function LojaPage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {featuredProducts.slice(0, 8).map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p} onQuickView={setQuickSlug} />
               ))}
             </div>
           </section>
@@ -226,38 +229,49 @@ function LojaPage() {
             </div>
 
             <TabsContent value="product" className="mt-0">
-              <ProductGrid products={filtered} loading={isLoading} kind="product" />
+              <ProductGrid products={filtered} loading={isLoading} kind="product" onQuickView={setQuickSlug} />
             </TabsContent>
             <TabsContent value="service" className="mt-0">
-              <ProductGrid products={filtered} loading={isLoading} kind="service" />
+              <ProductGrid products={filtered} loading={isLoading} kind="service" onQuickView={setQuickSlug} />
             </TabsContent>
           </Tabs>
         </section>
       </main>
       </div>
+      <ProductQuickView slug={quickSlug} onClose={() => setQuickSlug(null)} />
     </SiteShell>
   );
 }
 
 
-function ProductGrid({ products, loading, kind }: { products: Product[]; loading: boolean; kind: "product" | "service" }) {
+function ProductGrid({ products, loading, kind, onQuickView }: { products: Product[]; loading: boolean; kind: "product" | "service"; onQuickView: (slug: string) => void }) {
   if (loading) return <p className="text-muted-foreground">Carregando...</p>;
   if (products.length === 0) return <p className="text-muted-foreground">Nenhum {kind === "product" ? "produto" : "serviço"} encontrado.</p>;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {products.map((p) => <ProductCard key={p.id} product={p} />)}
+      {products.map((p) => <ProductCard key={p.id} product={p} onQuickView={onQuickView} />)}
     </div>
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
-  const { add } = useCart();
+function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (slug: string) => void }) {
+  const { isAdmin } = useAuth();
   const img = product.image_urls[0];
   const isService = product.kind === "service";
 
   return (
-    <Card className="overflow-hidden flex flex-col group hover:shadow-lg transition">
-      <Link to="/loja/$slug" params={{ slug: product.slug }}>
+    <Card className="overflow-hidden flex flex-col group hover:shadow-lg transition relative">
+      {isAdmin && (
+        <Link
+          to="/admin/produtos"
+          aria-label="Editar produto"
+          onClick={(e) => e.stopPropagation()}
+          className="absolute top-2 right-2 z-10 h-8 w-8 grid place-items-center rounded-full bg-foreground text-background shadow-md hover:bg-primary transition"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Link>
+      )}
+      <button type="button" onClick={() => onQuickView(product.slug)} className="text-left">
         <div className="aspect-square bg-muted overflow-hidden">
           {img ? (
             <img src={img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
@@ -267,11 +281,11 @@ function ProductCard({ product }: { product: Product }) {
             </div>
           )}
         </div>
-      </Link>
+      </button>
       <CardContent className="p-4 flex-1">
-        <Link to="/loja/$slug" params={{ slug: product.slug }} className="hover:underline">
+        <button type="button" onClick={() => onQuickView(product.slug)} className="hover:underline text-left w-full">
           <h3 className="font-semibold line-clamp-2">{product.name}</h3>
-        </Link>
+        </button>
         <p className="mt-2 text-xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
         <p className="text-xs text-muted-foreground">
           ou 12x de {formatBRL(Math.round(product.price_cents / 12))}
@@ -284,22 +298,10 @@ function ProductCard({ product }: { product: Product }) {
             <Button variant="default" className="w-full">Agendar pelo WhatsApp</Button>
           </a>
         ) : (
-          <Link to="/loja/$slug" params={{ slug: product.slug }} className="w-full">
-            <Button className="w-full" variant="outline" onClick={(e) => {
-              // If product has no attributes required, add directly
-              e.preventDefault();
-              add({
-                product_id: product.id,
-                variant_id: null,
-                variant_label: null,
-                name: product.name,
-                price_cents: product.price_cents,
-                kind: product.kind,
-              });
-            }}>
-              Adicionar ao carrinho
-            </Button>
-          </Link>
+          <Button className="w-full" onClick={() => onQuickView(product.slug)}>
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Comprar agora
+          </Button>
         )}
       </CardFooter>
     </Card>
