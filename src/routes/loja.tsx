@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { SiteShell } from "@/components/site-shell";
 import { WhatsAppIcon } from "@/lib/site";
 
 export const Route = createFileRoute("/loja")({
