@@ -141,24 +141,27 @@ export function ProdutoCard(p: Produto) {
     Motorola: { slug: "motorola", cor: "FFFFFF" },
   };
   const m = marcaSlug[p.marca];
+  const slug = slugify(p.nome);
   return (
     <div className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col" style={{ boxShadow: "var(--shadow-product)" }}>
-      <div className="relative aspect-square bg-gradient-to-br from-muted to-secondary grid place-items-center">
+      <Link to="/loja/$slug" params={{ slug }} className="relative aspect-square bg-gradient-to-br from-muted to-secondary grid place-items-center">
         {p.promo && <span className="absolute top-3 left-3 bg-badge-promo text-white text-xs font-bold px-2.5 py-1 rounded-full">-{desconto}%</span>}
         {m ? <img src={logo(m.slug, m.cor)} alt={`Logo ${p.marca}`} width={120} height={120} loading="lazy" className="h-24 w-24 object-contain opacity-90 group-hover:scale-110 transition" /> : <Smartphone className="h-20 w-20 text-muted-foreground/40" strokeWidth={1} />}
-      </div>
+      </Link>
       <div className="p-4 flex flex-col flex-1 gap-2">
         <span className="text-xs text-muted-foreground font-medium">{p.marca} · {p.cor}</span>
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2 min-h-[2.5rem]">{p.nome}</h3>
+        <Link to="/loja/$slug" params={{ slug }} className="hover:text-primary transition">
+          <h3 className="font-semibold text-sm leading-snug line-clamp-2 min-h-[2.5rem]">{p.nome}</h3>
+        </Link>
         <div className="mt-1">
           {p.promo && <div className="text-xs text-muted-foreground line-through">{brl(p.antigo)}</div>}
           <div className="text-price font-black text-xl leading-tight">{brl(p.preco)}</div>
           <div className="text-xs text-whatsapp font-semibold">ou {brl(pix)} no Pix</div>
           <div className="text-xs text-muted-foreground">12x de {brl(p.preco / 12)} sem juros</div>
         </div>
-        <a href={waLink(`Olá! Tenho interesse no ${p.nome} (${p.cor}) por ${brl(p.preco)}. Está disponível?`)} className="mt-auto inline-flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition">
-          <WhatsAppIcon className="h-4 w-4" /> Comprar
-        </a>
+        <Link to="/loja/$slug" params={{ slug }} className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition">
+          Ver produto
+        </Link>
       </div>
     </div>
   );
