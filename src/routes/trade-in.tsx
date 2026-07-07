@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WhatsAppIcon } from "@/lib/site";
 import { WHATSAPP_NUMBER, formatBRL } from "@/lib/marketplace";
+import { track, trackWhatsApp } from "@/lib/analytics";
 
 export const Route = createFileRoute("/trade-in")({
   head: () => ({
