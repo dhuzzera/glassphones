@@ -103,7 +103,7 @@ function Header() {
     if (!q) return;
     navigate({
       to: "/loja",
-      search: { q, tab: "product", cat: "null", cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 },
+      search: { q, tab: "product" as const, cat: null, cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 },
     });
     handleSearchClose();
   };
