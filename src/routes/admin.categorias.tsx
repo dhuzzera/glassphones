@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export const Route = createFileRoute("/admin/categorias")({
   component: CategoriesPage,
@@ -21,6 +22,7 @@ function CategoriesPage() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [type, setType] = useState<CategoryType>("product");
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const { data: cats = [], isLoading } = useQuery({
     queryKey: ["admin-categories"],
@@ -43,59 +45,67 @@ function CategoriesPage() {
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Excluir esta categoria?")) return;
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Excluída");
+    setDeleteTarget(null);
     qc.invalidateQueries({ queryKey: ["admin-categories"] });
     qc.invalidateQueries({ queryKey: ["categories"] });
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Categorias</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader><CardTitle>Nova categoria</CardTitle></CardHeader>
-          <CardContent>
-            <form onSubmit={create} className="space-y-3">
-              <div>
-                <Label>Nome</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} required />
-              </div>
-              <div>
-                <Label>Tipo</Label>
-                <Select value={type} onValueChange={(v) => setType(v as CategoryType)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="product">Produto</SelectItem>
-                    <SelectItem value="service">Serviço</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full"><Plus className="w-4 h-4 mr-2" />Criar</Button>
-            </form>
-          </CardContent>
-        </Card>
-        <Card className="md:col-span-2">
-          <CardHeader><CardTitle>Existentes</CardTitle></CardHeader>
-          <CardContent>
-            {isLoading ? <p>Carregando...</p> : cats.length === 0 ? (
-              <p className="text-muted-foreground text-sm">Nenhuma categoria ainda.</p>
-            ) : (
-              <div className="space-y-2">
-                {cats.map((c) => (
-                  <CategoryRow key={c.id} category={c} onRemove={remove} onChanged={() => {
-                    qc.invalidateQueries({ queryKey: ["admin-categories"] });
-                    qc.invalidateQueries({ queryKey: ["categories"] });
-                  }} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+    <>
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        description="A categoria será excluída permanentemente."
+        onConfirm={() => deleteTarget && remove(deleteTarget)}
+        onCancel={() => setDeleteTarget(null)}
+      />
+      <div>
+        <h1 className="text-2xl font-bold mb-6">Categorias</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader><CardTitle>Nova categoria</CardTitle></CardHeader>
+            <CardContent>
+              <form onSubmit={create} className="space-y-3">
+                <div>
+                  <Label>Nome</Label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} required />
+                </div>
+                <div>
+                  <Label>Tipo</Label>
+                  <Select value={type} onValueChange={(v) => setType(v as CategoryType)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="product">Produto</SelectItem>
+                      <SelectItem value="service">Serviço</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="w-full"><Plus className="w-4 h-4 mr-2" />Criar</Button>
+              </form>
+            </CardContent>
+          </Card>
+          <Card className="md:col-span-2">
+            <CardHeader><CardTitle>Existentes</CardTitle></CardHeader>
+            <CardContent>
+              {isLoading ? <p>Carregando...</p> : cats.length === 0 ? (
+                <p className="text-muted-foreground text-sm">Nenhuma categoria ainda.</p>
+              ) : (
+                <div className="space-y-2">
+                  {cats.map((c) => (
+                    <CategoryRow key={c.id} category={c} onRemove={setDeleteTarget} onChanged={() => {
+                      qc.invalidateQueries({ queryKey: ["admin-categories"] });
+                      qc.invalidateQueries({ queryKey: ["categories"] });
+                    }} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -17,7 +17,10 @@ import type { DeliveryMethod } from "@/lib/marketplace-types";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Nome muito curto").max(120),
-  phone: z.string().trim().min(8, "Telefone inválido").max(20),
+  phone: z.string().trim().regex(
+    /^(\+?55\s?)?(\(?\d{2}\)?\s?)(9\s?\d{4}|\d{4})-?\s?\d{4}$/,
+    "Telefone inválido. Use (XX) 9XXXX-XXXX"
+  ),
   email: z.string().trim().email("E-mail inválido").max(160).optional().or(z.literal("")),
   notes: z.string().max(500).optional(),
 });
@@ -54,6 +57,21 @@ function CheckoutPage() {
   useEffect(() => {
     if (hydrated && items.length === 0) navigate({ to: "/carrinho" });
   }, [hydrated, items.length, navigate]);
+
+  const fetchCep = async (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await res.json();
+      if (data.erro) return toast.error("CEP não encontrado");
+      setRua(data.logradouro ?? "");
+      setBairro(data.bairro ?? "");
+      setCidade(data.localidade ?? "");
+    } catch {
+      // silencioso
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +131,7 @@ function CheckoutPage() {
       clear();
       toast.success("Pedido registrado! Abrindo WhatsApp...");
       window.open(url, "_blank");
-      navigate({ to: "/loja" });
+      navigate({ to: "/pedido-confirmado", search: { id: data.id, name: parsed.data.name } });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro ao enviar pedido";
       toast.error(msg);
@@ -184,7 +202,7 @@ function CheckoutPage() {
               <CardContent className="grid grid-cols-1 sm:grid-cols-6 gap-3">
                 <div className="sm:col-span-2">
                   <Label htmlFor="cep">CEP</Label>
-                  <Input id="cep" value={cep} onChange={(e) => setCep(e.target.value)} placeholder="89281-100" maxLength={9} />
+                  <Input id="cep" value={cep} onChange={(e) => setCep(e.target.value)} onBlur={(e) => fetchCep(e.target.value)} placeholder="89281-100" maxLength={9} />
                 </div>
                 <div className="sm:col-span-4">
                   <Label htmlFor="rua">Rua / Logradouro</Label>

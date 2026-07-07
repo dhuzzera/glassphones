@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Order, OrderStatus } from "@/lib/marketplace-types";
@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/admin/pedidos")({
   component: OrdersAdmin,
@@ -36,6 +37,7 @@ function OrdersAdmin() {
   const qc = useQueryClient();
   const [filter, setFilter] = useState<OrderStatus | "all">("all");
   const [detail, setDetail] = useState<Order | null>(null);
+  const [search, setSearch] = useState("");
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["admin-orders", filter],
@@ -47,6 +49,16 @@ function OrdersAdmin() {
       return data as Order[];
     },
   });
+
+  const filteredOrders = search.trim()
+    ? orders.filter((o) => {
+        const q = search.toLowerCase();
+        return (
+          o.customer_name.toLowerCase().includes(q) ||
+          o.customer_phone.replace(/\D/g, "").includes(q.replace(/\D/g, ""))
+        );
+      })
+    : orders;
 
   const updateStatus = async (id: string, status: OrderStatus) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
@@ -63,26 +75,68 @@ function OrdersAdmin() {
     window.open(`https://wa.me/${withCountry}`, "_blank");
   };
 
+  const exportCSV = () => {
+    const headers = ["Data", "Pedido", "Cliente", "Telefone", "Email", "Total", "Status", "Entrega", "Observações"];
+    const rows = orders.map((o) => [
+      new Date(o.created_at).toLocaleString("pt-BR"),
+      `#${o.id.slice(0, 8).toUpperCase()}`,
+      o.customer_name,
+      o.customer_phone,
+      o.customer_email ?? "",
+      (o.total_cents / 100).toFixed(2).replace(".", ","),
+      STATUS_LABELS[o.status],
+      o.delivery_method === "pickup" ? "Retirada" : "Frete",
+      (o.notes ?? "").replace(/"/g, '""'),
+    ]);
+    const csv = [
+      headers.map((h) => `"${h}"`).join(","),
+      ...rows.map((r) => r.map((c) => `"${c}"`).join(",")),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pedidos-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado");
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Pedidos</h1>
-        <Select value={filter} onValueChange={(v) => setFilter(v as OrderStatus | "all")}>
-          <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            {Object.entries(STATUS_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={exportCSV} disabled={orders.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar CSV
+          </Button>
+          <Select value={filter} onValueChange={(v) => setFilter(v as OrderStatus | "all")}>
+            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {Object.entries(STATUS_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <Input
+          placeholder="Buscar por nome ou telefone..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
       </div>
 
       <Card>
         <CardContent className="p-0">
-          {isLoading ? <p className="p-6">Carregando...</p> : orders.length === 0 ? (
+          {isLoading ? <p className="p-6">Carregando...</p> : filteredOrders.length === 0 ? (
             <p className="p-6 text-muted-foreground">Nenhum pedido.</p>
           ) : (
             <div className="divide-y">
-              {orders.map((o) => (
+              {filteredOrders.map((o) => (
                 <button key={o.id} onClick={() => setDetail(o)} className="w-full text-left p-4 hover:bg-muted flex items-center gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
