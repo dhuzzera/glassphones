@@ -1,12 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronDown, ChevronRight, Clock, CreditCard, MapPin, Phone, Send, ShieldCheck, Smartphone, Star, Truck } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronRight, Clock, CreditCard, MapPin, Pencil, Phone, Send, ShieldCheck, Smartphone, Star, Truck } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState } from "react";
 import { brl, categorias, faqs, defeitos, heroSlides, logo, modelosPop, PHONE_DISPLAY, produtos, servicos, waLink, WhatsAppIcon, WHATSAPP_NUM, type Produto } from "@/lib/site";
 import { slugify } from "@/lib/marketplace";
 import { useFaqItems, useSiteSettings } from "@/hooks/use-site-content";
+import { useAuth } from "@/hooks/use-auth";
 import { trackServiceDetail, trackWhatsApp } from "@/lib/analytics";
+
 
 export function Hero() {
   return (
