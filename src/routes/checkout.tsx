@@ -131,7 +131,7 @@ function CheckoutPage() {
       clear();
       toast.success("Pedido registrado! Abrindo WhatsApp...");
       window.open(url, "_blank");
-      navigate({ to: "/pedido-confirmado", search: { id: data.id, name: parsed.data.name } });
+      navigate({ to: "/loja" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro ao enviar pedido";
       toast.error(msg);
