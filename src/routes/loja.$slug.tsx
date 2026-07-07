@@ -20,7 +20,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Category } from "@/lib/marketplace-types";
+import type { Product, Category, ProductVariant } from "@/lib/marketplace-types";
 import { formatBRL, buildServiceInquiryUrl, WHATSAPP_NUMBER } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
 import { useSiteSettings } from "@/hooks/use-site-content";
@@ -50,6 +50,7 @@ function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [zoomOpen, setZoomOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>({});
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
