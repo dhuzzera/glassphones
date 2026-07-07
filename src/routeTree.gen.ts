@@ -28,6 +28,7 @@ import { Route as ServicosSlugRouteImport } from './routes/servicos.$slug'
 import { Route as LojaSlugRouteImport } from './routes/loja.$slug'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
+import { Route as AdminDestaquesRouteImport } from './routes/admin.destaques'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminAvaliacoesRouteImport } from './routes/admin.avaliacoes'
 
@@ -126,6 +127,11 @@ const AdminPedidosRoute = AdminPedidosRouteImport.update({
   path: '/pedidos',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDestaquesRoute = AdminDestaquesRouteImport.update({
+  id: '/destaques',
+  path: '/destaques',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
   id: '/categorias',
   path: '/categorias',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/loja/$slug': typeof LojaSlugRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/loja/$slug': typeof LojaSlugRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/loja/$slug': typeof LojaSlugRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/avaliacoes'
     | '/admin/categorias'
+    | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/loja/$slug'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/avaliacoes'
     | '/admin/categorias'
+    | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/loja/$slug'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/avaliacoes'
     | '/admin/categorias'
+    | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/loja/$slug'
@@ -429,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPedidosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/destaques': {
+      id: '/admin/destaques'
+      path: '/destaques'
+      fullPath: '/admin/destaques'
+      preLoaderRoute: typeof AdminDestaquesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categorias': {
       id: '/admin/categorias'
       path: '/categorias'
@@ -449,6 +468,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAvaliacoesRoute: typeof AdminAvaliacoesRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
+  AdminDestaquesRoute: typeof AdminDestaquesRoute
   AdminPedidosRoute: typeof AdminPedidosRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -457,6 +477,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAvaliacoesRoute: AdminAvaliacoesRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
+  AdminDestaquesRoute: AdminDestaquesRoute,
   AdminPedidosRoute: AdminPedidosRoute,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminIndexRoute: AdminIndexRoute,

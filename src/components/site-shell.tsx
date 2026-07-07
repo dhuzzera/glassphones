@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut } from "lucide-react";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare } from "lucide-react";
 import type { ReactNode } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
