@@ -134,6 +134,7 @@ export function Categorias() {
 }
 
 export function ProdutoCard(p: Produto) {
+  const { isAdmin } = useAuth();
   const desconto = p.promo ? Math.round((1 - p.preco / p.antigo) * 100) : 0;
   const pix = p.preco * 0.9;
   const marcaSlug: Record<string, { slug: string; cor: string }> = {
@@ -145,11 +146,21 @@ export function ProdutoCard(p: Produto) {
   const m = marcaSlug[p.marca];
   const slug = slugify(p.nome);
   return (
-    <div className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col" style={{ boxShadow: "var(--shadow-product)" }}>
+    <div className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary hover:-translate-y-1 transition flex flex-col relative" style={{ boxShadow: "var(--shadow-product)" }}>
+      {isAdmin && (
+        <Link
+          to="/admin/produtos"
+          aria-label="Editar produto"
+          className="absolute top-3 right-3 z-10 h-8 w-8 grid place-items-center rounded-full bg-foreground text-background shadow-md hover:bg-primary transition"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Link>
+      )}
       <Link to="/loja/$slug" params={{ slug }} className="relative aspect-square bg-gradient-to-br from-muted to-secondary grid place-items-center">
         {p.promo && <span className="absolute top-3 left-3 bg-badge-promo text-white text-xs font-bold px-2.5 py-1 rounded-full">-{desconto}%</span>}
         {m ? <img src={logo(m.slug, m.cor)} alt={`Logo ${p.marca}`} width={120} height={120} loading="lazy" className="h-24 w-24 object-contain opacity-90 group-hover:scale-110 transition" /> : <Smartphone className="h-20 w-20 text-muted-foreground/40" strokeWidth={1} />}
       </Link>
+
       <div className="p-4 flex flex-col flex-1 gap-2">
         <span className="text-xs text-muted-foreground font-medium">{p.marca} · {p.cor}</span>
         <Link to="/loja/$slug" params={{ slug }} className="hover:text-primary transition">
