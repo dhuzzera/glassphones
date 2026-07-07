@@ -6,6 +6,7 @@ import { useSiteSettings } from "@/hooks/use-site-content";
 
 const NAV = [
   { to: "/", label: "Home" },
+  { to: "/loja", label: "Loja" },
   { to: "/servicos", label: "Serviços" },
   { to: "/ofertas", label: "Ofertas" },
   { to: "/orcamento", label: "Orçamento" },
