@@ -32,6 +32,7 @@ interface FormState {
   featured: boolean;
   active: boolean;
   stock: string;
+  batteryHealth: string;
 }
 
 const emptyForm: FormState = {
@@ -45,6 +46,7 @@ const emptyForm: FormState = {
   featured: false,
   active: true,
   stock: "",
+  batteryHealth: "100",
 };
 
 function ProductsAdmin() {
@@ -82,6 +84,7 @@ function ProductsAdmin() {
     featured: p.featured,
     active: p.active,
     stock: p.stock?.toString() ?? "",
+    batteryHealth: p.battery_health?.toString() ?? "100",
   });
 
   const remove = async (id: string) => {
@@ -186,6 +189,8 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
     try {
       const priceCents = Math.round(parseFloat(form.priceReais.replace(",", ".")) * 100);
       if (isNaN(priceCents) || priceCents < 0) throw new Error("Preço inválido");
+      const bh = form.batteryHealth.trim() === "" ? null : parseInt(form.batteryHealth, 10);
+      if (bh !== null && (isNaN(bh) || bh < 0 || bh > 100)) throw new Error("Saúde da bateria deve ser entre 0 e 100");
       const payload = {
         name: form.name,
         slug: form.slug || slugify(form.name),
@@ -197,6 +202,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
         featured: form.featured,
         active: form.active,
         stock: form.stock ? parseInt(form.stock, 10) : null,
+        battery_health: form.kind === "product" ? bh : null,
         updated_at: new Date().toISOString(),
       };
       const { error } = form.id
@@ -249,6 +255,19 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
               <Input type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
             </div>
           </div>
+          {form.kind === "product" && (
+            <div>
+              <Label>Saúde da bateria (%) <span className="text-xs text-muted-foreground">(padrão 100)</span></Label>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                value={form.batteryHealth}
+                onChange={(e) => setForm({ ...form, batteryHealth: e.target.value })}
+                placeholder="100"
+              />
+            </div>
+          )}
           <div>
             <Label>Categoria</Label>
             <Select value={form.category_id ?? "none"} onValueChange={(v) => setForm({ ...form, category_id: v === "none" ? null : v })}>

@@ -28,6 +28,7 @@ export interface Product {
   featured: boolean;
   active: boolean;
   stock: number | null;
+  battery_health: number | null;
   created_at: string;
   updated_at: string;
 }

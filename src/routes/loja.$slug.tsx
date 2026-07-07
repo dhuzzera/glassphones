@@ -435,6 +435,22 @@ function ProductDetail() {
               </div>
             </div>
 
+            {/* Battery health */}
+            {!isService && product.battery_health !== null && product.battery_health !== undefined && (
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-semibold">Saúde da bateria</p>
+                  <span className="text-lg font-bold text-primary">{product.battery_health}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-500 transition-all"
+                    style={{ width: `${Math.max(0, Math.min(100, product.battery_health))}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Benefits */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
               <div className="flex items-start gap-2 p-3 rounded-xl bg-muted/40">
