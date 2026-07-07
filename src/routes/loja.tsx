@@ -229,26 +229,27 @@ function LojaPage() {
             </div>
 
             <TabsContent value="product" className="mt-0">
-              <ProductGrid products={filtered} loading={isLoading} kind="product" />
+              <ProductGrid products={filtered} loading={isLoading} kind="product" onQuickView={setQuickSlug} />
             </TabsContent>
             <TabsContent value="service" className="mt-0">
-              <ProductGrid products={filtered} loading={isLoading} kind="service" />
+              <ProductGrid products={filtered} loading={isLoading} kind="service" onQuickView={setQuickSlug} />
             </TabsContent>
           </Tabs>
         </section>
       </main>
       </div>
+      <ProductQuickView slug={quickSlug} onClose={() => setQuickSlug(null)} />
     </SiteShell>
   );
 }
 
 
-function ProductGrid({ products, loading, kind }: { products: Product[]; loading: boolean; kind: "product" | "service" }) {
+function ProductGrid({ products, loading, kind, onQuickView }: { products: Product[]; loading: boolean; kind: "product" | "service"; onQuickView: (slug: string) => void }) {
   if (loading) return <p className="text-muted-foreground">Carregando...</p>;
   if (products.length === 0) return <p className="text-muted-foreground">Nenhum {kind === "product" ? "produto" : "serviço"} encontrado.</p>;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {products.map((p) => <ProductCard key={p.id} product={p} />)}
+      {products.map((p) => <ProductCard key={p.id} product={p} onQuickView={onQuickView} />)}
     </div>
   );
 }
