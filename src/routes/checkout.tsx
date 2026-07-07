@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/use-cart";
 import { formatBRL, buildOrderWhatsappUrl } from "@/lib/marketplace";
+import { track } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,8 @@ const schema = z.object({
   email: z.string().trim().email("E-mail inválido").max(160).optional().or(z.literal("")),
   notes: z.string().max(500).optional(),
 });
+
+type PaymentMethod = "pix" | "cartao" | "dinheiro" | "combinar";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
