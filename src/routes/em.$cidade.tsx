@@ -252,7 +252,11 @@ function CidadePage() {
             </h2>
             <p className="text-sm text-muted-foreground">
               {cidade.bairros.join(" · ")}. Não achou seu bairro? Fale no{" "}
-              <a href={waUrl} className="text-primary hover:underline font-medium">
+              <a
+                href={waUrl}
+                onClick={() => trackWhatsApp("cidade_bairros", { cidade: cidade.slug, uf: cidade.uf })}
+                className="text-primary hover:underline font-medium"
+              >
                 WhatsApp
               </a>{" "}
               — combinamos a melhor forma de entrega.
@@ -260,6 +264,27 @@ function CidadePage() {
           </div>
         </section>
       )}
+
+      {/* FAQ visível — reforça as respostas do FAQPage JSON-LD */}
+      <section className="container mx-auto px-4 pb-12">
+        <h2 className="text-2xl font-bold mb-4">Perguntas frequentes de clientes de {cidade.nome}</h2>
+        <div className="space-y-3">
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-1">Vocês entregam em {cidade.nome}?</h3>
+            <p className="text-sm text-muted-foreground">{cidade.destaque} Combinamos a entrega pelo WhatsApp.</p>
+          </div>
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-1">Qual a distância até {cidade.nome}?</h3>
+            <p className="text-sm text-muted-foreground">Cerca de {cidade.distanciaKm} km entre nossa loja em São Bento do Sul e {cidade.nome}.</p>
+          </div>
+          <div className="rounded-lg border p-4">
+            <h3 className="font-semibold mb-1">Fazem assistência técnica?</h3>
+            <p className="text-sm text-muted-foreground">
+              Sim — troca de tela, bateria e mais. <Link to="/servicos" className="text-primary hover:underline">Ver serviços</Link>.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Outras cidades (linking interno para SEO) */}
       <section className="container mx-auto px-4 pb-16">
