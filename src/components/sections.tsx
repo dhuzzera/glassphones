@@ -17,7 +17,7 @@ export function Hero() {
         <div className="text-white">
           <span className="inline-block bg-white/15 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold mb-4">🔥 MEGA OFERTAS DA SEMANA</span>
           <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-4">Os melhores <br />celulares, os<br /> melhores preços.</h1>
-          <p className="text-white/90 text-lg mb-6 max-w-md">iPhone, Samsung, Xiaomi e Motorola com garantia, parcelamento em até 12x e atendimento humano pelo WhatsApp.</p>
+          <p className="text-white/90 text-lg mb-6 max-w-md">iPhone, Samsung, Xiaomi e Motorola com garantia e atendimento humano pelo WhatsApp.</p>
           <div className="flex flex-wrap gap-3">
             <Link to="/ofertas" className="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-full font-bold hover:scale-105 transition">
               Ver ofertas <Smartphone className="h-4 w-4" />
