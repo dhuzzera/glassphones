@@ -305,21 +305,71 @@ function ProductDetail() {
 
             <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-sm text-muted-foreground">Preço</p>
-              <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
+              <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(effectivePrice)}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                ou 12x de {formatBRL(Math.round(product.price_cents / 12))} sem juros
+                ou 12x de {formatBRL(Math.round(effectivePrice / 12))} sem juros
               </p>
+
+              {hasVariants && (
+                <div className="mt-5 space-y-4">
+                  {attrNames.map((name) => (
+                    <div key={name}>
+                      <p className="text-sm font-medium mb-2">
+                        {name}
+                        {selectedAttrs[name] && (
+                          <span className="text-muted-foreground font-normal">: {selectedAttrs[name]}</span>
+                        )}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {attrGroups[name].map((val) => {
+                          const selected = selectedAttrs[name] === val;
+                          // check if any variant matches current selection + this option is active
+                          const wouldSelect = { ...selectedAttrs, [name]: val };
+                          const match = variants.find((v) =>
+                            attrNames.every((k) => (v.attributes?.[k] ?? "") === (wouldSelect[k] ?? ""))
+                          );
+                          const disabled = !!wouldSelect && !variants.some((v) => v.attributes?.[name] === val);
+                          const outOfStock = match && match.stock !== null && match.stock <= 0;
+                          return (
+                            <button
+                              key={val}
+                              type="button"
+                              onClick={() => setSelectedAttrs((s) => ({ ...s, [name]: val }))}
+                              disabled={disabled}
+                              className={`px-4 py-2 rounded-full border text-sm font-medium transition ${
+                                selected
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border bg-background hover:border-primary/50"
+                              } ${disabled ? "opacity-40 cursor-not-allowed" : ""} ${
+                                outOfStock && !selected ? "line-through opacity-60" : ""
+                              }`}
+                            >
+                              {val}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  {!allAttrsPicked && (
+                    <p className="text-xs text-muted-foreground">Selecione todas as variações.</p>
+                  )}
+                </div>
+              )}
 
               <div className="mt-4 flex items-center gap-2">
                 {inStock ? (
                   <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600">
                     <Check className="w-3 h-3 mr-1" />
-                    {lowStock ? `Últimas ${product.stock} unidades` : "Em estoque"}
+                    {lowStock ? `Últimas ${effectiveStock} unidades` : "Em estoque"}
                   </Badge>
                 ) : (
                   <Badge variant="destructive">Esgotado</Badge>
                 )}
                 {isService && <Badge variant="outline">Serviço</Badge>}
+                {activeVariant?.sku && (
+                  <Badge variant="outline" className="text-xs">SKU: {activeVariant.sku}</Badge>
+                )}
               </div>
 
               {!isService && inStock && (
@@ -335,7 +385,7 @@ function ProductDetail() {
                     </button>
                     <span className="w-10 text-center font-semibold">{qty}</span>
                     <button
-                      onClick={() => setQty(q => (product.stock !== null ? Math.min(product.stock, q + 1) : q + 1))}
+                      onClick={() => setQty(q => (effectiveStock !== null ? Math.min(effectiveStock, q + 1) : q + 1))}
                       className="h-9 w-9 grid place-items-center hover:bg-muted rounded-r-full transition"
                       aria-label="Aumentar"
                     >
