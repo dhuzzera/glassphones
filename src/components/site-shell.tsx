@@ -5,6 +5,7 @@ import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 
 function AdminBar() {
   const { isAdmin } = useAuth();
