@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Zap, ShieldCheck, CreditCard, ShoppingCart, Pencil, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, ProductVariant } from "@/lib/marketplace-types";
@@ -196,14 +196,19 @@ export function ProductQuickView({ slug, onClose }: Props) {
                 </div>
               )}
 
-              <Link
-                to="/loja/$slug"
-                params={{ slug: product.slug }}
-                onClick={() => onClose()}
+              <button
+                type="button"
+                onClick={() => {
+                  const targetSlug = product.slug;
+                  onClose();
+                  setTimeout(() => {
+                    navigate({ to: "/loja/$slug", params: { slug: targetSlug } });
+                  }, 0);
+                }}
                 className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1 self-start"
               >
                 <ExternalLink className="h-3 w-3" /> Abrir página completa
-              </Link>
+              </button>
             </div>
           </div>
         )}
