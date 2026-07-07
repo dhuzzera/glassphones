@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TradeInRouteImport } from './routes/trade-in'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicosRouteImport } from './routes/servicos'
+import { Route as PedidoConfirmadoRouteImport } from './routes/pedido-confirmado'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as OfertasRouteImport } from './routes/ofertas'
 import { Route as LojaRouteImport } from './routes/loja'
@@ -32,10 +33,18 @@ import { Route as EmCidadeRouteImport } from './routes/em.$cidade'
 import { Route as CelularSlugRouteImport } from './routes/celular.$slug'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminDestaquesRouteImport } from './routes/admin.destaques'
+import { Route as AdminCuponsRouteImport } from './routes/admin.cupons'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminAvaliacoesRouteImport } from './routes/admin.avaliacoes'
 
+const PedidoConfirmadoRoute = PedidoConfirmadoRouteImport.update({
+  id: '/pedido-confirmado',
+  path: '/pedido-confirmado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TradeInRoute = TradeInRouteImport.update({
   id: '/trade-in',
   path: '/trade-in',
@@ -151,9 +160,24 @@ const AdminPedidosRoute = AdminPedidosRouteImport.update({
   path: '/pedidos',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDestaquesRoute = AdminDestaquesRouteImport.update({
   id: '/destaques',
   path: '/destaques',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCuponsRoute = AdminCuponsRouteImport.update({
+  id: '/cupons',
+  path: '/cupons',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
@@ -181,12 +205,16 @@ export interface FileRoutesByFullPath {
   '/loja': typeof LojaRouteWithChildren
   '/ofertas': typeof OfertasRoute
   '/orcamento': typeof OrcamentoRoute
+  '/pedido-confirmado': typeof PedidoConfirmadoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/cupons': typeof AdminCuponsRoute
   '/admin/destaques': typeof AdminDestaquesRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/celular/$slug': typeof CelularSlugRoute
@@ -208,12 +236,16 @@ export interface FileRoutesByTo {
   '/loja': typeof LojaRouteWithChildren
   '/ofertas': typeof OfertasRoute
   '/orcamento': typeof OrcamentoRoute
+  '/pedido-confirmado': typeof PedidoConfirmadoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/cupons': typeof AdminCuponsRoute
   '/admin/destaques': typeof AdminDestaquesRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/celular/$slug': typeof CelularSlugRoute
@@ -237,12 +269,16 @@ export interface FileRoutesById {
   '/loja': typeof LojaRouteWithChildren
   '/ofertas': typeof OfertasRoute
   '/orcamento': typeof OrcamentoRoute
+  '/pedido-confirmado': typeof PedidoConfirmadoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/cupons': typeof AdminCuponsRoute
   '/admin/destaques': typeof AdminDestaquesRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/celular/$slug': typeof CelularSlugRoute
@@ -267,12 +303,16 @@ export interface FileRouteTypes {
     | '/loja'
     | '/ofertas'
     | '/orcamento'
+    | '/pedido-confirmado'
     | '/servicos'
     | '/sitemap.xml'
     | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
+    | '/admin/configuracoes'
+    | '/admin/cupons'
     | '/admin/destaques'
+    | '/admin/leads'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/celular/$slug'
@@ -294,12 +334,16 @@ export interface FileRouteTypes {
     | '/loja'
     | '/ofertas'
     | '/orcamento'
+    | '/pedido-confirmado'
     | '/servicos'
     | '/sitemap.xml'
     | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
+    | '/admin/configuracoes'
+    | '/admin/cupons'
     | '/admin/destaques'
+    | '/admin/leads'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/celular/$slug'
@@ -322,12 +366,16 @@ export interface FileRouteTypes {
     | '/loja'
     | '/ofertas'
     | '/orcamento'
+    | '/pedido-confirmado'
     | '/servicos'
     | '/sitemap.xml'
     | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
+    | '/admin/configuracoes'
+    | '/admin/cupons'
     | '/admin/destaques'
+    | '/admin/leads'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/celular/$slug'
@@ -351,6 +399,7 @@ export interface RootRouteChildren {
   LojaRoute: typeof LojaRouteWithChildren
   OfertasRoute: typeof OfertasRoute
   OrcamentoRoute: typeof OrcamentoRoute
+  PedidoConfirmadoRoute: typeof PedidoConfirmadoRoute
   ServicosRoute: typeof ServicosRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradeInRoute: typeof TradeInRoute
@@ -379,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/servicos'
       fullPath: '/servicos'
       preLoaderRoute: typeof ServicosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedido-confirmado': {
+      id: '/pedido-confirmado'
+      path: '/pedido-confirmado'
+      fullPath: '/pedido-confirmado'
+      preLoaderRoute: typeof PedidoConfirmadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orcamento': {
@@ -521,11 +577,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPedidosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/destaques': {
       id: '/admin/destaques'
       path: '/destaques'
       fullPath: '/admin/destaques'
       preLoaderRoute: typeof AdminDestaquesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cupons': {
+      id: '/admin/cupons'
+      path: '/cupons'
+      fullPath: '/admin/cupons'
+      preLoaderRoute: typeof AdminCuponsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/categorias': {
@@ -548,7 +625,10 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAvaliacoesRoute: typeof AdminAvaliacoesRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminCuponsRoute: typeof AdminCuponsRoute
   AdminDestaquesRoute: typeof AdminDestaquesRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
   AdminPedidosRoute: typeof AdminPedidosRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -557,7 +637,10 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAvaliacoesRoute: AdminAvaliacoesRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminCuponsRoute: AdminCuponsRoute,
   AdminDestaquesRoute: AdminDestaquesRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
   AdminPedidosRoute: AdminPedidosRoute,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -601,6 +684,7 @@ const rootRouteChildren: RootRouteChildren = {
   LojaRoute: LojaRouteWithChildren,
   OfertasRoute: OfertasRoute,
   OrcamentoRoute: OrcamentoRoute,
+  PedidoConfirmadoRoute: PedidoConfirmadoRoute,
   ServicosRoute: ServicosRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradeInRoute: TradeInRoute,
