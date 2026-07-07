@@ -156,7 +156,7 @@ function LojaPage() {
 
   const toggleArrayFilter = (key: "cap" | "cor", value: string) => {
     const arr = search[key];
-    const next = arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value];
+    const next = arr.includes(value) ? arr.filter((x: string) => x !== value) : [...arr, value];
     setSearch({ [key]: next } as Partial<z.infer<typeof searchSchema>>);
   };
 
