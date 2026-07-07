@@ -30,6 +30,7 @@ export function WhatsAppFloat() {
   return (
     <a
       href={href}
+      onClick={() => trackWhatsApp("float", { open: open ? "1" : "0" })}
       aria-label={`Falar no WhatsApp — ${label}`}
       className="group fixed bottom-6 right-6 z-50 flex items-center gap-3"
     >
