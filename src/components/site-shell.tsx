@@ -5,6 +5,7 @@ import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 
 function AdminBar() {
   const { isAdmin } = useAuth();
@@ -51,9 +52,10 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/loja", label: "Loja" },
   { to: "/servicos", label: "Serviços" },
+  { to: "/comparar", label: "Comparar" },
+  { to: "/trade-in", label: "Trade-in" },
   { to: "/ofertas", label: "Ofertas" },
   { to: "/avaliacoes", label: "Avaliações" },
-  { to: "/orcamento", label: "Orçamento" },
   { to: "/faq", label: "FAQ" },
   { to: "/contato", label: "Contato" },
 ] as const;
@@ -173,19 +175,6 @@ function Footer() {
   );
 }
 
-function WhatsAppFloat() {
-  const { get } = useSiteSettings();
-  return (
-    <a
-      href={get("contact.whatsapp_url")}
-      aria-label="Falar no WhatsApp"
-      className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-whatsapp text-whatsapp-foreground grid place-items-center shadow-lg hover:scale-110 transition animate-pulse"
-      style={{ boxShadow: "0 10px 30px -5px oklch(0.7 0.17 150 / 0.6)" }}
-    >
-      <WhatsAppIcon className="h-7 w-7" />
-    </a>
-  );
-}
 
 export function SiteShell({ children }: { children: ReactNode }) {
   return (

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TradeInRouteImport } from './routes/trade-in'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicosRouteImport } from './routes/servicos'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
@@ -16,6 +17,7 @@ import { Route as OfertasRouteImport } from './routes/ofertas'
 import { Route as LojaRouteImport } from './routes/loja'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
@@ -26,12 +28,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ServicosSlugRouteImport } from './routes/servicos.$slug'
 import { Route as LojaSlugRouteImport } from './routes/loja.$slug'
+import { Route as EmCidadeRouteImport } from './routes/em.$cidade'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
 import { Route as AdminDestaquesRouteImport } from './routes/admin.destaques'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminAvaliacoesRouteImport } from './routes/admin.avaliacoes'
 
+const TradeInRoute = TradeInRouteImport.update({
+  id: '/trade-in',
+  path: '/trade-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -65,6 +73,11 @@ const FaqRoute = FaqRouteImport.update({
 const ContatoRoute = ContatoRouteImport.update({
   id: '/contato',
   path: '/contato',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompararRoute = CompararRouteImport.update({
+  id: '/comparar',
+  path: '/comparar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -117,6 +130,11 @@ const LojaSlugRoute = LojaSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => LojaRoute,
 } as any)
+const EmCidadeRoute = EmCidadeRouteImport.update({
+  id: '/em/$cidade',
+  path: '/em/$cidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminProdutosRoute = AdminProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
@@ -151,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/avaliacoes': typeof AvaliacoesRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
+  '/comparar': typeof CompararRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
   '/loja': typeof LojaRouteWithChildren
@@ -158,11 +177,13 @@ export interface FileRoutesByFullPath {
   '/orcamento': typeof OrcamentoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/em/$cidade': typeof EmCidadeRoute
   '/loja/$slug': typeof LojaSlugRoute
   '/servicos/$slug': typeof ServicosSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -174,6 +195,7 @@ export interface FileRoutesByTo {
   '/avaliacoes': typeof AvaliacoesRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
+  '/comparar': typeof CompararRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
   '/loja': typeof LojaRouteWithChildren
@@ -181,11 +203,13 @@ export interface FileRoutesByTo {
   '/orcamento': typeof OrcamentoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/em/$cidade': typeof EmCidadeRoute
   '/loja/$slug': typeof LojaSlugRoute
   '/servicos/$slug': typeof ServicosSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -199,6 +223,7 @@ export interface FileRoutesById {
   '/avaliacoes': typeof AvaliacoesRoute
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
+  '/comparar': typeof CompararRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
   '/loja': typeof LojaRouteWithChildren
@@ -206,11 +231,13 @@ export interface FileRoutesById {
   '/orcamento': typeof OrcamentoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/destaques': typeof AdminDestaquesRoute
   '/admin/pedidos': typeof AdminPedidosRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/em/$cidade': typeof EmCidadeRoute
   '/loja/$slug': typeof LojaSlugRoute
   '/servicos/$slug': typeof ServicosSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -225,6 +252,7 @@ export interface FileRouteTypes {
     | '/avaliacoes'
     | '/carrinho'
     | '/checkout'
+    | '/comparar'
     | '/contato'
     | '/faq'
     | '/loja'
@@ -232,11 +260,13 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/servicos'
     | '/sitemap.xml'
+    | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
     | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/em/$cidade'
     | '/loja/$slug'
     | '/servicos/$slug'
     | '/admin/'
@@ -248,6 +278,7 @@ export interface FileRouteTypes {
     | '/avaliacoes'
     | '/carrinho'
     | '/checkout'
+    | '/comparar'
     | '/contato'
     | '/faq'
     | '/loja'
@@ -255,11 +286,13 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/servicos'
     | '/sitemap.xml'
+    | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
     | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/em/$cidade'
     | '/loja/$slug'
     | '/servicos/$slug'
     | '/admin'
@@ -272,6 +305,7 @@ export interface FileRouteTypes {
     | '/avaliacoes'
     | '/carrinho'
     | '/checkout'
+    | '/comparar'
     | '/contato'
     | '/faq'
     | '/loja'
@@ -279,11 +313,13 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/servicos'
     | '/sitemap.xml'
+    | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
     | '/admin/destaques'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/em/$cidade'
     | '/loja/$slug'
     | '/servicos/$slug'
     | '/admin/'
@@ -297,6 +333,7 @@ export interface RootRouteChildren {
   AvaliacoesRoute: typeof AvaliacoesRoute
   CarrinhoRoute: typeof CarrinhoRoute
   CheckoutRoute: typeof CheckoutRoute
+  CompararRoute: typeof CompararRoute
   ContatoRoute: typeof ContatoRoute
   FaqRoute: typeof FaqRoute
   LojaRoute: typeof LojaRouteWithChildren
@@ -304,10 +341,19 @@ export interface RootRouteChildren {
   OrcamentoRoute: typeof OrcamentoRoute
   ServicosRoute: typeof ServicosRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TradeInRoute: typeof TradeInRoute
+  EmCidadeRoute: typeof EmCidadeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trade-in': {
+      id: '/trade-in'
+      path: '/trade-in'
+      fullPath: '/trade-in'
+      preLoaderRoute: typeof TradeInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -355,6 +401,13 @@ declare module '@tanstack/react-router' {
       path: '/contato'
       fullPath: '/contato'
       preLoaderRoute: typeof ContatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comparar': {
+      id: '/comparar'
+      path: '/comparar'
+      fullPath: '/comparar'
+      preLoaderRoute: typeof CompararRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -426,6 +479,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/loja/$slug'
       preLoaderRoute: typeof LojaSlugRouteImport
       parentRoute: typeof LojaRoute
+    }
+    '/em/$cidade': {
+      id: '/em/$cidade'
+      path: '/em/$cidade'
+      fullPath: '/em/$cidade'
+      preLoaderRoute: typeof EmCidadeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/produtos': {
       id: '/admin/produtos'
@@ -515,6 +575,7 @@ const rootRouteChildren: RootRouteChildren = {
   AvaliacoesRoute: AvaliacoesRoute,
   CarrinhoRoute: CarrinhoRoute,
   CheckoutRoute: CheckoutRoute,
+  CompararRoute: CompararRoute,
   ContatoRoute: ContatoRoute,
   FaqRoute: FaqRoute,
   LojaRoute: LojaRouteWithChildren,
@@ -522,6 +583,8 @@ const rootRouteChildren: RootRouteChildren = {
   OrcamentoRoute: OrcamentoRoute,
   ServicosRoute: ServicosRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TradeInRoute: TradeInRoute,
+  EmCidadeRoute: EmCidadeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
