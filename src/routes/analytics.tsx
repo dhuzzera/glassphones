@@ -45,7 +45,6 @@ function AnalyticsPage() {
   }
 
   if (!isAdmin) return null;
-  const [debug, setDebug] = useState(false);
 
   const refresh = () => setEvents(readLog());
 
