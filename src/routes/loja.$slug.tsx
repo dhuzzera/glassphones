@@ -629,6 +629,32 @@ function ProductDetail() {
               ))}
             </div>
           </section>
+        {/* Prova social */}
+        {!isService && <ProductSocialProof productId={product.id} productName={product.name} />}
+
+        {/* SEO local: onde comprar este produto */}
+        {!isService && (
+          <section className="mt-12" aria-labelledby="onde-comprar-titulo">
+            <h2 id="onde-comprar-titulo" className="text-xl font-bold mb-4">
+              Onde comprar {product.name}
+            </h2>
+            <Separator className="mb-6" />
+            <p className="text-sm text-muted-foreground mb-4">
+              Atendemos com entrega rápida e retirada combinada em toda a região:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {CIDADES.map((c) => (
+                <Link
+                  key={c.slug}
+                  to="/em/$cidade"
+                  params={{ cidade: c.slug }}
+                  className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary hover:text-primary transition"
+                >
+                  {product.name.split(" ").slice(0, 3).join(" ")} em {c.nome}
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
       </main>
 
