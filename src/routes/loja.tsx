@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { SiteShell } from "@/components/site-shell";
 import { WhatsAppIcon } from "@/lib/site";
 
 export const Route = createFileRoute("/loja")({
@@ -85,9 +86,19 @@ function LojaPage() {
   const heroSubtitle = get("home.hero_subtitle") || "Smartphones, acessórios e assistência técnica em São Bento do Sul.";
 
   return (
-    <div className="min-h-screen bg-background">
-      <MarketplaceHeader count={count} />
-
+    <SiteShell>
+      <div className="min-h-screen bg-background">
+        {count > 0 && (
+          <div className="container mx-auto px-4 pt-4 flex justify-end">
+            <Link to="/carrinho">
+              <Button variant="outline" size="sm" className="relative">
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Carrinho
+                <Badge className="absolute -top-2 -right-2 h-5 min-w-5 px-1">{count}</Badge>
+              </Button>
+            </Link>
+          </div>
+        )}
       <main>
         {/* HERO */}
         <section className="relative overflow-hidden border-b border-border">
@@ -223,30 +234,11 @@ function LojaPage() {
           </Tabs>
         </section>
       </main>
-    </div>
+      </div>
+    </SiteShell>
   );
 }
 
-function MarketplaceHeader({ count }: { count: number }) {
-  return (
-    <header className="border-b bg-card sticky top-0 z-40 backdrop-blur">
-      <div className="container mx-auto flex items-center justify-between py-4 px-4">
-        <Link to="/" className="text-xl font-bold">Glass Phone SBS</Link>
-        <div className="flex items-center gap-2">
-          <Link to="/carrinho">
-            <Button variant="outline" size="sm" className="relative">
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Carrinho
-              {count > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 min-w-5 px-1">{count}</Badge>
-              )}
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function ProductGrid({ products, loading, kind }: { products: Product[]; loading: boolean; kind: "product" | "service" }) {
   if (loading) return <p className="text-muted-foreground">Carregando...</p>;
