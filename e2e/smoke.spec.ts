@@ -59,22 +59,11 @@ test.describe("Smoke — WhatsApp deep-links", () => {
   });
 
   test("trade-in monta wa.me com marca/modelo/estimativa", async ({ page }) => {
-    // Antes de qualquer script rodar: intercepta atribuições a location.href
-    // e guarda em window.__lastNav (sem redefinir a propriedade nativa).
-    await page.addInitScript(() => {
-      const orig = Object.getOwnPropertyDescriptor(
-        Object.getPrototypeOf(window.location),
-        "href",
-      );
-      Object.defineProperty(window.location, "href", {
-        configurable: true,
-        get() {
-          return orig?.get?.call(window.location) ?? "";
-        },
-        set(v: string) {
-          (window as unknown as { __lastNav?: string }).__lastNav = v;
-        },
-      });
+    // Capturamos a URL via framenavigated (window.location.href = wa.me/...
+    // gera uma navegação de nível superior).
+    const navUrls: string[] = [];
+    page.on("framenavigated", (frame) => {
+      if (frame === page.mainFrame()) navUrls.push(frame.url());
     });
 
     await page.goto("/trade-in?cidade=rio-negrinho&origem=teste");
@@ -85,22 +74,21 @@ test.describe("Smoke — WhatsApp deep-links", () => {
     const tel = page.locator('input[maxlength="20"]');
     await tel.fill("47999999999");
 
+    // Bloqueia a request real para wa.me para não sair da sandbox
+    await page.route("https://wa.me/**", (route) =>
+      route.fulfill({ status: 200, body: "ok" }),
+    );
+
     await page.getByRole("button", { name: /falar no whatsapp/i }).click();
 
     await expect
-      .poll(
-        async () =>
-          await page.evaluate(
-            () => (window as unknown as { __lastNav?: string }).__lastNav ?? "",
-          ),
-        { timeout: 5000 },
-      )
+      .poll(() => navUrls.find((u) => u.includes("wa.me/5547996801247")) ?? "", {
+        timeout: 5000,
+      })
       .toMatch(/wa\.me\/5547996801247/);
 
-    const captured = await page.evaluate(
-      () => (window as unknown as { __lastNav?: string }).__lastNav ?? "",
-    );
-    const decoded = decodeURIComponent(captured);
+    const target = navUrls.find((u) => u.includes("wa.me/5547996801247"))!;
+    const decoded = decodeURIComponent(target);
     expect(decoded).toContain("iPhone 13");
     expect(decoded).toContain("Trade-in");
   });
