@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /checkout
+Disallow: /carrinho
 
-Sitemap: https://glassphones.lovable.app/sitemap.xml
+Sitemap: https://www.glassphone.com.br/sitemap.xml

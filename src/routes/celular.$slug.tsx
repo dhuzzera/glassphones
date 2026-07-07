@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CIDADES } from "@/lib/cidades";
 
-const BASE_URL = "https://glassphones.lovable.app";
+const BASE_URL = "https://www.glassphone.com.br";
 
 /**
  * Parse "iphone-13-pro-128gb" → { modelo: "iphone 13 pro", capacidade: "128GB" }

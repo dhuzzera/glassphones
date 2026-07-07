@@ -28,7 +28,10 @@ const searchSchema = z.object({
   cond: fallback(z.array(z.string()), []).default([]),
   min: fallback(z.number(), 0).default(0),
   max: fallback(z.number(), 0).default(0),
+  page: fallback(z.number(), 1).default(1),
 });
+
+const ITEMS_PER_PAGE = 12;
 
 export const Route = createFileRoute("/loja")({
   validateSearch: zodValidator(searchSchema),
@@ -165,7 +168,15 @@ function LojaPage() {
   };
 
   const clearFilters = () =>
-    setSearch({ q: "", cap: [], cor: [], cond: [], min: 0, max: 0 });
+    setSearch({ q: "", cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 });
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const currentPage = Math.max(1, Math.min(search.page, totalPages || 1));
+  const paginatedProducts = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <SiteShell>
@@ -376,10 +387,56 @@ function LojaPage() {
             )}
 
             <TabsContent value="product" className="mt-0">
-              <ProductGrid products={filtered} loading={isLoading} kind="product" onQuickView={setQuickSlug} />
+              <ProductGrid products={paginatedProducts} loading={isLoading} kind="product" onQuickView={setQuickSlug} />
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setSearch({ page: currentPage - 1 })}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setSearch({ page: currentPage + 1 })}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              )}
             </TabsContent>
             <TabsContent value="service" className="mt-0">
-              <ProductGrid products={filtered} loading={isLoading} kind="service" onQuickView={setQuickSlug} />
+              <ProductGrid products={paginatedProducts} loading={isLoading} kind="service" onQuickView={setQuickSlug} />
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setSearch({ page: currentPage - 1 })}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setSearch({ page: currentPage + 1 })}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </section>

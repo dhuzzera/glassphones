@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { MessageCircle, ChevronDown } from "lucide-react";
+import { MessageCircle, ChevronDown, Download } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { TradeInLead, LeadStatus } from "@/lib/marketplace-types";
@@ -96,23 +96,74 @@ function LeadsAdmin() {
     return acc;
   }, {});
 
+  const exportCSV = () => {
+    const headers = [
+      "Data",
+      "Nome",
+      "Telefone",
+      "Marca",
+      "Modelo",
+      "Estado",
+      "Bateria",
+      "Estimativa Min",
+      "Estimativa Max",
+      "Cidade",
+      "Produto Interesse",
+      "Status",
+      "Notas",
+    ];
+    const rows = leads.map((l) => [
+      new Date(l.created_at).toLocaleString("pt-BR"),
+      l.customer_name,
+      l.customer_phone,
+      l.marca,
+      l.modelo,
+      l.estado,
+      `${l.bateria}%`,
+      formatBRL(l.estimativa_min),
+      formatBRL(l.estimativa_max),
+      l.cidade_origem || "",
+      l.produto_origem || "",
+      STATUS_LABELS[l.status],
+      (l.notes || "").replace(/"/g, '""'),
+    ]);
+    const csv = [
+      headers.map((h) => `"${h}"`).join(","),
+      ...rows.map((r) => r.map((c) => `"${c}"`).join(",")),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `leads-trade-in-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado");
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <h1 className="text-2xl font-bold">Leads Trade-in</h1>
-        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as LeadStatus | "all")}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos ({leads.length})</SelectItem>
-            {ALL_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {STATUS_LABELS[s]} ({counts[s] ?? 0})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={exportCSV} disabled={leads.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar CSV
+          </Button>
+          <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as LeadStatus | "all")}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos ({leads.length})</SelectItem>
+              {ALL_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {STATUS_LABELS[s]} ({counts[s] ?? 0})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Kanban resumido */}

@@ -5,7 +5,7 @@ import hero3 from "@/assets/hero3.jpg.asset.json";
 import logoDark from "@/assets/glassphone-logo-cliente.png.asset.json";
 import logoFlat from "@/assets/glassphone-logo-cliente.png.asset.json";
 
-export const SITE_URL = "https://glassphones.lovable.app";
+export const SITE_URL = "https://www.glassphone.com.br";
 export const WHATSAPP_URL = "https://api.whatsapp.com/message/L6DTBZKAUP67J1?autoload=1&app_absent=0";
 export const WHATSAPP_NUM = "5547996801247";
 export const INSTAGRAM = "https://www.instagram.com/glass_phonesbs/";

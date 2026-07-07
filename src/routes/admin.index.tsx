@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/marketplace";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import type { OrderSource } from "@/lib/marketplace-types";
 
 export const Route = createFileRoute("/admin/")({
@@ -32,7 +32,7 @@ function Dashboard() {
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
 
-      const [pendingRes, activeRes, monthRes, leadsRes] = await Promise.all([
+      const [pendingRes, activeRes, monthRes, leadsRes, last6MonthsRes] = await Promise.all([
         supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("products").select("id", { count: "exact", head: true }).eq("active", true),
         supabase
@@ -44,6 +44,35 @@ function Dashboard() {
           .from("trade_in_leads")
           .select("id", { count: "exact", head: true })
           .eq("status", "new"),
+        // Últimos 6 meses de receita
+        (async () => {
+          const now = new Date();
+          const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+          const { data, error } = await supabase
+            .from("orders")
+            .select("created_at, total_cents")
+            .gte("created_at", sixMonthsAgo.toISOString())
+            .in("status", ["confirmed", "paid", "delivered"]);
+          if (error) return [];
+          
+          // Agrupar por mês
+          const byMonth: Record<string, number> = {};
+          for (const o of data ?? []) {
+            const d = new Date(o.created_at);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+            byMonth[key] = (byMonth[key] ?? 0) + (o.total_cents ?? 0);
+          }
+          
+          // Preencher os 6 meses mesmo que não tenha pedidos
+          const months: Array<{ month: string; revenue: number }> = [];
+          for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+            const label = d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+            months.push({ month: label, revenue: byMonth[key] ?? 0 });
+          }
+          return months;
+        })(),
       ]);
 
       const revenueCents = (monthRes.data ?? []).reduce(
@@ -69,6 +98,7 @@ function Dashboard() {
         revenueCents,
         newLeads: leadsRes.count ?? 0,
         sourceData,
+        revenueByMonth: last6MonthsRes,
       };
     },
   });
@@ -115,7 +145,7 @@ function Dashboard() {
       </div>
 
       {stats?.sourceData && stats.sourceData.length > 0 && (
-        <Card>
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-base">Pedidos por origem (este mês)</CardTitle>
           </CardHeader>
@@ -136,6 +166,41 @@ function Dashboard() {
                   ))}
                 </Bar>
               </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {stats?.revenueByMonth && stats.revenueByMonth.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Receita dos últimos 6 meses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={stats.revenueByMonth} margin={{ top: 4, right: 8, left: -8, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(v: number) =>
+                    v >= 100000
+                      ? `R$${(v / 100000).toFixed(0)}k`
+                      : `R$${(v / 100).toFixed(0)}`
+                  }
+                />
+                <Tooltip
+                  formatter={(value: number) => [formatBRL(value), "Receita"]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#6366f1"
+                  strokeWidth={2}
+                  dot={{ fill: "#6366f1", r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

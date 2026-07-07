@@ -4,7 +4,7 @@ import { servicos } from "@/lib/site";
 import { CIDADES } from "@/lib/cidades";
 import { slugify } from "@/lib/marketplace";
 
-const BASE_URL = "https://glassphones.lovable.app";
+const BASE_URL = "https://www.glassphone.com.br";
 
 interface SitemapEntry {
   path: string;
