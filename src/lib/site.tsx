@@ -71,7 +71,7 @@ export const faqs = [
   { q: "Quanto tempo demora a troca de tela?", a: "A maioria das trocas de tela é concluída no mesmo dia, entre 40 minutos e 2 horas, dependendo do modelo e da disponibilidade da peça." },
   { q: "Como funciona o orçamento?", a: "O orçamento é gratuito. Envie modelo e defeito pelo WhatsApp ou traga o aparelho na loja. Respondemos em poucos minutos com valor e prazo." },
   { q: "Vocês atendem qualquer marca?", a: "Sim. Trabalhamos com iPhone, Samsung, Xiaomi, Motorola e outras marcas populares. Se o modelo for raro, confirmamos a disponibilidade da peça antes." },
-  { q: "Formas de pagamento?", a: "Aceitamos Pix, dinheiro, débito e crédito em até 12x sem juros no cartão." },
+  { q: "Formas de pagamento?", a: "Trabalhamos com Pix, dinheiro, débito e crédito. Fale com a gente no WhatsApp para conhecer as condições e opções de parcelamento." },
   { q: "Vocês fazem retirada no domicílio?", a: "Sim, atendemos São Bento do Sul e região com serviço de coleta e entrega. Consulte a disponibilidade pelo WhatsApp." },
 ];
 

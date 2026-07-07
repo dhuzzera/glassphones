@@ -32,7 +32,7 @@ const SETTINGS_FALLBACK: SiteSettings = {
   "contact.address_line2": "São Bento do Sul/SC · 89281-100",
   "contact.hours": "Seg-Sáb 9h às 19h",
   "topbar.shipping": "Entrega para todo o Brasil",
-  "topbar.payment": "Até 12x sem juros no cartão",
+  "topbar.payment": "Parcelamento sob consulta no WhatsApp",
   "footer.tagline": "Smartphones, acessórios e assistência com atendimento humano.",
 };
 

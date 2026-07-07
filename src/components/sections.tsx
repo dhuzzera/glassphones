@@ -17,7 +17,7 @@ export function Hero() {
         <div className="text-white">
           <span className="inline-block bg-white/15 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold mb-4">🔥 MEGA OFERTAS DA SEMANA</span>
           <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-4">Os melhores <br />celulares, os<br /> melhores preços.</h1>
-          <p className="text-white/90 text-lg mb-6 max-w-md">iPhone, Samsung, Xiaomi e Motorola com garantia, parcelamento em até 12x e atendimento humano pelo WhatsApp.</p>
+          <p className="text-white/90 text-lg mb-6 max-w-md">iPhone, Samsung, Xiaomi e Motorola com garantia e atendimento humano pelo WhatsApp.</p>
           <div className="flex flex-wrap gap-3">
             <Link to="/ofertas" className="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-full font-bold hover:scale-105 transition">
               Ver ofertas <Smartphone className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function Benefits() {
   const items = [
     { icon: ShieldCheck, t: "Garantia oficial", d: "Produtos originais lacrados" },
     { icon: Truck, t: "Frete pra todo Brasil", d: "Enviamos no mesmo dia" },
-    { icon: CreditCard, t: "12x sem juros", d: "Cartão, Pix ou boleto" },
+    { icon: CreditCard, t: "Pagamento flexível", d: "Consulte as opções no WhatsApp" },
     { icon: WhatsAppIcon, t: "Atendimento humano", d: "Tire dúvidas no WhatsApp" },
   ];
   return (
@@ -170,7 +170,7 @@ export function ProdutoCard(p: Produto) {
           {p.promo && <div className="text-xs text-muted-foreground line-through">{brl(p.antigo)}</div>}
           <div className="text-price font-black text-xl leading-tight">{brl(p.preco)}</div>
           <div className="text-xs text-whatsapp font-semibold">ou {brl(pix)} no Pix</div>
-          <div className="text-xs text-muted-foreground">12x de {brl(p.preco / 12)} sem juros</div>
+          <div className="text-xs text-muted-foreground">Consulte parcelamento no WhatsApp</div>
         </div>
         <Link to="/loja/$slug" params={{ slug }} className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition">
           Ver produto

@@ -287,9 +287,6 @@ function ProductCard({ product, onQuickView }: { product: Product; onQuickView: 
           <h3 className="font-semibold line-clamp-2">{product.name}</h3>
         </button>
         <p className="mt-2 text-xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
-        <p className="text-xs text-muted-foreground">
-          ou 12x de {formatBRL(Math.round(product.price_cents / 12))}
-        </p>
         {product.featured && <Badge className="mt-2" variant="secondary">Destaque</Badge>}
       </CardContent>
       <CardFooter className="p-4 pt-0">

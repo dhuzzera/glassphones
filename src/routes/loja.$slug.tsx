@@ -306,9 +306,6 @@ function ProductDetail() {
             <div className="rounded-2xl bg-card border border-border p-5">
               <p className="text-sm text-muted-foreground">Preço</p>
               <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(effectivePrice)}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                ou 12x de {formatBRL(Math.round(effectivePrice / 12))} sem juros
-              </p>
 
               {hasVariants && (
                 <div className="mt-5 space-y-4">

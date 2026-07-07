@@ -7,7 +7,7 @@ export const Route = createFileRoute("/ofertas")({
   head: () => ({
     meta: [
       { title: "Ofertas — iPhone, Samsung, Xiaomi | Glass Phone SBS" },
-      { name: "description", content: "Smartphones novos e seminovos com melhores preços em São Bento do Sul. 12x sem juros e frete para todo Brasil." },
+      { name: "description", content: "Smartphones novos e seminovos com melhores preços em São Bento do Sul. Frete para todo Brasil." },
       { property: "og:title", content: "Ofertas — Glass Phone SBS" },
       { property: "og:description", content: "iPhone, Samsung, Xiaomi e Motorola com garantia e parcelamento." },
       { property: "og:type", content: "website" },

@@ -133,7 +133,6 @@ export function ProductQuickView({ slug, onClose }: Props) {
                 <div className="mt-3 flex items-baseline gap-3">
                   <span className="text-3xl font-black text-primary">{formatBRL(effectivePrice)}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">ou 12x de {formatBRL(Math.round(effectivePrice / 12))} sem juros</p>
               </div>
 
               {attrNames.length > 0 && (
@@ -187,7 +186,7 @@ export function ProductQuickView({ slug, onClose }: Props) {
               <div className="grid gap-3">
                 <InfoTile icon={Zap} title="Entrega Imediata" desc="Receba seu pacote imediatamente após o pagamento." />
                 <InfoTile icon={ShieldCheck} title="Segurança Total" desc="Seus dados são criptografados de ponta-a-ponta durante todo o processo." />
-                <InfoTile icon={CreditCard} title="Forma de pagamento" desc="Aceitamos PIX, cartão em até 12x e boleto." />
+                <InfoTile icon={CreditCard} title="Forma de pagamento" desc="Fale com a gente no WhatsApp para conhecer as opções." />
               </div>
 
               {product.description && (
