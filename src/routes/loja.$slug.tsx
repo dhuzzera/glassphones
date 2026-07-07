@@ -272,11 +272,11 @@ function ProductDetail() {
               )}
             </div>
 
-            {product.image_urls.length > 1 && (
+            {effectiveImgList.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
-                {product.image_urls.map((u, i) => (
+                {effectiveImgList.map((u, i) => (
                   <button
-                    key={i}
+                    key={`${u}-${i}`}
                     onClick={() => setSelectedImg(i)}
                     className={`w-20 h-20 rounded-lg overflow-hidden border-2 shrink-0 transition ${
                       i === selectedImg ? "border-primary" : "border-transparent hover:border-border"
