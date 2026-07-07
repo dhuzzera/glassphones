@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState } from "react";
 import { brl, categorias, faqs, defeitos, heroSlides, logo, modelosPop, PHONE_DISPLAY, produtos, servicos, waLink, WhatsAppIcon, WHATSAPP_NUM, type Produto } from "@/lib/site";
+import { slugify } from "@/lib/marketplace";
 import { useFaqItems, useSiteSettings } from "@/hooks/use-site-content";
 import { trackServiceDetail, trackWhatsApp } from "@/lib/analytics";
 
