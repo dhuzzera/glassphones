@@ -174,19 +174,6 @@ function Footer() {
   );
 }
 
-function WhatsAppFloat() {
-  const { get } = useSiteSettings();
-  return (
-    <a
-      href={get("contact.whatsapp_url")}
-      aria-label="Falar no WhatsApp"
-      className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-whatsapp text-whatsapp-foreground grid place-items-center shadow-lg hover:scale-110 transition animate-pulse"
-      style={{ boxShadow: "0 10px 30px -5px oklch(0.7 0.17 150 / 0.6)" }}
-    >
-      <WhatsAppIcon className="h-7 w-7" />
-    </a>
-  );
-}
 
 export function SiteShell({ children }: { children: ReactNode }) {
   return (
