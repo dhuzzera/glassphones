@@ -189,8 +189,22 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
     try {
       const priceCents = Math.round(parseFloat(form.priceReais.replace(",", ".")) * 100);
       if (isNaN(priceCents) || priceCents < 0) throw new Error("Preço inválido");
-      const bh = form.batteryHealth.trim() === "" ? null : parseInt(form.batteryHealth, 10);
-      if (bh !== null && (isNaN(bh) || bh < 0 || bh > 100)) throw new Error("Saúde da bateria deve ser entre 0 e 100");
+
+      // Saúde da bateria: só se aplica a produtos. Vazio => 100% (padrão).
+      let batteryHealth: number | null = null;
+      if (form.kind === "product") {
+        const raw = form.batteryHealth.trim();
+        if (raw === "") {
+          batteryHealth = 100;
+        } else {
+          const parsed = Number(raw.replace(",", "."));
+          if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+            throw new Error("Saúde da bateria deve ser um número entre 0 e 100");
+          }
+          batteryHealth = Math.round(parsed);
+        }
+      }
+
       const payload = {
         name: form.name,
         slug: form.slug || slugify(form.name),
@@ -202,9 +216,10 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
         featured: form.featured,
         active: form.active,
         stock: form.stock ? parseInt(form.stock, 10) : null,
-        battery_health: form.kind === "product" ? bh : null,
+        battery_health: batteryHealth,
         updated_at: new Date().toISOString(),
       };
+      console.log("[admin.produtos] salvando", { id: form.id, battery_health: payload.battery_health });
       const { error } = form.id
         ? await supabase.from("products").update(payload).eq("id", form.id)
         : await supabase.from("products").insert(payload);
