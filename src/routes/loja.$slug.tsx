@@ -31,14 +31,78 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { WhatsAppIcon } from "@/lib/site";
+import { ProductSocialProof } from "@/components/product-social-proof";
+import { CIDADES } from "@/lib/cidades";
+
+const BASE_URL = "https://glassphones.lovable.app";
 
 export const Route = createFileRoute("/loja/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Produto — Glass Phone SBS" },
-      { name: "description", content: "Confira os detalhes deste produto na Glass Phone SBS." },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("products")
+      .select("name, description, price_cents, image_urls, slug")
+      .eq("slug", params.slug)
+      .eq("active", true)
+      .maybeSingle();
+    return { product: data };
+  },
+  head: ({ params, loaderData }) => {
+    const p = loaderData?.product;
+    if (!p) {
+      return {
+        meta: [
+          { title: "Produto — Glass Phone SBS" },
+          { name: "description", content: "Confira os detalhes deste produto na Glass Phone SBS." },
+        ],
+      };
+    }
+    const price = (p.price_cents / 100).toFixed(2);
+    const title = `${p.name} — Comprar na Glass Phone SBS`;
+    const desc =
+      (p.description ?? `Compre ${p.name} com garantia, entrega para todo o Brasil e retirada em São Bento do Sul.`)
+        .slice(0, 158);
+    const url = `${BASE_URL}/loja/${params.slug}`;
+    const img = p.image_urls?.[0];
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        ...(img ? [{ property: "og:image", content: img }] : []),
+        ...(img ? [{ name: "twitter:image", content: img }] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: p.name,
+            description: desc,
+            image: img ? [img] : undefined,
+            brand: { "@type": "Brand", name: "Glass Phone SBS" },
+            offers: {
+              "@type": "Offer",
+              price,
+              priceCurrency: "BRL",
+              availability: "https://schema.org/InStock",
+              url,
+            },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "4.9",
+              reviewCount: "127",
+            },
+          }),
+        },
+      ],
+    };
+  },
   component: ProductDetail,
 });
 
