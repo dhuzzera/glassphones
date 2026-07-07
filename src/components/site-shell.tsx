@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle } from "lucide-react";
-import type { ReactNode } from "react";
+import { CreditCard, Instagram, Truck, LayoutDashboard, Package, Tag, ClipboardList, LogOut, Star, MessageSquare, Recycle, Menu, X } from "lucide-react";
+import { type ReactNode, useState } from "react";
 import { assets, categorias, WhatsAppIcon } from "@/lib/site";
 import { useSiteSettings } from "@/hooks/use-site-content";
 import { useAuth } from "@/hooks/use-auth";
@@ -79,50 +79,62 @@ function TopBar() {
 
 function Header() {
   const { get } = useSiteSettings();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
-      <div className="container mx-auto px-4 py-4 flex items-center gap-6">
-        <Link to="/" className="flex items-center shrink-0">
-          <img src={assets.logoDark} alt="Glass Phone SBS" className="h-12 md:h-14 w-auto" />
+      <div className="container mx-auto px-4 py-3 flex items-center gap-4">
+        <Link to="/" className="flex items-center shrink-0" onClick={() => setMobileOpen(false)}>
+          <img src={assets.logoDark} alt="Glass Phone SBS" className="h-10 md:h-12 w-auto" />
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden lg:flex flex-1 items-center gap-5 text-sm font-medium">
           {NAV.map(n => (
-            <Link
-              key={n.to}
-              to={n.to}
-              activeOptions={{ exact: true }}
-              activeProps={{ className: "text-primary" }}
-              className="hover:text-primary transition"
-            >
+            <Link key={n.to} to={n.to} activeOptions={{ exact: true }}
+              activeProps={{ className: "text-primary" }} className="hover:text-primary transition">
               {n.label}
             </Link>
           ))}
         </nav>
 
-        <a
-          href={get("contact.whatsapp_url")}
-          className="ml-auto hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
-        >
-          <WhatsAppIcon className="h-4 w-4" /> WhatsApp
-        </a>
-      </div>
-      {/* Mobile nav */}
-      <nav className="lg:hidden border-t border-border overflow-x-auto">
-        <div className="container mx-auto px-4 py-2 flex gap-4 text-sm font-medium whitespace-nowrap">
-          {NAV.map(n => (
-            <Link
-              key={n.to}
-              to={n.to}
-              activeOptions={{ exact: true }}
-              activeProps={{ className: "text-primary" }}
-              className="hover:text-primary transition py-1"
-            >
-              {n.label}
-            </Link>
-          ))}
+        <div className="ml-auto flex items-center gap-2">
+          <a href={get("contact.whatsapp_url")}
+            className="hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2 rounded-full font-semibold text-sm hover:opacity-90 transition">
+            <WhatsAppIcon className="h-4 w-4" /> WhatsApp
+          </a>
+          {/* Hambúrguer */}
+          <button
+            className="lg:hidden p-2 rounded-md hover:bg-muted transition"
+            onClick={() => setMobileOpen(v => !v)}
+            aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-      </nav>
+      </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <nav className="lg:hidden border-t border-border bg-background/98 backdrop-blur shadow-lg">
+          <div className="container mx-auto px-4 py-2 flex flex-col">
+            {NAV.map(n => (
+              <Link key={n.to} to={n.to}
+                onClick={() => setMobileOpen(false)}
+                activeOptions={{ exact: true }}
+                activeProps={{ className: "text-primary bg-primary/5" }}
+                className="flex items-center px-2 py-3 text-sm font-medium rounded-md hover:bg-muted transition border-b border-border/40 last:border-0">
+                {n.label}
+              </Link>
+            ))}
+            <a href={get("contact.whatsapp_url")}
+              onClick={() => setMobileOpen(false)}
+              className="mt-3 mb-2 flex items-center justify-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-3 rounded-full font-semibold text-sm hover:opacity-90 transition">
+              <WhatsAppIcon className="h-4 w-4" /> Falar no WhatsApp
+            </a>
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

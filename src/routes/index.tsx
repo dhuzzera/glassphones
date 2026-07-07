@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
         "@type": "LocalBusiness",
         "@id": `${SITE_URL}/#business`,
         name: "Glass Phone SBS",
-        image: `${SITE_URL}/__l5e/assets-v1/739dfcef-1519-4af3-875e-3147d284a9a2/glassphone-logo-dark.png`,
+        image: "https://www.glassphone.com.br/glassphone-logo-dark.png",
         url: `${SITE_URL}/`,
         telephone: "+55-47-99680-1247",
         priceRange: "$$",

@@ -164,7 +164,7 @@ function LojaPage() {
   const toggleArrayFilter = (key: "cap" | "cor" | "cond", value: string) => {
     const arr = search[key];
     const next = arr.includes(value) ? arr.filter((x: string) => x !== value) : [...arr, value];
-    setSearch({ [key]: next } as Partial<z.infer<typeof searchSchema>>);
+    setSearch({ [key]: next, page: 1 } as Partial<z.infer<typeof searchSchema>>);
   };
 
   const clearFilters = () =>
@@ -259,7 +259,7 @@ function LojaPage() {
         <section id="novidades" className="container mx-auto px-4 py-10 scroll-mt-20">
           <h2 className="text-2xl font-bold mb-6">Novidades</h2>
 
-          <Tabs value={search.tab} onValueChange={(v) => setSearch({ tab: v as "product" | "service", cat: null, cap: [], cor: [], min: 0, max: 0 })}>
+          <Tabs value={search.tab} onValueChange={(v) => setSearch({ tab: v as "product" | "service", cat: null, cap: [], cor: [], cond: [], min: 0, max: 0, page: 1 })}>
             <TabsList>
               <TabsTrigger value="product"><Smartphone className="w-4 h-4 mr-2" />Produtos</TabsTrigger>
               <TabsTrigger value="service"><Wrench className="w-4 h-4 mr-2" />Serviços</TabsTrigger>
@@ -268,13 +268,13 @@ function LojaPage() {
             <div className="my-6 flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Buscar..." className="pl-9" value={search.q} onChange={(e) => setSearch({ q: e.target.value })} />
+                <Input placeholder="Buscar..." className="pl-9" value={search.q} onChange={(e) => setSearch({ q: e.target.value, page: 1 })} />
               </div>
               {catsForTab.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  <Button size="sm" variant={search.cat === null ? "default" : "outline"} onClick={() => setSearch({ cat: null })}>Todas</Button>
+                  <Button size="sm" variant={search.cat === null ? "default" : "outline"} onClick={() => setSearch({ cat: null, page: 1 })}>Todas</Button>
                   {catsForTab.map((c) => (
-                    <Button key={c.id} size="sm" variant={search.cat === c.id ? "default" : "outline"} onClick={() => setSearch({ cat: c.id })}>{c.name}</Button>
+                    <Button key={c.id} size="sm" variant={search.cat === c.id ? "default" : "outline"} onClick={() => setSearch({ cat: c.id, page: 1 })}>{c.name}</Button>
                   ))}
                 </div>
               )}
