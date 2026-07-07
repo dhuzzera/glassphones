@@ -187,6 +187,7 @@ function WhatsAppFloat() {
 export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <AdminBar />
       <TopBar />
       <Header />
       <main className="flex-1">{children}</main>
@@ -195,3 +196,4 @@ export function SiteShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
