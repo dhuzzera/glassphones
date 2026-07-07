@@ -45,23 +45,26 @@ function CartPage() {
           <>
             <div className="space-y-3">
               {items.map((item) => (
-                <Card key={item.product_id}>
+                <Card key={`${item.product_id}::${item.variant_id ?? ""}`}>
                   <CardContent className="p-4 flex items-center gap-4">
                     <div className="flex-1">
                       <p className="font-medium">{item.name}</p>
+                      {item.variant_label && (
+                        <p className="text-xs text-muted-foreground">{item.variant_label}</p>
+                      )}
                       <p className="text-sm text-muted-foreground">{formatBRL(item.price_cents)} cada</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.product_id, item.quantity - 1)}>
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.product_id, item.quantity - 1, item.variant_id)}>
                         <Minus className="w-3 h-3" />
                       </Button>
                       <span className="w-8 text-center">{item.quantity}</span>
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.product_id, item.quantity + 1)}>
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQty(item.product_id, item.quantity + 1, item.variant_id)}>
                         <Plus className="w-3 h-3" />
                       </Button>
                     </div>
                     <div className="w-24 text-right font-semibold">{formatBRL(item.price_cents * item.quantity)}</div>
-                    <Button variant="ghost" size="icon" onClick={() => remove(item.product_id)}>
+                    <Button variant="ghost" size="icon" onClick={() => remove(item.product_id, item.variant_id)}>
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
                   </CardContent>
