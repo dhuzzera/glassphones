@@ -189,6 +189,8 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
     try {
       const priceCents = Math.round(parseFloat(form.priceReais.replace(",", ".")) * 100);
       if (isNaN(priceCents) || priceCents < 0) throw new Error("Preço inválido");
+      const bh = form.batteryHealth.trim() === "" ? null : parseInt(form.batteryHealth, 10);
+      if (bh !== null && (isNaN(bh) || bh < 0 || bh > 100)) throw new Error("Saúde da bateria deve ser entre 0 e 100");
       const payload = {
         name: form.name,
         slug: form.slug || slugify(form.name),
@@ -200,6 +202,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
         featured: form.featured,
         active: form.active,
         stock: form.stock ? parseInt(form.stock, 10) : null,
+        battery_health: form.kind === "product" ? bh : null,
         updated_at: new Date().toISOString(),
       };
       const { error } = form.id
