@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TradeInRouteImport } from './routes/trade-in'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicosRouteImport } from './routes/servicos'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
@@ -32,6 +33,11 @@ import { Route as AdminDestaquesRouteImport } from './routes/admin.destaques'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminAvaliacoesRouteImport } from './routes/admin.avaliacoes'
 
+const TradeInRoute = TradeInRouteImport.update({
+  id: '/trade-in',
+  path: '/trade-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/orcamento': typeof OrcamentoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/destaques': typeof AdminDestaquesRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/orcamento': typeof OrcamentoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/destaques': typeof AdminDestaquesRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/orcamento': typeof OrcamentoRoute
   '/servicos': typeof ServicosRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trade-in': typeof TradeInRoute
   '/admin/avaliacoes': typeof AdminAvaliacoesRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/destaques': typeof AdminDestaquesRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/servicos'
     | '/sitemap.xml'
+    | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
     | '/admin/destaques'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/servicos'
     | '/sitemap.xml'
+    | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
     | '/admin/destaques'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/servicos'
     | '/sitemap.xml'
+    | '/trade-in'
     | '/admin/avaliacoes'
     | '/admin/categorias'
     | '/admin/destaques'
@@ -304,10 +316,18 @@ export interface RootRouteChildren {
   OrcamentoRoute: typeof OrcamentoRoute
   ServicosRoute: typeof ServicosRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TradeInRoute: typeof TradeInRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trade-in': {
+      id: '/trade-in'
+      path: '/trade-in'
+      fullPath: '/trade-in'
+      preLoaderRoute: typeof TradeInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -522,6 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrcamentoRoute: OrcamentoRoute,
   ServicosRoute: ServicosRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TradeInRoute: TradeInRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
