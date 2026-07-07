@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { CreditCard, Instagram, Truck } from "lucide-react";
 import type { ReactNode } from "react";
-import { assets, categorias, INSTAGRAM, PHONE_DISPLAY, waLink, WhatsAppIcon } from "@/lib/site";
+import { assets, categorias, WhatsAppIcon } from "@/lib/site";
+import { useSiteSettings } from "@/hooks/use-site-content";
 
 const NAV = [
   { to: "/", label: "Home" },
