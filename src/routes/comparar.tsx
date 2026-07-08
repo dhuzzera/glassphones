@@ -171,10 +171,26 @@ function CompararPage() {
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const chosen = selected.map((id) => byId.get(id)).filter(Boolean) as Product[];
 
+  // Carrega specs dos produtos já selecionados quando a lista de produtos carrega
+  const specsLoaded = Object.keys(specs).length;
+  useMemo(() => {
+    if (products.length === 0) return;
+    for (const id of selected) {
+      const p = byId.get(id);
+      if (p) loadSpecs(p);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products.length]);
+
   const updateUrl = (ids: string[]) =>
     navigate({ search: { ids: ids.join(",") }, replace: true });
 
   const loadSpecs = async (product: Product) => {
+    // Se o produto já tem specs salvas no banco, usa diretamente — sem chamar API
+    if (product.specs && Object.keys(product.specs).length > 0) {
+      setSpecs((s) => ({ ...s, [product.id]: product.specs as MobileSpecs }));
+      return;
+    }
     if (specs[product.id] !== undefined) return;
     setLoadingSpecs((s) => ({ ...s, [product.id]: true }));
     const result = await fetchPhoneSpecs(product.name);
@@ -468,7 +484,7 @@ function CompareTable({ chosen, specs, loadingSpecs, anyApiSpecs, allSpecsLoaded
           <CellWrapper key={p.id} isWinner={priceWinner === i}>
             <span className="text-primary font-bold text-sm">{formatBRL(p.price_cents)}</span>
             <span className="block text-muted-foreground text-[10px] font-normal">
-              12× {formatBRL(Math.ceil(p.price_cents / 12))}
+              Parcelas no WhatsApp
             </span>
           </CellWrapper>
         ))}

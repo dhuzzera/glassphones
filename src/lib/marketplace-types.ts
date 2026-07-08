@@ -33,6 +33,7 @@ export interface Product {
   stock: number | null;
   battery_health: number | null;
   condition: ProductCondition | null;
+  specs: Record<string, string> | null;
   created_at: string;
   updated_at: string;
 }

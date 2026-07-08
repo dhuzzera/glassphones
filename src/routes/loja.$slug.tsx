@@ -371,7 +371,7 @@ function ProductDetail() {
               <p className="text-sm text-muted-foreground">Preço</p>
               <p className="mt-1 text-4xl font-bold text-primary">{formatBRL(effectivePrice)}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                ou 12× de {formatBRL(Math.ceil(effectivePrice / 12))} no cartão
+                Parcelas sob consulta no WhatsApp
               </p>
 
               {hasVariants && (
@@ -595,6 +595,25 @@ function ProductDetail() {
             <Separator className="mb-6" />
             <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line leading-relaxed">
               {product.description}
+            </div>
+          </section>
+        )}
+
+        {/* Ficha técnica */}
+        {product.specs && Object.keys(product.specs).length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-bold mb-4">Ficha técnica</h2>
+            <Separator className="mb-6" />
+            <div className="rounded-xl border border-border overflow-hidden">
+              {Object.entries(product.specs as Record<string, string>).map(([key, value], i) => (
+                <div
+                  key={key}
+                  className={`grid grid-cols-2 gap-4 px-4 py-3 text-sm ${i % 2 === 0 ? "bg-muted/30" : ""}`}
+                >
+                  <span className="text-muted-foreground font-medium">{key}</span>
+                  <span>{value}</span>
+                </div>
+              ))}
             </div>
           </section>
         )}

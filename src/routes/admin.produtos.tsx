@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { Pencil, Trash2, Plus, X, Upload, Search, ArrowLeft } from "lucide-react";
+import { Pencil, Trash2, Plus, X, Upload, Search, ArrowLeft, Sparkles, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, Category, ProductKind, ProductVariant } from "@/lib/marketplace-types";
@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 
+const MOBILEAPI_KEY = import.meta.env.VITE_MOBILEAPI_KEY as string | undefined;
+
 export const Route = createFileRoute("/admin/produtos")({
   component: ProductsAdmin,
 });
@@ -25,12 +27,14 @@ interface FormState {
   name: string; slug: string; description: string; priceReais: string;
   kind: ProductKind; category_id: string | null; image_urls: string[];
   featured: boolean; active: boolean; stock: string; batteryHealth: string; condition: string;
+  specs: Record<string, string>;
 }
 
 const emptyForm: FormState = {
   name: "", slug: "", description: "", priceReais: "",
   kind: "product", category_id: null, image_urls: [],
   featured: false, active: true, stock: "", batteryHealth: "100", condition: "",
+  specs: {},
 };
 
 function ProductsAdmin() {
@@ -65,6 +69,7 @@ function ProductsAdmin() {
     featured: p.featured, active: p.active,
     stock: p.stock?.toString() ?? "", batteryHealth: p.battery_health?.toString() ?? "100",
     condition: p.condition ?? "",
+    specs: (p.specs as Record<string, string>) ?? {},
   });
 
   const remove = async (id: string) => {
@@ -158,8 +163,80 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [fetchingSpecs, setFetchingSpecs] = useState(false);
+  const [newSpecKey, setNewSpecKey] = useState("");
+  const [newSpecVal, setNewSpecVal] = useState("");
 
   useEffect(() => { setForm(state); }, [state]);
+
+  const catsForKind = categories.filter(c => c.type === form.kind);
+
+  // Mapeamento MobileAPI → rótulos em português
+  const API_SPEC_MAP: Record<string, string> = {
+    screen_resolution: "Tela",
+    hardware: "Processador / RAM",
+    storage: "Armazenamento",
+    camera: "Câmera traseira",
+    battery_capacity: "Bateria",
+    os: "Sistema",
+    "5g": "5G",
+    nfc: "NFC",
+    weight: "Peso",
+    release_date: "Lançamento",
+  };
+
+  const fetchSpecs = async () => {
+    if (!MOBILEAPI_KEY) {
+      toast.error("VITE_MOBILEAPI_KEY não configurada");
+      return;
+    }
+    if (!form.name.trim()) {
+      toast.error("Informe o nome do produto primeiro");
+      return;
+    }
+    setFetchingSpecs(true);
+    try {
+      const res = await fetch(
+        `https://api.mobileapi.dev/devices/search?name=${encodeURIComponent(form.name)}&key=${MOBILEAPI_KEY}`
+      );
+      if (!res.ok) throw new Error(`API retornou ${res.status}`);
+      const data = await res.json();
+      const device = Array.isArray(data) ? data[0] : data;
+      if (!device) { toast.error("Modelo não encontrado na MobileAPI"); return; }
+
+      const parsed: Record<string, string> = {};
+      for (const [apiKey, label] of Object.entries(API_SPEC_MAP)) {
+        if (device[apiKey]) parsed[label] = String(device[apiKey]);
+      }
+      if (Object.keys(parsed).length === 0) {
+        toast.error("Nenhuma spec encontrada para este modelo");
+        return;
+      }
+      setForm(f => ({ ...f, specs: { ...f.specs, ...parsed } }));
+      toast.success(`${Object.keys(parsed).length} specs importadas`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao buscar specs");
+    } finally {
+      setFetchingSpecs(false);
+    }
+  };
+
+  const addSpec = () => {
+    const k = newSpecKey.trim();
+    const v = newSpecVal.trim();
+    if (!k || !v) return;
+    setForm(f => ({ ...f, specs: { ...f.specs, [k]: v } }));
+    setNewSpecKey("");
+    setNewSpecVal("");
+  };
+
+  const removeSpec = (key: string) => {
+    setForm(f => {
+      const next = { ...f.specs };
+      delete next[key];
+      return { ...f, specs: next };
+    });
+  };
 
   const catsForKind = categories.filter(c => c.type === form.kind);
 
@@ -204,6 +281,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
         stock: form.stock ? parseInt(form.stock, 10) : null,
         battery_health: batteryHealth,
         condition: form.kind === "product" && form.condition ? form.condition : null,
+        specs: form.kind === "product" && Object.keys(form.specs).length > 0 ? form.specs : null,
         updated_at: new Date().toISOString(),
       };
       const { error } = form.id
@@ -320,6 +398,72 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
               </label>
             </div>
           </div>
+
+          {form.kind === "product" && (
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Ficha técnica</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Specs exibidas no comparador e na PDP
+                  </p>
+                </div>
+                {MOBILEAPI_KEY && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={fetchSpecs}
+                    disabled={fetchingSpecs}
+                    className="gap-1.5 shrink-0"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {fetchingSpecs ? "Buscando…" : "Buscar specs"}
+                  </Button>
+                )}
+              </div>
+
+              {/* Lista de specs */}
+              {Object.keys(form.specs).length > 0 && (
+                <div className="rounded-lg border border-border divide-y">
+                  {Object.entries(form.specs).map(([k, v]) => (
+                    <div key={k} className="flex items-center gap-2 px-3 py-2">
+                      <span className="text-xs text-muted-foreground w-32 shrink-0">{k}</span>
+                      <Input
+                        value={v}
+                        onChange={e => setForm(f => ({ ...f, specs: { ...f.specs, [k]: e.target.value } }))}
+                        className="h-7 text-xs flex-1"
+                      />
+                      <button type="button" onClick={() => removeSpec(k)} className="text-muted-foreground hover:text-destructive shrink-0">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Adicionar spec manual */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Nome (ex: Tela)"
+                  value={newSpecKey}
+                  onChange={e => setNewSpecKey(e.target.value)}
+                  className="h-8 text-xs"
+                  onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSpec())}
+                />
+                <Input
+                  placeholder="Valor (ex: 6.1 pol.)"
+                  value={newSpecVal}
+                  onChange={e => setNewSpecVal(e.target.value)}
+                  className="h-8 text-xs"
+                  onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSpec())}
+                />
+                <Button type="button" size="sm" variant="outline" onClick={addSpec} className="h-8 shrink-0">
+                  <Plus className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-6">
             <div className="flex items-center justify-between gap-3">

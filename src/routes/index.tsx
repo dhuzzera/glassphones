@@ -162,7 +162,7 @@ function Home() {
                       </Link>
                       <p className="mt-2 text-lg font-bold text-primary">{formatBRL(p.price_cents)}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        ou 12× de {formatBRL(Math.ceil(p.price_cents / 12))} no cartão
+                        Parcelas sob consulta no WhatsApp
                       </p>
                     </CardContent>
                     <CardFooter className="p-4 pt-0">

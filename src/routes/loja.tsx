@@ -344,7 +344,7 @@ function ProductCard({ product }: { product: Product }) {
         </Link>
         <p className="mt-2 text-xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          ou 12× de {formatBRL(Math.ceil(product.price_cents / 12))}
+          Parcelas sob consulta no WhatsApp
         </p>
         <div className="flex flex-wrap gap-1 mt-2">
           {product.featured && <Badge variant="secondary" className="text-xs">Destaque</Badge>}
