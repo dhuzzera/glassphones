@@ -96,20 +96,25 @@ function CompararPage() {
             em uma tabela clara.
           </p>
           {/* Botão para comparar specs técnicas no Versus */}
-          {chosen.length >= 2 && (
-            <div className="mt-4">
-              <a
-                href={`https://versus.com/br/phone/${chosen.map(p => p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")).join("/vs/")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Comparar specs técnicas no Versus.com
-              </a>
-              <p className="text-xs text-muted-foreground mt-1">
-                Abre no Versus com os modelos selecionados para ver comparativo técnico detalhado.
-              </p>
+          {chosen.length >= 1 && (
+            <div className="mt-4 p-3 rounded-xl border border-border bg-muted/30 flex flex-col sm:flex-row sm:items-center gap-2">
+              <div className="flex-1 text-sm text-muted-foreground">
+                {chosen.length === 1
+                  ? "Selecione mais 1 modelo para comparar no Versus"
+                  : `${chosen.length} modelos prontos para comparar`}
+              </div>
+              {chosen.length >= 2 && (
+                <a
+                  href={`https://versus.com/br/phone/${chosen.map(p => encodeURIComponent(p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""))).join("/vs/")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" size="sm" className="gap-2 shrink-0">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Comparar specs no Versus.com
+                  </Button>
+                </a>
+              )}
             </div>
           )}
         </header>
