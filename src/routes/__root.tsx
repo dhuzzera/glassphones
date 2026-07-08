@@ -128,8 +128,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/glassphone-logo.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/glassphone-logo.png" },
+      { rel: "icon", href: "/glassphone-logo-cliente.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/glassphone-logo-cliente.png" },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
