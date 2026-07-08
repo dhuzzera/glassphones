@@ -186,22 +186,27 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
   };
 
   const fetchSpecs = async () => {
-    if (!MOBILEAPI_KEY) {
-      toast.error("VITE_MOBILEAPI_KEY não configurada");
-      return;
-    }
     if (!form.name.trim()) {
       toast.error("Informe o nome do produto primeiro");
       return;
     }
     setFetchingSpecs(true);
     try {
-      const res = await fetch(
-        `https://api.mobileapi.dev/devices/search?name=${encodeURIComponent(form.name)}&key=${MOBILEAPI_KEY}`
-      );
-      if (!res.ok) throw new Error(`API retornou ${res.status}`);
-      const data = await res.json();
-      const device = Array.isArray(data) ? data[0] : data;
+      const { data: { session } } = await supabase.auth.getSession();
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+      const res = await fetch(`${supabaseUrl}/functions/v1/fetch-phone-specs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({ name: form.name }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? `Erro ${res.status}`);
+      }
+      const device = await res.json();
       if (!device) { toast.error("Modelo não encontrado na MobileAPI"); return; }
 
       const parsed: Record<string, string> = {};
@@ -408,8 +413,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
                     Specs exibidas no comparador e na PDP
                   </p>
                 </div>
-                {MOBILEAPI_KEY && (
-                  <Button
+                <Button
                     type="button"
                     size="sm"
                     variant="outline"
@@ -420,7 +424,6 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
                     <Sparkles className="w-3.5 h-3.5" />
                     {fetchingSpecs ? "Buscando…" : "Buscar specs"}
                   </Button>
-                )}
               </div>
 
               {/* Lista de specs */}

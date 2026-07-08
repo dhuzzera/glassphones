@@ -6,7 +6,7 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { ShoppingCart, Search, Wrench, Smartphone, Pencil, SlidersHorizontal, X, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product, Category, ProductVariant } from "@/lib/marketplace-types";
-import { formatBRL, buildServiceInquiryUrl } from "@/lib/marketplace";
+import { formatBRL } from "@/lib/marketplace";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { SiteShell } from "@/components/site-shell";
 import { ProductGridSkeleton } from "@/components/product-skeleton";
 import { WhatsAppIcon } from "@/lib/site";
 import { SITE_URL } from "@/lib/site";
+import { ProductQuickView } from "@/components/product-quick-view";
 
 const searchSchema = z.object({
   tab: fallback(z.enum(["product", "service"]), "product").default("product"),
@@ -298,6 +299,8 @@ function Pagination({ currentPage, totalPages, onPage }: { currentPage: number; 
 }
 
 function ProductGrid({ products, loading, kind }: { products: Product[]; loading: boolean; kind: "product" | "service" }) {
+  const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
+
   if (loading) return <ProductGridSkeleton count={8} />;
   if (products.length === 0) return (
     <div className="py-16 text-center">
@@ -306,13 +309,16 @@ function ProductGrid({ products, loading, kind }: { products: Product[]; loading
     </div>
   );
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {products.map((p) => <ProductCard key={p.id} product={p} />)}
-    </div>
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {products.map((p) => <ProductCard key={p.id} product={p} onQuickView={setQuickViewSlug} />)}
+      </div>
+      <ProductQuickView slug={quickViewSlug} onClose={() => setQuickViewSlug(null)} />
+    </>
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (slug: string) => void }) {
   const { isAdmin } = useAuth();
   const img = product.image_urls[0];
   const isService = product.kind === "service";
@@ -326,8 +332,8 @@ function ProductCard({ product }: { product: Product }) {
         </Link>
       )}
 
-      {/* Imagem → vai para PDP */}
-      <Link to="/loja/$slug" params={{ slug: product.slug }} className="block">
+      {/* Imagem → abre quick view */}
+      <button type="button" onClick={() => onQuickView(product.slug)} className="block text-left w-full">
         <div className="aspect-square bg-muted overflow-hidden">
           {img
             ? <img src={img} alt={product.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-500" loading="lazy" />
@@ -336,12 +342,12 @@ function ProductCard({ product }: { product: Product }) {
               </div>
           }
         </div>
-      </Link>
+      </button>
 
       <CardContent className="p-4 flex-1">
-        <Link to="/loja/$slug" params={{ slug: product.slug }} className="hover:underline">
+        <button type="button" onClick={() => onQuickView(product.slug)} className="hover:underline text-left w-full">
           <h3 className="font-semibold line-clamp-2 text-sm leading-snug">{product.name}</h3>
-        </Link>
+        </button>
         <p className="mt-2 text-xl font-bold text-primary">{formatBRL(product.price_cents)}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
           Parcelas sob consulta no WhatsApp
@@ -355,19 +361,12 @@ function ProductCard({ product }: { product: Product }) {
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
-        {isService ? (
-          <a href={buildServiceInquiryUrl(product.name)} target="_blank" rel="noopener noreferrer" className="w-full">
-            <Button variant="default" className="w-full text-sm">
-              <WhatsAppIcon className="w-3.5 h-3.5 mr-2" /> Agendar
-            </Button>
-          </a>
-        ) : (
-          <Link to="/loja/$slug" params={{ slug: product.slug }} className="w-full">
-            <Button className="w-full text-sm">
-              <ChevronRight className="w-3.5 h-3.5 mr-1" /> Ver produto
-            </Button>
-          </Link>
-        )}
+        <Button className="w-full text-sm" onClick={() => onQuickView(product.slug)}>
+          {isService
+            ? <><WhatsAppIcon className="w-3.5 h-3.5 mr-2" /> Agendar</>
+            : <><ChevronRight className="w-3.5 h-3.5 mr-1" /> Ver produto</>
+          }
+        </Button>
       </CardFooter>
     </Card>
   );
