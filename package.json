@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview",
+    "build:dev": "vite build --mode development",    "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
     "e2e": "playwright test",
