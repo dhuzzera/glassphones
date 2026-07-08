@@ -238,7 +238,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
     });
   };
 
-  const catsForKind = categories.filter(c => c.type === form.kind);
+
 
   const upload = async (files: FileList) => {
     setUploading(true);
