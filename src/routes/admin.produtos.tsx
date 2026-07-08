@@ -18,6 +18,24 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 
 const MOBILEAPI_KEY = import.meta.env.VITE_MOBILEAPI_KEY as string | undefined;
 
+// Campos estruturados da ficha técnica — os mais relevantes para o cliente comparar
+const SPEC_FIELDS = [
+  { key: "Tela",             label: "Tela",              placeholder: 'ex: 6.1", OLED, 2556×1179, 460ppi' },
+  { key: "Processador",      label: "Processador",        placeholder: "ex: Apple A15 Bionic / Snapdragon 8 Gen 2" },
+  { key: "RAM",              label: "RAM",                placeholder: "ex: 6 GB" },
+  { key: "Armazenamento",    label: "Armazenamento",      placeholder: "ex: 128 GB / 256 GB" },
+  { key: "Câmera traseira",  label: "Câmera traseira",    placeholder: "ex: 12 MP + 12 MP (ultrawide)" },
+  { key: "Câmera frontal",   label: "Câmera frontal",     placeholder: "ex: 12 MP, TrueDepth" },
+  { key: "Bateria",          label: "Bateria",            placeholder: "ex: 3.227 mAh, carregamento 20W" },
+  { key: "Sistema",          label: "Sistema",            placeholder: "ex: iOS 17 / Android 14" },
+  { key: "5G",               label: "5G",                 placeholder: "ex: Sim / Não" },
+  { key: "NFC",              label: "NFC",                placeholder: "ex: Sim / Não" },
+  { key: "Peso",             label: "Peso",               placeholder: "ex: 172 g" },
+  { key: "Dimensões",        label: "Dimensões",          placeholder: "ex: 147,5 × 71,5 × 7,8 mm" },
+  { key: "Resistência",      label: "Resistência",        placeholder: "ex: IP68" },
+  { key: "Lançamento",       label: "Lançamento",         placeholder: "ex: Setembro 2022" },
+] as const;
+
 export const Route = createFileRoute("/admin/produtos")({
   component: ProductsAdmin,
 });
@@ -405,7 +423,7 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
           </div>
 
           {form.kind === "product" && (
-            <div className="space-y-2 pt-2 border-t">
+            <div className="space-y-3 pt-2 border-t">
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Ficha técnica</Label>
@@ -414,48 +432,52 @@ function ProductEditor({ state, categories, onClose, onSaved }: {
                   </p>
                 </div>
                 <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={fetchSpecs}
-                    disabled={fetchingSpecs}
-                    className="gap-1.5 shrink-0"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    {fetchingSpecs ? "Buscando…" : "Buscar specs"}
-                  </Button>
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={fetchSpecs}
+                  disabled={fetchingSpecs}
+                  className="gap-1.5 shrink-0"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {fetchingSpecs ? "Buscando…" : "Buscar specs"}
+                </Button>
               </div>
 
-              {/* Lista de specs */}
-              {Object.keys(form.specs).length > 0 && (
-                <div className="rounded-lg border border-border divide-y">
-                  {Object.entries(form.specs).map(([k, v]) => (
-                    <div key={k} className="flex items-center gap-2 px-3 py-2">
-                      <span className="text-xs text-muted-foreground w-32 shrink-0">{k}</span>
-                      <Input
-                        value={v}
-                        onChange={e => setForm(f => ({ ...f, specs: { ...f.specs, [k]: e.target.value } }))}
-                        className="h-7 text-xs flex-1"
-                      />
-                      <button type="button" onClick={() => removeSpec(k)} className="text-muted-foreground hover:text-destructive shrink-0">
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Campos estruturados — os mais úteis para o cliente comparar */}
+              <div className="rounded-lg border border-border divide-y">
+                {SPEC_FIELDS.map(({ key, label, placeholder }) => (
+                  <div key={key} className="flex items-center gap-3 px-3 py-2">
+                    <span className="text-xs text-muted-foreground w-36 shrink-0">{label}</span>
+                    <Input
+                      value={form.specs[key] ?? ""}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setForm(f => {
+                          const next = { ...f.specs };
+                          if (val) next[key] = val;
+                          else delete next[key];
+                          return { ...f, specs: next };
+                        });
+                      }}
+                      placeholder={placeholder}
+                      className="h-7 text-xs flex-1"
+                    />
+                  </div>
+                ))}
+              </div>
 
-              {/* Adicionar spec manual */}
+              {/* Campo extra para specs adicionais */}
               <div className="flex gap-2">
                 <Input
-                  placeholder="Nome (ex: Tela)"
+                  placeholder="Campo extra (ex: Wi-Fi)"
                   value={newSpecKey}
                   onChange={e => setNewSpecKey(e.target.value)}
                   className="h-8 text-xs"
                   onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSpec())}
                 />
                 <Input
-                  placeholder="Valor (ex: 6.1 pol.)"
+                  placeholder="Valor"
                   value={newSpecVal}
                   onChange={e => setNewSpecVal(e.target.value)}
                   className="h-8 text-xs"
