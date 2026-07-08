@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   X, Plus, Check, ExternalLink, Loader2, Smartphone,
@@ -171,9 +171,8 @@ function CompararPage() {
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const chosen = selected.map((id) => byId.get(id)).filter(Boolean) as Product[];
 
-  // Carrega specs dos produtos já selecionados quando a lista de produtos carrega
-  const specsLoaded = Object.keys(specs).length;
-  useMemo(() => {
+  // Carrega specs dos produtos já selecionados quando a lista carrega
+  useEffect(() => {
     if (products.length === 0) return;
     for (const id of selected) {
       const p = byId.get(id);
