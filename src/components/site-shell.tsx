@@ -17,7 +17,7 @@ function AdminBar() {
     { to: "/admin/categorias", label: "Categorias", icon: Tag },
     { to: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
     { to: "/admin/leads", label: "Leads", icon: Recycle },
-    { to: "/admin/avaliacoes", label: "Avalia├º├Áes", icon: MessageSquare },
+    { to: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquare },
     { to: "/admin/configuracoes", label: "Config.", icon: Settings },
   ];
   return (
@@ -53,11 +53,11 @@ function AdminBar() {
 const NAV = [
   { to: "/", label: "Home" },
   { to: "/loja", label: "Loja" },
-  { to: "/servicos", label: "Servi├ºos" },
+  { to: "/servicos", label: "Serviços" },
   { to: "/comparar", label: "Comparar" },
   { to: "/trade-in", label: "Trade-in" },
   { to: "/ofertas", label: "Ofertas" },
-  { to: "/avaliacoes", label: "Avalia├º├Áes" },
+  { to: "/avaliacoes", label: "Avaliações" },
   { to: "/faq", label: "FAQ" },
   { to: "/contato", label: "Contato" },
 ] as const;
@@ -167,7 +167,7 @@ function Header() {
             className="hidden sm:inline-flex items-center gap-2 bg-whatsapp text-whatsapp-foreground px-4 py-2 rounded-full font-semibold text-sm hover:opacity-90 transition">
             <WhatsAppIcon className="h-4 w-4" /> WhatsApp
           </a>
-          {/* Hamb├║rguer */}
+          {/* Hambúrguer */}
           <button
             className="lg:hidden p-2 rounded-md hover:bg-muted transition"
             onClick={() => setMobileOpen(v => !v)}
@@ -226,7 +226,7 @@ function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-3">Navega├º├úo</h4>
+          <h4 className="font-semibold mb-3">Navegação</h4>
           <ul className="space-y-2 text-sm text-background/70">
             {NAV.filter(n => n.to !== "/").map(n => (
               <li key={n.to}><Link to={n.to} className="hover:text-primary">{n.label}</Link></li>
@@ -244,7 +244,7 @@ function Footer() {
         </div>
       </div>
       <div className="container mx-auto px-4 mt-10 pt-6 border-t border-background/10 text-xs text-background/50 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
-        <span>┬® {new Date().getFullYear()} Glass Phone SBS. Todos os direitos reservados.</span>
+        <span>© {new Date().getFullYear()} Glass Phone SBS. Todos os direitos reservados.</span>
         <Link to="/auth" className="hover:text-primary transition-colors">Admin</Link>
       </div>
 
