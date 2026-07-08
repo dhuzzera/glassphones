@@ -229,7 +229,7 @@ function CidadePage() {
                 <Card className="hover:shadow-lg transition h-full">
                   <div className="aspect-square rounded-t-lg bg-muted overflow-hidden">
                     {p.image_urls[0] && (
-                      <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                      <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-contain p-2" loading="lazy" />
                     )}
                   </div>
                   <CardContent className="p-3">

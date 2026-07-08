@@ -321,7 +321,7 @@ function ProductDetail() {
             >
               {img ? (
                 <>
-                  <img src={img} alt={product.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                  <img src={img} alt={product.name} className="w-full h-full object-contain p-2 transition-transform group-hover:scale-105" />
                   <div className="absolute top-3 right-3 bg-background/80 backdrop-blur rounded-full p-2 opacity-0 group-hover:opacity-100 transition">
                     <ZoomIn className="w-4 h-4" />
                   </div>
@@ -635,7 +635,7 @@ function ProductDetail() {
                 >
                   <div className="aspect-square bg-muted overflow-hidden">
                     {p.image_urls[0] ? (
-                      <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" />
+                      <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition" />
                     ) : (
                       <div className="w-full h-full grid place-items-center text-muted-foreground">
                         <Smartphone className="w-10 h-10" />

@@ -330,7 +330,7 @@ function ProductCard({ product }: { product: Product }) {
       <Link to="/loja/$slug" params={{ slug: product.slug }} className="block">
         <div className="aspect-square bg-muted overflow-hidden">
           {img
-            ? <img src={img} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
+            ? <img src={img} alt={product.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-500" loading="lazy" />
             : <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                 {isService ? <Wrench className="w-12 h-12" /> : <Smartphone className="w-12 h-12" />}
               </div>

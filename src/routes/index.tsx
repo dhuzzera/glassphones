@@ -151,7 +151,7 @@ function Home() {
                     <Link to="/loja/$slug" params={{ slug: p.slug }}>
                       <div className="aspect-square bg-muted overflow-hidden">
                         {p.image_urls[0]
-                          ? <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" />
+                          ? <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-500" loading="lazy" />
                           : <div className="w-full h-full grid place-items-center text-muted-foreground"><Smartphone className="w-10 h-10" /></div>
                         }
                       </div>
