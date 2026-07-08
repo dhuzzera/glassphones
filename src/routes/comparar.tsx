@@ -204,16 +204,8 @@ function CompararPage() {
     updateUrl(next);
   };
 
-  const versusUrl =
-    chosen.length >= 2
-      ? `https://versus.com/br/phone/${chosen
-          .map((p) =>
-            encodeURIComponent(
-              p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
-            )
-          )
-          .join("/vs/")}`
-      : null;
+  // Manda para a listagem de phones do Versus — o usuário busca lá pelo modelo exato
+  const versusUrl = chosen.length >= 2 ? "https://versus.com/en/phone" : null;
 
   // Verifica se todos estão carregando ou nenhum tem specs da API
   const allSpecsLoaded = chosen.every((p) => !loadingSpecs[p.id]);
@@ -339,7 +331,7 @@ function CompararPage() {
                 <a href={versusUrl} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground text-xs">
                     <ExternalLink className="w-3.5 h-3.5" />
-                    Specs completas no Versus.com
+                    Comparar no Versus.com
                   </Button>
                 </a>
               </div>

@@ -54,40 +54,108 @@ const FATOR_ESTADO: Record<Estado, number> = {
   danificado: 0.25,
 };
 
-/** Palpite grosseiro: iPhone recente (>= 13) pesa mais, antigo pesa menos. */
+/**
+ * Calcula o fator de modelo dinamicamente a partir da geração detectada no nome.
+ * Funciona automaticamente para modelos futuros sem precisar atualizar o código.
+ *
+ * Depreciação anual: ~15% ao ano a partir do modelo atual estimado.
+ * Tier multiplier: Ultra/Pro Max > Pro > padrão > mini/lite.
+ */
 function fatorModelo(marca: Marca, modelo: string): number {
   const m = modelo.toLowerCase();
+
+  // Ano atual — usamos como referência para calcular a defasagem
+  const anoAtual = new Date().getFullYear();
+
   if (marca === "apple") {
-    if (/(15|16)\s?pro\s?max/.test(m)) return 1.9;
-    if (/(15|16)\s?pro/.test(m)) return 1.6;
-    if (/(15|16)/.test(m)) return 1.3;
-    if (/14\s?pro/.test(m)) return 1.2;
-    if (/14/.test(m)) return 1.0;
-    if (/13/.test(m)) return 0.8;
-    if (/12/.test(m)) return 0.55;
-    if (/11/.test(m)) return 0.4;
-    return 0.3;
+    // iPhone: geração → ano de lançamento (13=2021, 14=2022, 15=2023, 16=2024, ...)
+    const gen = parseInt(m.match(/iphone\s?(\d+)/)?.[1] ?? m.match(/\b(\d{2})\b/)?.[1] ?? "0");
+    if (gen >= 11) {
+      const anoLancamento = 2021 + (gen - 13); // iPhone 13 = 2021
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      const fatorBase = Math.max(0.25, 1.0 - defasagem * 0.15);
+      // Tier
+      const isProMax = /pro\s?max/.test(m);
+      const isPro = !isProMax && /pro/.test(m);
+      const isMini = /mini/.test(m);
+      const tierMult = isProMax ? 1.9 : isPro ? 1.5 : isMini ? 0.85 : 1.0;
+      return parseFloat((fatorBase * tierMult).toFixed(3));
+    }
+    // Modelos antigos (< 11)
+    const legacy = parseInt(m.match(/\b(\d+)\b/)?.[1] ?? "0");
+    return Math.max(0.1, 0.3 - Math.max(0, 11 - legacy) * 0.04);
   }
+
   if (marca === "samsung") {
-    if (/s2[34]\s?ultra/.test(m)) return 1.9;
-    if (/s2[34]/.test(m)) return 1.4;
-    if (/s2[12]/.test(m)) return 0.9;
-    if (/a5[45]/.test(m)) return 0.9;
-    if (/a3[45]/.test(m)) return 0.7;
-    return 0.7;
+    // Galaxy S: série S + número (S21=2021, S22=2022, S23=2023, S24=2024, S25=2025...)
+    const sMatch = m.match(/s\s?(\d{2})/);
+    if (sMatch) {
+      const gen = parseInt(sMatch[1]);
+      const anoLancamento = 2000 + gen; // S21 → 2021, S25 → 2025
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      const fatorBase = Math.max(0.25, 1.0 - defasagem * 0.14);
+      const isUltra = /ultra/.test(m);
+      const isPlus = /\+|plus/.test(m);
+      const tierMult = isUltra ? 1.9 : isPlus ? 1.2 : 1.0;
+      return parseFloat((fatorBase * tierMult).toFixed(3));
+    }
+    // Galaxy A: série A mais recente vale mais
+    const aMatch = m.match(/a\s?(\d{2})/);
+    if (aMatch) {
+      const gen = parseInt(aMatch[1]);
+      // A54 (2023), A55 (2024), A56 (2025)...
+      const anoLancamento = 2019 + Math.floor(gen / 10);
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      return Math.max(0.3, 0.85 - defasagem * 0.1);
+    }
+    return 0.6;
   }
+
   if (marca === "xiaomi") {
-    if (/1[34]\s?ultra/.test(m)) return 1.6;
-    if (/1[34]/.test(m)) return 1.2;
-    if (/note\s?1[23]/.test(m)) return 0.8;
-    return 0.7;
+    // Xiaomi 14, 15... / Redmi Note 13, 14...
+    const mainMatch = m.match(/xiaomi\s?(\d+)|(?:^|\s)(\d{2})(?:\s|$)/);
+    const noteMatch = m.match(/note\s?(\d+)/);
+    if (noteMatch) {
+      const gen = parseInt(noteMatch[1]);
+      const anoLancamento = 2019 + Math.floor((gen - 8) / 2);
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      return Math.max(0.3, 0.85 - defasagem * 0.1);
+    }
+    const gen = parseInt(mainMatch?.[1] ?? mainMatch?.[2] ?? "0");
+    if (gen >= 10) {
+      // Xiaomi 13 = 2023, 14 = 2024, 15 = 2025
+      const anoLancamento = 2010 + gen;
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      const fatorBase = Math.max(0.3, 1.0 - defasagem * 0.13);
+      const isUltra = /ultra/.test(m);
+      const isPro = /pro/.test(m);
+      return parseFloat((fatorBase * (isUltra ? 1.6 : isPro ? 1.25 : 1.0)).toFixed(3));
+    }
+    return 0.6;
   }
+
   if (marca === "motorola") {
-    if (/edge\s?50/.test(m)) return 1.3;
-    if (/edge\s?40/.test(m)) return 1.0;
-    return 0.7;
+    // Edge 40, 50, 60...
+    const edgeMatch = m.match(/edge\s?(\d+)/);
+    if (edgeMatch) {
+      const gen = parseInt(edgeMatch[1]);
+      // Edge 40 = 2023, 50 = 2024, 60 = 2025
+      const anoLancamento = 2013 + Math.floor(gen / 10) * 2;
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      return Math.max(0.4, 1.1 - defasagem * 0.12);
+    }
+    // Moto G: G54, G85...
+    const gMatch = m.match(/(?:moto\s?)?g\s?(\d{2})/);
+    if (gMatch) {
+      const gen = parseInt(gMatch[1]);
+      const anoLancamento = 2018 + Math.floor((gen - 40) / 10);
+      const defasagem = Math.max(0, anoAtual - anoLancamento);
+      return Math.max(0.3, 0.75 - defasagem * 0.08);
+    }
+    return 0.6;
   }
-  return 0.8;
+
+  return 0.75;
 }
 
 function estimar(marca: Marca, modelo: string, estado: Estado, bateria: number): {
