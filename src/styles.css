@@ -109,9 +109,9 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: 'Rajdhani', system-ui, sans-serif;
-    font-weight: 500;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
   }
-  h1, h2, h3 { font-family: 'Rajdhani', system-ui, sans-serif; font-weight: 700; letter-spacing: 0.01em; text-transform: uppercase; }
+  h1, h2, h3 { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
 }
 

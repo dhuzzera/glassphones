@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { X, Plus, Check, Minus } from "lucide-react";
+import { X, Plus, Check, Minus, ExternalLink } from "lucide-react";
 import { SiteShell } from "@/components/site-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/marketplace";
@@ -9,6 +9,7 @@ import type { Product } from "@/lib/marketplace-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/comparar")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -24,10 +25,10 @@ export const Route = createFileRoute("/comparar")({
       },
       { property: "og:title", content: "Comparador de celulares" },
       { property: "og:description", content: "Compare modelos lado a lado antes de comprar." },
-      { property: "og:url", content: "https://glassphones.lovable.app/comparar" },
+      { property: "og:url", content: `${SITE_URL}/comparar` },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "https://glassphones.lovable.app/comparar" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/comparar` }],
   }),
   component: CompararPage,
 });
@@ -94,6 +95,23 @@ function CompararPage() {
             Escolha até {MAX} modelos e veja preço, saúde da bateria e especificações
             em uma tabela clara.
           </p>
+          {/* Botão para comparar specs técnicas no Versus */}
+          {chosen.length >= 2 && (
+            <div className="mt-4">
+              <a
+                href={`https://versus.com/br/phone/${chosen.map(p => p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")).join("/vs/")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Comparar specs técnicas no Versus.com
+              </a>
+              <p className="text-xs text-muted-foreground mt-1">
+                Abre no Versus com os modelos selecionados para ver comparativo técnico detalhado.
+              </p>
+            </div>
+          )}
         </header>
 
         {picking || chosen.length < MAX ? (

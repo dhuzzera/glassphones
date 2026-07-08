@@ -129,9 +129,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/glassphone-logo.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/glassphone-logo.png" },
+      { rel: "manifest", href: "/manifest.json" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" },
+      // Inter suporta Latin Extended (ç, ã, õ, etc.) — Rajdhani não tem cobertura completa
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" },
     ],
     scripts: GTM_ID
       ? [
