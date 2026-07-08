@@ -398,8 +398,7 @@ function TradeInPage() {
                     </div>
                     <p className="text-xs text-muted-foreground flex items-start gap-1.5">
                       <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                      Valor estimado a partir do modelo, estado e bateria. O valor
-                      final é confirmado após avaliação presencial (10-15 min).
+                      Valor calculado pelo site com base no modelo, estado e bateria. O valor exato pode ser maior ou menor após avaliação presencial (10-15 min).
                     </p>
                   </>
                 ) : (
