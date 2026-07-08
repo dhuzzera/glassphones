@@ -20,8 +20,8 @@ export const assets = {
   hero1: "/hero1.jpg",
   hero2: "/hero2.jpg",
   hero3: "/hero3.jpg",
-  logoDark: "/glassphone-logo-dark.png",
-  logoFlat: "/glassphone-logo.png",
+  logoDark: "/glassphone-logo-cliente.png",
+  logoFlat: "/glassphone-logo-cliente.png",
 };
 
 export function WhatsAppIcon({ className }: { className?: string }) {
