@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { X, Plus, Check, Minus, ExternalLink, Loader2, Smartphone } from "lucide-react";
+import {
+  X, Plus, Check, ExternalLink, Loader2, Smartphone,
+  BatteryFull, Monitor, Cpu, Camera, Weight, ChevronDown, ChevronUp,
+} from "lucide-react";
 import { SiteShell } from "@/components/site-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/marketplace";
 import type { Product } from "@/lib/marketplace-types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SITE_URL } from "@/lib/site";
@@ -22,9 +24,7 @@ export const Route = createFileRoute("/comparar")({
   head: () => ({
     meta: [
       { title: "Comparar celulares — Glass Phone SBS" },
-      { name: "description", content: "Compare até 3 celulares lado a lado: tela, câmera, bateria, processador e preço. Escolha o modelo ideal na Glass Phone SBS." },
-      { property: "og:title", content: "Comparador de celulares" },
-      { property: "og:description", content: "Compare modelos lado a lado antes de comprar." },
+      { name: "description", content: "Compare até 3 celulares lado a lado: tela, câmera, bateria, processador e preço." },
       { property: "og:url", content: `${SITE_URL}/comparar` },
       { property: "og:type", content: "website" },
     ],
@@ -33,7 +33,8 @@ export const Route = createFileRoute("/comparar")({
   component: CompararPage,
 });
 
-// ─── MobileAPI types ────────────────────────────────────────────────────────
+// ─── MobileAPI ─────────────────────────────────────────────────────────────
+
 interface MobileSpecs {
   name?: string;
   brand_name?: string;
@@ -44,11 +45,9 @@ interface MobileSpecs {
   weight?: string;
   release_date?: string;
   storage?: string;
-  colors?: string;
   os?: string;
   nfc?: string;
   "5g"?: string;
-  connectivity?: string;
   [key: string]: string | undefined;
 }
 
@@ -66,29 +65,95 @@ async function fetchPhoneSpecs(productName: string): Promise<MobileSpecs | null>
   }
 }
 
-// ─── Spec rows definition ────────────────────────────────────────────────────
-const SPEC_ROWS: { label: string; key: keyof MobileSpecs }[] = [
+// ─── Spec rows config ───────────────────────────────────────────────────────
+
+const API_SPEC_ROWS: { label: string; key: keyof MobileSpecs }[] = [
   { label: "Tela", key: "screen_resolution" },
   { label: "Processador / RAM", key: "hardware" },
   { label: "Armazenamento", key: "storage" },
   { label: "Câmera traseira", key: "camera" },
-  { label: "Bateria", key: "battery_capacity" },
+  { label: "Bateria (capacidade)", key: "battery_capacity" },
   { label: "Sistema", key: "os" },
   { label: "5G", key: "5g" },
   { label: "NFC", key: "nfc" },
   { label: "Peso", key: "weight" },
-  { label: "Cores", key: "colors" },
   { label: "Lançamento", key: "release_date" },
 ];
 
-// ─── Page component ──────────────────────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+/** Extrai número de uma string como "4500 mAh" → 4500 */
+function extractNumber(val?: string): number | null {
+  if (!val) return null;
+  const m = val.match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : null;
+}
+
+type WinnerFn = (values: (string | null | undefined)[]) => number | null;
+
+/** Retorna o índice do "vencedor" para uma linha de spec */
+const winnerByHighestNumber: WinnerFn = (values) => {
+  const nums = values.map(extractNumber);
+  const max = Math.max(...nums.filter((n): n is number => n !== null));
+  if (!isFinite(max)) return null;
+  const idx = nums.indexOf(max);
+  return idx >= 0 ? idx : null;
+};
+
+const winnerByLowestNumber: WinnerFn = (values) => {
+  const nums = values.map(extractNumber);
+  const min = Math.min(...nums.filter((n): n is number => n !== null));
+  if (!isFinite(min)) return null;
+  const idx = nums.indexOf(min);
+  return idx >= 0 ? idx : null;
+};
+
+// chave → qual direção é melhor
+const WIN_RULES: Partial<Record<keyof MobileSpecs | "price" | "battery_health", WinnerFn>> = {
+  battery_capacity: winnerByHighestNumber,
+  weight: winnerByLowestNumber,
+  price: winnerByLowestNumber,
+  battery_health: winnerByHighestNumber,
+};
+
+// ─── Componentes ─────────────────────────────────────────────────────────────
+
+function ConditionBadge({ condition }: { condition: Product["condition"] }) {
+  if (!condition) return <span className="text-muted-foreground">—</span>;
+  const colors: Record<string, string> = {
+    novo: "bg-emerald-500/10 text-emerald-700 border-emerald-200",
+    "semi-novo": "bg-blue-500/10 text-blue-700 border-blue-200",
+    usado: "bg-orange-500/10 text-orange-700 border-orange-200",
+  };
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium capitalize ${colors[condition] ?? ""}`}>
+      {condition}
+    </span>
+  );
+}
+
+function BatteryBar({ value }: { value: number | null }) {
+  if (value === null) return <span className="text-muted-foreground text-xs">—</span>;
+  const color = value >= 85 ? "bg-emerald-500" : value >= 70 ? "bg-yellow-500" : "bg-red-500";
+  return (
+    <div className="flex items-center gap-2 min-w-0">
+      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden min-w-[40px]">
+        <div className={`h-full ${color} transition-all`} style={{ width: `${value}%` }} />
+      </div>
+      <span className="text-xs font-semibold shrink-0">{value}%</span>
+    </div>
+  );
+}
+
+// ─── Página principal ────────────────────────────────────────────────────────
+
 function CompararPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
   const initialIds = search.ids ? search.ids.split(",").filter(Boolean).slice(0, MAX) : [];
   const [selected, setSelected] = useState<string[]>(initialIds);
-  const [picking, setPicking] = useState(initialIds.length === 0);
+  const [selectorOpen, setSelectorOpen] = useState(initialIds.length < 2);
   const [specs, setSpecs] = useState<Record<string, MobileSpecs | null>>({});
   const [loadingSpecs, setLoadingSpecs] = useState<Record<string, boolean>>({});
 
@@ -106,12 +171,11 @@ function CompararPage() {
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const chosen = selected.map((id) => byId.get(id)).filter(Boolean) as Product[];
 
-  const updateUrl = (ids: string[]) => {
+  const updateUrl = (ids: string[]) =>
     navigate({ search: { ids: ids.join(",") }, replace: true });
-  };
 
   const loadSpecs = async (product: Product) => {
-    if (specs[product.id] !== undefined) return; // already loaded
+    if (specs[product.id] !== undefined) return;
     setLoadingSpecs((s) => ({ ...s, [product.id]: true }));
     const result = await fetchPhoneSpecs(product.name);
     setSpecs((s) => ({ ...s, [product.id]: result }));
@@ -120,15 +184,16 @@ function CompararPage() {
 
   const toggle = (id: string) => {
     setSelected((prev) => {
-      const next = prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : prev.length >= MAX ? prev : [...prev, id];
-      updateUrl(next);
-      // load specs for newly added
-      if (!prev.includes(id) && prev.length < MAX) {
-        const p = byId.get(id);
-        if (p) loadSpecs(p);
+      if (prev.includes(id)) {
+        const next = prev.filter((x) => x !== id);
+        updateUrl(next);
+        return next;
       }
+      if (prev.length >= MAX) return prev;
+      const next = [...prev, id];
+      updateUrl(next);
+      const p = byId.get(id);
+      if (p) loadSpecs(p);
       return next;
     });
   };
@@ -137,264 +202,364 @@ function CompararPage() {
     const next = selected.filter((x) => x !== id);
     setSelected(next);
     updateUrl(next);
-    if (next.length === 0) setPicking(true);
   };
 
-  // Build Versus URL
-  const versusUrl = chosen.length >= 2
-    ? `https://versus.com/br/phone/${chosen.map(p => encodeURIComponent(p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""))).join("/vs/")}`
-    : null;
+  const versusUrl =
+    chosen.length >= 2
+      ? `https://versus.com/br/phone/${chosen
+          .map((p) =>
+            encodeURIComponent(
+              p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+            )
+          )
+          .join("/vs/")}`
+      : null;
+
+  // Verifica se todos estão carregando ou nenhum tem specs da API
+  const allSpecsLoaded = chosen.every((p) => !loadingSpecs[p.id]);
+  const anyApiSpecs = chosen.some((p) => specs[p.id] !== null && specs[p.id] !== undefined);
 
   return (
     <SiteShell>
-      <section className="container mx-auto px-4 py-10 md:py-14">
-        <header className="max-w-3xl mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-            Compare celulares lado a lado
-          </h1>
-          <p className="text-muted-foreground">
-            Selecione até {MAX} modelos para comparar preço, tela, câmera, bateria e muito mais.
+      <section className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">Comparar celulares</h1>
+          <p className="text-muted-foreground text-sm">
+            Selecione até {MAX} modelos para comparar specs lado a lado.
           </p>
+        </div>
 
-          {/* Barra de progresso + link Versus */}
-          {chosen.length >= 1 && (
-            <div className="mt-4 p-3 rounded-xl border border-border bg-muted/30 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div className="flex-1 text-sm">
-                {chosen.length === 1
-                  ? <span className="text-muted-foreground">Selecione mais 1 modelo para comparar</span>
-                  : <span className="text-emerald-600 font-medium">✓ {chosen.length} modelos prontos</span>
-                }
-              </div>
-              {versusUrl && (
-                <a href={versusUrl} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="gap-2 shrink-0">
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    Ver specs técnicas no Versus.com
-                  </Button>
-                </a>
-              )}
-            </div>
-          )}
-        </header>
-
-        {/* Product picker */}
-        {(picking || chosen.length < MAX) && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold">
-                Selecione produtos ({selected.length}/{MAX})
-              </h2>
-              {chosen.length >= 2 && (
-                <Button variant="outline" size="sm" onClick={() => setPicking(false)}>
-                  Ver comparação
-                </Button>
-              )}
-            </div>
-
-            {isLoading ? (
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-48 rounded-lg" />)}
-              </div>
-            ) : products.length === 0 ? (
-              <p className="text-muted-foreground">Nenhum produto disponível.</p>
-            ) : (
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {products.map((p) => {
-                  const isSel = selected.includes(p.id);
-                  const disabled = !isSel && selected.length >= MAX;
+        {/* ── Seletor colapsável ── */}
+        <div className="mb-6 rounded-xl border border-border bg-card overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setSelectorOpen((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/40 transition"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold">Selecionar modelos</span>
+              <div className="flex gap-1.5">
+                {[...Array(MAX)].map((_, i) => {
+                  const p = chosen[i];
                   return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => toggle(p.id)}
-                      disabled={disabled}
-                      className={`text-left rounded-lg border p-3 transition ${
-                        isSel ? "border-primary bg-primary/5 ring-2 ring-primary/30"
-                               : "border-border hover:border-primary/50 hover:bg-muted/40"
-                      } ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                    <div
+                      key={i}
+                      className={`h-6 w-6 rounded-full border-2 text-[10px] font-bold grid place-items-center transition ${
+                        p
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-muted-foreground"
+                      }`}
                     >
-                      <div className="aspect-square rounded bg-muted overflow-hidden mb-2">
-                        {p.image_urls[0]
-                          ? <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover" />
-                          : <div className="w-full h-full grid place-items-center text-muted-foreground"><Smartphone className="w-8 h-8" /></div>
-                        }
-                      </div>
-                      <p className="text-sm font-medium line-clamp-2">{p.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{formatBRL(p.price_cents)}</p>
-                      {isSel && (
-                        <div className="mt-2 inline-flex items-center gap-1 text-xs text-primary font-semibold">
-                          <Check className="h-3 w-3" /> Selecionado
-                        </div>
-                      )}
-                    </button>
+                      {p ? <Check className="w-3 h-3" /> : i + 1}
+                    </div>
                   );
                 })}
               </div>
+              {chosen.length > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {chosen.length}/{MAX} selecionado{chosen.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+            {selectorOpen ? (
+              <ChevronUp className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
             )}
-          </div>
-        )}
+          </button>
 
-        {/* Comparison table */}
-        {chosen.length >= 2 && (
-          <ComparisonTable
-            products={chosen}
-            specs={specs}
-            loadingSpecs={loadingSpecs}
-            onRemove={remove}
-            onAdd={() => setPicking(true)}
-          />
+          {selectorOpen && (
+            <div className="border-t border-border p-4">
+              {isLoading ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {[...Array(8)].map((_, i) => (
+                    <Skeleton key={i} className="h-44 rounded-lg" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {products.map((p) => {
+                    const isSel = selected.includes(p.id);
+                    const disabled = !isSel && selected.length >= MAX;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => toggle(p.id)}
+                        disabled={disabled}
+                        className={`text-left rounded-xl border p-3 transition ${
+                          isSel
+                            ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                            : "border-border hover:border-primary/40 hover:bg-muted/30"
+                        } ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                      >
+                        <div className="aspect-square rounded-lg bg-muted overflow-hidden mb-2">
+                          {p.image_urls[0] ? (
+                            <img
+                              src={p.image_urls[0]}
+                              alt={p.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full grid place-items-center text-muted-foreground">
+                              <Smartphone className="w-8 h-8" />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs font-medium line-clamp-2 mb-1">{p.name}</p>
+                        <p className="text-xs text-primary font-bold">{formatBRL(p.price_cents)}</p>
+                        {isSel && (
+                          <div className="flex items-center gap-1 text-xs text-primary mt-1">
+                            <Check className="w-3 h-3" /> Selecionado
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {chosen.length >= 2 && (
+                <div className="mt-4 flex justify-end">
+                  <Button size="sm" onClick={() => setSelectorOpen(false)}>
+                    Ver comparação →
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── Tabela de comparação ── */}
+        {chosen.length >= 2 ? (
+          <div>
+            {/* Link Versus */}
+            {versusUrl && (
+              <div className="flex justify-end mb-4">
+                <a href={versusUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground text-xs">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Specs completas no Versus.com
+                  </Button>
+                </a>
+              </div>
+            )}
+
+            {/* Scroll horizontal no mobile */}
+            <div className="overflow-x-auto -mx-4 px-4">
+              <div style={{ minWidth: chosen.length === 3 ? "640px" : "440px" }}>
+                {/* Cabeçalho com fotos e preços */}
+                <div
+                  className={`grid gap-3 mb-1`}
+                  style={{ gridTemplateColumns: `180px repeat(${chosen.length}, 1fr)` }}
+                >
+                  {/* célula vazia */}
+                  <div />
+                  {chosen.map((p) => (
+                    <div key={p.id} className="rounded-xl border border-border bg-card p-3 flex flex-col items-center text-center gap-2">
+                      <div className="w-full aspect-square rounded-lg bg-muted overflow-hidden">
+                        {p.image_urls[0] ? (
+                          <img
+                            src={p.image_urls[0]}
+                            alt={p.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full grid place-items-center text-muted-foreground">
+                            <Smartphone className="w-10 h-10" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-start justify-between w-full gap-1">
+                        <p className="text-xs font-semibold leading-snug text-left line-clamp-3 flex-1">
+                          {p.name}
+                        </p>
+                        <button
+                          onClick={() => remove(p.id)}
+                          aria-label="Remover"
+                          className="text-muted-foreground hover:text-destructive shrink-0 mt-0.5"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <Link to="/loja/$slug" params={{ slug: p.slug }} className="w-full">
+                        <Button size="sm" className="w-full text-xs">Comprar</Button>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Linhas da tabela */}
+                <CompareTable chosen={chosen} specs={specs} loadingSpecs={loadingSpecs} anyApiSpecs={anyApiSpecs} allSpecsLoaded={allSpecsLoaded} />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border py-16 text-center text-muted-foreground">
+            <Smartphone className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="text-sm">Selecione pelo menos 2 modelos acima para comparar.</p>
+          </div>
         )}
       </section>
     </SiteShell>
   );
 }
 
-// ─── Comparison table ────────────────────────────────────────────────────────
-function ComparisonTable({
-  products, specs, loadingSpecs, onRemove, onAdd,
-}: {
-  products: Product[];
+// ─── Tabela de specs ─────────────────────────────────────────────────────────
+
+interface CompareTableProps {
+  chosen: Product[];
   specs: Record<string, MobileSpecs | null>;
   loadingSpecs: Record<string, boolean>;
-  onRemove: (id: string) => void;
-  onAdd: () => void;
-}) {
-  const slots = [...products, ...Array(Math.max(0, MAX - products.length)).fill(null)];
-  const hasSpecs = products.some((p) => specs[p.id] != null);
+  anyApiSpecs: boolean;
+  allSpecsLoaded: boolean;
+}
+
+function CompareTable({ chosen, specs, loadingSpecs, anyApiSpecs, allSpecsLoaded }: CompareTableProps) {
+  const cols = chosen.length;
+
+  const gridStyle = { gridTemplateColumns: `180px repeat(${cols}, 1fr)` };
+
+  const rowBase = "grid gap-3 border-t border-border items-center";
+  const labelClass = "py-3 pl-1 text-xs text-muted-foreground font-medium";
+  const cellClass = "py-3 px-2 text-xs text-center";
+
+  // Determina o índice vencedor para uma lista de valores
+  function getWinner(key: string, values: (string | null | undefined)[]): number | null {
+    const fn = WIN_RULES[key as keyof typeof WIN_RULES];
+    if (!fn) return null;
+    return fn(values);
+  }
+
+  function CellWrapper({
+    children,
+    isWinner,
+    loading,
+  }: {
+    children: React.ReactNode;
+    isWinner?: boolean;
+    loading?: boolean;
+  }) {
+    return (
+      <div
+        className={`${cellClass} rounded-lg transition ${
+          isWinner
+            ? "bg-emerald-500/10 text-emerald-700 font-semibold"
+            : ""
+        }`}
+      >
+        {loading ? (
+          <Skeleton className="h-4 w-16 mx-auto" />
+        ) : (
+          children
+        )}
+      </div>
+    );
+  }
+
+  // ── Linha: Preço ──
+  const priceValues = chosen.map((p) => String(p.price_cents));
+  const priceWinner = getWinner("price", priceValues);
+
+  // ── Linha: Saúde da bateria ──
+  const batteryValues = chosen.map((p) =>
+    p.battery_health !== null ? String(p.battery_health) : null
+  );
+  const batteryWinner = getWinner("battery_health", batteryValues);
 
   return (
-    <Card>
-      <CardContent className="p-0 overflow-x-auto">
-        <table className="w-full min-w-[600px]">
-          <thead>
-            <tr className="border-b bg-muted/30">
-              <th className="p-4 text-left text-xs uppercase tracking-wider text-muted-foreground w-36 sticky left-0 bg-muted/30">
-                Especificação
-              </th>
-              {slots.map((p, i) => (
-                <th key={i} className="p-4 text-left align-top border-l min-w-[180px]">
-                  {p ? (
-                    <div className="space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <Link to="/loja/$slug" params={{ slug: p.slug }}
-                          className="font-semibold text-sm hover:text-primary transition line-clamp-2">
-                          {p.name}
-                        </Link>
-                        <button onClick={() => onRemove(p.id)}
-                          className="text-muted-foreground hover:text-destructive transition shrink-0"
-                          aria-label={`Remover ${p.name}`}>
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                      <div className="aspect-square rounded bg-muted overflow-hidden max-w-[140px]">
-                        {p.image_urls[0] && (
-                          <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover" />
-                        )}
-                      </div>
-                      {loadingSpecs[p.id] && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <Loader2 className="w-3 h-3 animate-spin" /> Buscando specs...
-                        </div>
-                      )}
-                      {!loadingSpecs[p.id] && specs[p.id] === null && (
-                        <Badge variant="outline" className="text-xs">Specs não encontradas</Badge>
-                      )}
-                    </div>
-                  ) : (
-                    <button onClick={onAdd}
-                      className="w-full aspect-square max-w-[140px] rounded border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition flex flex-col items-center justify-center text-muted-foreground hover:text-primary">
-                      <Plus className="h-6 w-6 mb-1" />
-                      <span className="text-xs">Adicionar</span>
-                    </button>
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      {/* Preço */}
+      <div className={`${rowBase} first:border-t-0`} style={gridStyle}>
+        <div className={labelClass}>Preço</div>
+        {chosen.map((p, i) => (
+          <CellWrapper key={p.id} isWinner={priceWinner === i}>
+            <span className="text-primary font-bold text-sm">{formatBRL(p.price_cents)}</span>
+            <span className="block text-muted-foreground text-[10px] font-normal">
+              12× {formatBRL(Math.ceil(p.price_cents / 12))}
+            </span>
+          </CellWrapper>
+        ))}
+      </div>
+
+      {/* Condição */}
+      <div className={rowBase} style={gridStyle}>
+        <div className={labelClass}>Condição</div>
+        {chosen.map((p) => (
+          <CellWrapper key={p.id}>
+            <ConditionBadge condition={p.condition} />
+          </CellWrapper>
+        ))}
+      </div>
+
+      {/* Saúde da bateria */}
+      <div className={rowBase} style={gridStyle}>
+        <div className={`${labelClass} flex items-center gap-1`}>
+          <BatteryFull className="w-3.5 h-3.5" />
+          Saúde da bateria
+        </div>
+        {chosen.map((p, i) => (
+          <CellWrapper key={p.id} isWinner={batteryWinner === i}>
+            {p.battery_health !== null ? (
+              <div className="flex justify-center">
+                <div className="w-full max-w-[100px]">
+                  <BatteryBar value={p.battery_health} />
+                </div>
+              </div>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
+          </CellWrapper>
+        ))}
+      </div>
+
+      {/* Specs da API */}
+      {!allSpecsLoaded ? (
+        <div className={rowBase} style={gridStyle}>
+          <div className={labelClass}>Specs técnicas</div>
+          {chosen.map((p) => (
+            <CellWrapper key={p.id} loading={loadingSpecs[p.id]}>
+              {!loadingSpecs[p.id] && (
+                <span className="text-muted-foreground text-xs flex items-center justify-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" /> buscando…
+                </span>
+              )}
+            </CellWrapper>
+          ))}
+        </div>
+      ) : anyApiSpecs ? (
+        API_SPEC_ROWS.map((row) => {
+          const values = chosen.map((p) => specs[p.id]?.[row.key] ?? null);
+          const hasAny = values.some(Boolean);
+          if (!hasAny) return null;
+          const winner = getWinner(row.key as string, values);
+          return (
+            <div key={row.key} className={rowBase} style={gridStyle}>
+              <div className={labelClass}>{row.label}</div>
+              {chosen.map((p, i) => (
+                <CellWrapper key={p.id} isWinner={winner === i}>
+                  {specs[p.id]?.[row.key] ?? (
+                    <span className="text-muted-foreground">—</span>
                   )}
-                </th>
+                </CellWrapper>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {/* Preço — linha especial */}
-            <tr className="border-b bg-primary/5">
-              <td className="p-4 text-sm font-semibold sticky left-0 bg-primary/5">Preço na loja</td>
-              {slots.map((p, i) => (
-                <td key={i} className="p-4 border-l align-top">
-                  {p ? (
-                    <div className="space-y-2">
-                      <p className="text-xl font-bold text-primary">{formatBRL(p.price_cents)}</p>
-                      <p className="text-xs text-muted-foreground">ou 12× de {formatBRL(Math.ceil(p.price_cents / 12))}</p>
-                      <Link to="/loja/$slug" params={{ slug: p.slug }}>
-                        <Button size="sm" className="w-full mt-1">Comprar</Button>
-                      </Link>
-                    </div>
-                  ) : <span className="text-muted-foreground/40">—</span>}
-                </td>
-              ))}
-            </tr>
-
-            {/* Saúde da bateria do banco (sempre disponível) */}
-            <tr className="border-b">
-              <td className="p-4 text-sm text-muted-foreground sticky left-0 bg-card">Saúde da bateria</td>
-              {slots.map((p, i) => (
-                <td key={i} className="p-4 border-l align-middle">
-                  {p ? (
-                    p.battery_health != null ? (
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden max-w-[80px]">
-                          <div className="h-full bg-emerald-500" style={{ width: `${p.battery_health}%` }} />
-                        </div>
-                        <span className="text-sm font-medium">{p.battery_health}%</span>
-                      </div>
-                    ) : <span className="text-muted-foreground text-sm">—</span>
-                  ) : <span className="text-muted-foreground/40">—</span>}
-                </td>
-              ))}
-            </tr>
-
-            {/* Specs da API */}
-            {hasSpecs && SPEC_ROWS.map((row) => (
-              <tr key={row.key} className="border-b">
-                <td className="p-4 text-sm text-muted-foreground sticky left-0 bg-card">{row.label}</td>
-                {slots.map((p, i) => (
-                  <td key={i} className="p-4 border-l align-top text-sm">
-                    {p ? (
-                      loadingSpecs[p.id]
-                        ? <Skeleton className="h-4 w-24" />
-                        : <span>{specs[p.id]?.[row.key] ?? "—"}</span>
-                    ) : <span className="text-muted-foreground/40">—</span>}
-                  </td>
-                ))}
-              </tr>
-            ))}
-
-            {/* Condição */}
-            <tr className="border-b">
-              <td className="p-4 text-sm text-muted-foreground sticky left-0 bg-card">Condição</td>
-              {slots.map((p, i) => (
-                <td key={i} className="p-4 border-l">
-                  {p ? (
-                    p.condition
-                      ? <Badge variant="outline" className="capitalize">{p.condition}</Badge>
-                      : <span className="text-muted-foreground text-sm">—</span>
-                  ) : <span className="text-muted-foreground/40">—</span>}
-                </td>
-              ))}
-            </tr>
-
-            {/* Ver produto */}
-            <tr>
-              <td className="p-4 sticky left-0 bg-card"></td>
-              {slots.map((p, i) => (
-                <td key={i} className="p-4 border-l">
-                  {p && (
-                    <Link to="/loja/$slug" params={{ slug: p.slug }}>
-                      <Button size="sm" variant="outline" className="w-full">Ver produto</Button>
-                    </Link>
-                  )}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-      </CardContent>
-    </Card>
+            </div>
+          );
+        })
+      ) : (
+        <div className={rowBase} style={gridStyle}>
+          <div className={labelClass}>Specs técnicas</div>
+          {chosen.map((p) => (
+            <CellWrapper key={p.id}>
+              <span className="text-muted-foreground text-[10px]">
+                {MOBILEAPI_KEY ? "Não disponível" : "API não configurada"}
+              </span>
+            </CellWrapper>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
+
+

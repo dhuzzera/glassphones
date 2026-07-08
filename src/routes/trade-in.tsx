@@ -99,8 +99,8 @@ function estimar(marca: Marca, modelo: string, estado: Estado, bateria: number):
   const fe = FATOR_ESTADO[estado];
   const fb = Math.max(0.5, Math.min(1, bateria / 100));
   const central = Math.round(base * fm * fe * fb);
-  const min = Math.round(central * 0.85);
-  const max = Math.round(central * 1.15);
+  const min = Math.round(central * 0.85) + 50_000; // +R$500
+  const max = Math.round(central * 1.15) + 50_000; // +R$500
   return { min, max };
 }
 
