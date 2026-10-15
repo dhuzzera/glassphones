@@ -191,6 +191,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <footer className="border-t border-border px-4 py-3 text-center text-xs text-muted-foreground sm:text-right sm:px-6">
+        Desenvolvido por <a href="https://www.instagram.com/emf.digital/" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">@emf.digital</a>
+      </footer>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
